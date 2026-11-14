@@ -1,0 +1,1 @@
+Sistema de agendamento para um estúdio de pilates, de uso exclusivo da dona e instrutora. As turmas têm até 3 alunos por horário e cada sessão dura 1h. Ela controla a agenda, a presença, as reposições, a mensalidade e a ficha de saúde de cada aluno. Os alunos não acessam o sistema.

@@ -1,0 +1,64 @@
+{
+  "name": "Agendamento Pilates",
+  "repo": "agendamento-pilates",
+  "tagline": "A agenda do estúdio de pilates, feita para a instrutora.",
+  "urls": {
+    "demo": "https://agendamento-pilates.vercel.app"
+  },
+  "stack": [
+    {
+      "pkg": "next"
+    },
+    {
+      "pkg": "react"
+    },
+    {
+      "pkg": "typescript"
+    },
+    {
+      "pkg": "tailwindcss"
+    },
+    {
+      "pkg": "eslint"
+    },
+    {
+      "pkg": "vitest"
+    }
+  ],
+  "badges_extra": [
+    {
+      "alt": "Dados",
+      "label": "dados",
+      "message": "só no seu navegador",
+      "color": "9fe02e"
+    }
+  ],
+  "banner": {
+    "chips": 4
+  },
+  "demo": {
+    "note": "",
+    "layout": "stack",
+    "shots": []
+  },
+  "features": [
+    {
+      "title": "Agenda por horário",
+      "desc": "Turmas de até 3 alunos, sessões de 1h, com vagas livres à vista."
+    },
+    {
+      "title": "Ficha do aluno",
+      "desc": "Saúde, lesões, pontos de atenção e evolução em um só lugar."
+    },
+    {
+      "title": "Reposição",
+      "desc": "Cada desmarcação vira crédito, sem expiração."
+    },
+    {
+      "title": "Mensalidade",
+      "desc": "Indicador de pago ou pendente por mês."
+    }
+  ],
+  "credits": [],
+  "footer": "Feito com 💚 para quem cuida do movimento dos outros"
+}
