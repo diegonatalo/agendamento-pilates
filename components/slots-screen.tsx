@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
+import { BlockedPeriodsSection } from "@/components/blocked-periods-section";
 import { Field } from "@/components/field";
 import {
   BUTTON_DANGER,
@@ -152,6 +153,7 @@ export const SlotsScreen = () => {
           })}
         </div>
       )}
+      <BlockedPeriodsSection />
     </main>
   );
 };

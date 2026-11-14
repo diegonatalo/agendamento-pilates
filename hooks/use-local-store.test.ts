@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { createLocalStore } from "@/hooks/local-store";
+import { createLocalStore } from "@/hooks/use-local-store";
 
 const KEY = "app:test:v1";
 

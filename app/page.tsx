@@ -1,5 +1,5 @@
-import { HomeScreen } from "@/components/home-screen";
+import { AgendaScreen } from "@/components/agenda-screen";
 
 export default function Page() {
-  return <HomeScreen />;
+  return <AgendaScreen />;
 }

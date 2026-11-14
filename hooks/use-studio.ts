@@ -1,20 +1,41 @@
-import { createLocalStore } from "@/hooks/local-store";
-import { useLocalStore } from "@/hooks/use-local-store";
+import { createLocalStore, useLocalStore } from "@/hooks/use-local-store";
 import { newId } from "@/lib/ids";
+import {
+  removeBookingsOfSlot,
+  removeBookingsOfStudent,
+  setAttendance,
+  sortBlockedPeriods,
+  validateBlockedPeriod,
+} from "@/lib/schedule";
 import { sortSlots, validateNewSlot } from "@/lib/slots";
 import { STORAGE_KEYS } from "@/lib/storage-keys";
 import { removeSlotFromStudents, sortStudents } from "@/lib/students";
-import type { ClassSlot, Student } from "@/types/pilates";
+import type {
+  BlockedPeriod,
+  Booking,
+  BookingStatus,
+  ClassSlot,
+  DateKey,
+  Student,
+} from "@/types/pilates";
 
 const slotsStore = createLocalStore<ClassSlot[]>(STORAGE_KEYS.slots, []);
 const studentsStore = createLocalStore<Student[]>(STORAGE_KEYS.students, []);
+const bookingsStore = createLocalStore<Booking[]>(STORAGE_KEYS.bookings, []);
+const blockedStore = createLocalStore<BlockedPeriod[]>(
+  STORAGE_KEYS.blockedPeriods,
+  [],
+);
 
-/** Horários, alunos e as operações que mantêm os dois coerentes. */
+/** Dados do estúdio e as operações que mantêm tudo coerente. */
 export const useStudio = () => {
   const slotsState = useLocalStore(slotsStore);
   const studentsState = useLocalStore(studentsStore);
+  const bookingsState = useLocalStore(bookingsStore);
+  const blockedState = useLocalStore(blockedStore);
   const slots = sortSlots(slotsState.data);
   const students = sortStudents(studentsState.data);
+  const blockedPeriods = sortBlockedPeriods(blockedState.data);
 
   /** Devolve a mensagem de erro, ou `null` quando adicionou. */
   const addSlot = (candidate: Pick<ClassSlot, "weekday" | "startTime">) => {
@@ -27,6 +48,7 @@ export const useStudio = () => {
   const removeSlot = (slotId: string) => {
     slotsStore.set(slotsState.data.filter((slot) => slot.id !== slotId));
     studentsStore.set(removeSlotFromStudents(studentsState.data, slotId));
+    bookingsStore.set(removeBookingsOfSlot(bookingsState.data, slotId));
   };
 
   const saveStudent = (student: Student) => {
@@ -38,16 +60,58 @@ export const useStudio = () => {
     );
   };
 
-  const removeStudent = (studentId: string) =>
+  const removeStudent = (studentId: string) => {
     studentsStore.set(studentsState.data.filter((s) => s.id !== studentId));
+    bookingsStore.set(removeBookingsOfStudent(bookingsState.data, studentId));
+  };
+
+  const markAttendance = (
+    target: { slotId: string; date: DateKey; studentId: string },
+    status: BookingStatus,
+  ) =>
+    bookingsStore.set(
+      setAttendance(bookingsState.data, target, status, newId()),
+    );
+
+  /** Devolve a mensagem de erro, ou `null` quando bloqueou. */
+  const addBlockedPeriod = (
+    startDate: DateKey,
+    endDate: DateKey,
+    reason: string,
+  ) => {
+    const error = validateBlockedPeriod(startDate, endDate);
+    if (error) return error;
+    blockedStore.set([
+      ...blockedState.data,
+      {
+        id: newId(),
+        startDate,
+        endDate,
+        reason: reason.trim() || "Sem aula",
+      },
+    ]);
+    return null;
+  };
+
+  const removeBlockedPeriod = (periodId: string) =>
+    blockedStore.set(blockedState.data.filter((p) => p.id !== periodId));
 
   return {
-    ready: slotsState.ready && studentsState.ready,
+    ready:
+      slotsState.ready &&
+      studentsState.ready &&
+      bookingsState.ready &&
+      blockedState.ready,
     slots,
     students,
+    bookings: bookingsState.data,
+    blockedPeriods,
     addSlot,
     removeSlot,
     saveStudent,
     removeStudent,
+    markAttendance,
+    addBlockedPeriod,
+    removeBlockedPeriod,
   };
 };

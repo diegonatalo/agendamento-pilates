@@ -145,7 +145,7 @@ Ainda não publicado. Os dados ficam no `localStorage` do navegador da instrutor
 
 - [x] Setup do projeto e testes
 - [x] Alunos e grade de horários
-- [ ] Agenda, presença e bloqueio de datas
+- [x] Agenda, presença e bloqueio de datas
 - [ ] Desmarcar, reposição e aula experimental
 - [ ] Mensalidade
 - [ ] Backup, acessibilidade e deploy
