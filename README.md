@@ -113,6 +113,7 @@ Para reexecutar ao salvar: `pnpm test:watch`.
 app/              Apenas arquivos de rota
 components/       Telas e componentes de interface
 docs/             Fontes do README
+hooks/            Estado e persistência no localStorage
 lib/              Lógica pura, sem React
 public/           Arquivos estáticos
 types/            Tipos compartilhados do domínio
@@ -143,7 +144,7 @@ Ainda não publicado. Os dados ficam no `localStorage` do navegador da instrutor
 ### 🧭 Próximos passos
 
 - [x] Setup do projeto e testes
-- [ ] Alunos e grade de horários
+- [x] Alunos e grade de horários
 - [ ] Agenda, presença e bloqueio de datas
 - [ ] Desmarcar, reposição e aula experimental
 - [ ] Mensalidade

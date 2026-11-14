@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 export const NotFoundScreen = () => (
-  <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col items-start justify-center gap-4 px-4 py-12">
+  <main className="flex flex-col items-start justify-center gap-4">
     <h1 className="text-3xl font-semibold tracking-tight">
       Página não encontrada
     </h1>
