@@ -8,6 +8,7 @@ const ITEMS = [
   { href: "/", label: "Agenda", icon: "M8 2v3M16 2v3M3 9h18M5 4h14a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Z" },
   { href: "/alunos", label: "Alunos", icon: "M16 20v-1a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v1M10 11a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7ZM20 20v-1a4 4 0 0 0-3-3.9M15 4.2a3.5 3.5 0 0 1 0 6.6" },
   { href: "/horarios", label: "Horários", icon: "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18ZM12 7v5l3 2" },
+  { href: "/backup", label: "Backup", icon: "M12 3v12M7 10l5 5 5-5M5 21h14" },
 ] as const;
 
 /** Bottom Tab Bar no celular; barra no topo a partir de `md`. */

@@ -4,4 +4,5 @@ export const STORAGE_KEYS = {
   bookings: "app:pilates:bookings:v1",
   blockedPeriods: "app:pilates:blocked-periods:v1",
   payments: "app:pilates:payments:v1",
+  lastBackup: "app:pilates:last-backup:v1",
 } as const;

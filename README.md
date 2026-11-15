@@ -44,6 +44,8 @@ Sistema de agendamento para um estúdio de pilates, de uso exclusivo da dona e i
 <br />
 <img src="docs/assets/f-03.svg" alt="Reposição: Cada desmarcação vira crédito, sem expiração." width="49%" />
 <img src="docs/assets/f-04.svg" alt="Mensalidade: Indicador de pago ou pendente por mês." width="49%" />
+<br />
+<img src="docs/assets/f-05.svg" alt="Backup: Exporta e restaura todos os dados em um arquivo JSON." width="49%" />
 
 </div>
 
@@ -140,7 +142,17 @@ types/            Tipos compartilhados do domínio
 
 ### 🌐 Deploy
 
-Ainda não publicado. Os dados ficam no `localStorage` do navegador da instrutora; o backup é exportado em JSON.
+O app é estático e não tem servidor próprio nem banco: os dados ficam no `localStorage` do navegador de quem usa. Qualquer hospedagem de Next.js serve (por exemplo a Vercel: importe o repositório e publique, sem configurar nada).
+
+- `NEXT_PUBLIC_SITE_URL` é opcional e define o endereço usado em metadados e no sitemap; sem ela vale `http://localhost:3000`.
+- O site pede `noindex`, porque é de uso pessoal da instrutora.
+- Como os dados não saem do navegador, **trocar de aparelho ou limpar os dados do navegador apaga tudo**: use a aba Backup para exportar e restaurar o JSON.
+
+### 💾 Backup
+
+A aba **Backup** baixa um arquivo `agenda-pilates-AAAA-MM-DD.json` com horários, alunos, presenças, datas bloqueadas e pagamentos, e restaura a partir dele (substituindo os dados atuais, depois de confirmar). Arquivos de outro app, de outra versão ou incompletos são recusados sem alterar nada.
+
+O arquivo tem dados de saúde e contato dos alunos, **sem criptografia**: guarde em local seguro.
 
 ### 🧭 Próximos passos
 
@@ -149,7 +161,9 @@ Ainda não publicado. Os dados ficam no `localStorage` do navegador da instrutor
 - [x] Agenda, presença e bloqueio de datas
 - [x] Desmarcar, reposição e aula experimental
 - [x] Mensalidade
-- [ ] Backup, acessibilidade e deploy
+- [x] Backup e acessibilidade
+- [ ] Publicar e definir o endereço final
+- [ ] Guardar o valor da mensalidade de cada mês
 
 <br />
 

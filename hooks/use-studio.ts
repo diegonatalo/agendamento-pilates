@@ -1,5 +1,6 @@
 import { createLocalStore, useLocalStore } from "@/hooks/use-local-store";
 import { newId } from "@/lib/ids";
+import type { StudioData } from "@/lib/backup";
 import { removePaymentsOfStudent, setPayment } from "@/lib/payments";
 import {
   addMakeup,
@@ -29,6 +30,10 @@ import type {
 const slotsStore = createLocalStore<ClassSlot[]>(STORAGE_KEYS.slots, []);
 const studentsStore = createLocalStore<Student[]>(STORAGE_KEYS.students, []);
 const bookingsStore = createLocalStore<Booking[]>(STORAGE_KEYS.bookings, []);
+const lastBackupStore = createLocalStore<DateKey | null>(
+  STORAGE_KEYS.lastBackup,
+  null,
+);
 const paymentsStore = createLocalStore<MonthlyPayment[]>(
   STORAGE_KEYS.payments,
   [],
@@ -45,6 +50,7 @@ export const useStudio = () => {
   const bookingsState = useLocalStore(bookingsStore);
   const blockedState = useLocalStore(blockedStore);
   const paymentsState = useLocalStore(paymentsStore);
+  const lastBackupState = useLocalStore(lastBackupStore);
   const slots = sortSlots(slotsState.data);
   const students = sortStudents(studentsState.data);
   const blockedPeriods = sortBlockedPeriods(blockedState.data);
@@ -77,6 +83,17 @@ export const useStudio = () => {
     bookingsStore.set(removeBookingsOfStudent(bookingsState.data, studentId));
     paymentsStore.set(removePaymentsOfStudent(paymentsState.data, studentId));
   };
+
+  /** Substitui todos os dados pelos do backup. */
+  const restoreData = (data: StudioData) => {
+    slotsStore.set(data.slots);
+    studentsStore.set(data.students);
+    bookingsStore.set(data.bookings);
+    blockedStore.set(data.blockedPeriods);
+    paymentsStore.set(data.payments);
+  };
+
+  const recordBackup = (date: DateKey) => lastBackupStore.set(date);
 
   const markPayment = (
     studentId: string,
@@ -147,7 +164,10 @@ export const useStudio = () => {
     slots,
     students,
     payments: paymentsState.data,
+    lastBackup: lastBackupState.data,
     markPayment,
+    restoreData,
+    recordBackup,
     bookings: bookingsState.data,
     blockedPeriods,
     addSlot,

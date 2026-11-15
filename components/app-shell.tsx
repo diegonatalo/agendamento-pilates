@@ -15,7 +15,7 @@ export const AppShell = ({ children }: Props) => (
     <div
       id="conteudo"
       tabIndex={-1}
-      className="mx-auto w-full max-w-3xl flex-1 px-4 pb-24 pt-6 md:pb-8"
+      className="focus:outline-none mx-auto w-full max-w-3xl flex-1 px-4 pb-24 pt-6 md:pb-8"
     >
       {children}
     </div>

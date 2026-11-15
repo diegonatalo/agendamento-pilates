@@ -57,6 +57,10 @@
     {
       "title": "Mensalidade",
       "desc": "Indicador de pago ou pendente por mês."
+    },
+    {
+      "title": "Backup",
+      "desc": "Exporta e restaura todos os dados em um arquivo JSON."
     }
   ],
   "credits": [],
