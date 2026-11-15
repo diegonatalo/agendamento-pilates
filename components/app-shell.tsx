@@ -13,7 +13,7 @@ export const AppShell = ({ children }: Props) => (
     >
       Pular para o conteúdo
     </a>
-    <header className="sticky top-0 z-20 border-b border-line bg-bg/80 backdrop-blur-md">
+    <header className="sticky top-0 z-20 border-b border-line bg-bg">
       <div className="mx-auto flex w-full max-w-4xl items-center justify-between gap-4 px-4 py-3">
         <Logo />
         <MainNav />
