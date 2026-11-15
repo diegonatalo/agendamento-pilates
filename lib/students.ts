@@ -1,4 +1,4 @@
-import { CLASS_CAPACITY } from "@/lib/constants";
+import { DEFAULT_SETTINGS } from "@/lib/constants";
 import { findPlan } from "@/lib/plans";
 import type { DateKey, Plan, Student } from "@/types/pilates";
 
@@ -52,8 +52,11 @@ export const studentsInSlot = (
   students: Student[],
 ): Student[] => students.filter((s) => s.active && s.slotIds.includes(slotId));
 
-export const slotHasVacancy = (slotId: string, students: Student[]): boolean =>
-  studentsInSlot(slotId, students).length < CLASS_CAPACITY;
+export const slotHasVacancy = (
+  slotId: string,
+  students: Student[],
+  capacity: number = DEFAULT_SETTINGS.capacity,
+): boolean => studentsInSlot(slotId, students).length < capacity;
 
 /** Iniciais para o avatar: primeira e última palavra do nome. */
 export const initialsOf = (name: string): string => {

@@ -8,13 +8,13 @@ import {
   LINK_BUTTON,
 } from "@/components/form-styles";
 import { cn } from "@/lib/cn";
-import { CLASS_CAPACITY } from "@/lib/constants";
 import type { Attendee, Session } from "@/lib/schedule";
 import { endTime } from "@/lib/slots";
 import type { Booking, BookingStatus, Student } from "@/types/pilates";
 
 type Props = {
   session: Session;
+  sessionMinutes: number;
   students: Student[];
   bookings: Booking[];
   onSetStatus: (attendee: Attendee, status: BookingStatus) => void;
@@ -44,9 +44,9 @@ const actionsFor = (attendee: Attendee): Action[] =>
     : ["present", "absent"];
 
 /** Uma bolinha por vaga: cheia se ocupada. Decorativo; o texto diz o mesmo. */
-const Pips = ({ occupied }: { occupied: number }) => (
+const Pips = ({ occupied, capacity }: { occupied: number; capacity: number }) => (
   <span aria-hidden="true" className="flex gap-1">
-    {Array.from({ length: CLASS_CAPACITY }, (_, i) => (
+    {Array.from({ length: capacity }, (_, i) => (
       <span
         key={i}
         className={cn(
@@ -60,6 +60,7 @@ const Pips = ({ occupied }: { occupied: number }) => (
 
 export const SessionCard = ({
   session,
+  sessionMinutes,
   students,
   bookings,
   onSetStatus,
@@ -67,7 +68,7 @@ export const SessionCard = ({
   onBookMakeup,
   onBookTrial,
 }: Props) => {
-  const { slot, blockedBy, attendees, occupied, vacancies } = session;
+  const { slot, blockedBy, attendees, occupied, capacity, vacancies } = session;
   const titleId = `session-${slot.id}`;
 
   return (
@@ -77,13 +78,13 @@ export const SessionCard = ({
     >
       <header className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1">
         <h3 id={titleId} className="font-display text-lg font-semibold">
-          {slot.startTime} às {endTime(slot.startTime)}
+          {slot.startTime} às {endTime(slot.startTime, sessionMinutes)}
         </h3>
         {blockedBy ? null : (
           <div className="flex items-center gap-2">
-            <Pips occupied={occupied} />
+            <Pips occupied={occupied} capacity={capacity} />
             <p className="text-sm text-muted">
-              {occupied}/{CLASS_CAPACITY} ocupadas ·{" "}
+              {occupied}/{capacity} ocupadas ·{" "}
               {vacancies === 0
                 ? "lotada"
                 : `${vacancies} ${vacancies === 1 ? "vaga livre" : "vagas livres"}`}

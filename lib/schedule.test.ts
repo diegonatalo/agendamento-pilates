@@ -151,6 +151,13 @@ describe("buildSession", () => {
   });
 });
 
+describe("capacidade configurável", () => {
+  it("calcula as vagas com a capacidade informada", () => {
+    const session = buildSession(slot, MONDAY, [student("a")], [], [], 5);
+    expect(session).toMatchObject({ occupied: 1, capacity: 5, vacancies: 4 });
+  });
+});
+
 describe("sessionsForDate", () => {
   const slots: ClassSlot[] = [
     { id: "late", weekday: 1, startTime: "18:00" },

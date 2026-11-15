@@ -1,5 +1,13 @@
-import { SESSION_DURATION_MINUTES } from "@/lib/constants";
-import type { ClassSlot, TimeOfDay, Weekday } from "@/types/pilates";
+import { DEFAULT_SETTINGS } from "@/lib/constants";
+import type {
+  ClassSlot,
+  StudioSettings,
+  TimeOfDay,
+  Weekday,
+} from "@/types/pilates";
+
+/** O que define o tamanho de um horário na grade. */
+export type SlotTiming = Pick<StudioSettings, "sessionMinutes" | "breakMinutes">;
 
 export const WEEKDAY_LABELS: Record<Weekday, string> = {
   0: "Domingo",
@@ -24,23 +32,29 @@ export const timeToMinutes = (time: TimeOfDay): number => {
   return hours * 60 + minutes;
 };
 
-const minutesToTime = (total: number): TimeOfDay => {
+export const minutesToTime = (total: number): TimeOfDay => {
   const hours = Math.floor(total / 60) % 24;
   const minutes = total % 60;
   return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`;
 };
 
-export const endTime = (start: TimeOfDay): TimeOfDay =>
-  minutesToTime(timeToMinutes(start) + SESSION_DURATION_MINUTES);
+export const endTime = (
+  start: TimeOfDay,
+  sessionMinutes: number = DEFAULT_SETTINGS.sessionMinutes,
+): TimeOfDay => minutesToTime(timeToMinutes(start) + sessionMinutes);
 
-/** Duas sessões se sobrepõem se começam com menos de 1h de diferença no mesmo dia. */
+/**
+ * Duas sessões do mesmo dia conflitam se a segunda começa antes de a primeira
+ * terminar somada ao intervalo entre sessões.
+ */
 export const slotsOverlap = (
   a: Pick<ClassSlot, "weekday" | "startTime">,
   b: Pick<ClassSlot, "weekday" | "startTime">,
+  timing: SlotTiming = DEFAULT_SETTINGS,
 ): boolean =>
   a.weekday === b.weekday &&
   Math.abs(timeToMinutes(a.startTime) - timeToMinutes(b.startTime)) <
-    SESSION_DURATION_MINUTES;
+    timing.sessionMinutes + timing.breakMinutes;
 
 export const sortSlots = (slots: ClassSlot[]): ClassSlot[] =>
   [...slots].sort(
@@ -49,20 +63,27 @@ export const sortSlots = (slots: ClassSlot[]): ClassSlot[] =>
       timeToMinutes(a.startTime) - timeToMinutes(b.startTime),
   );
 
-export const formatSlot = (slot: ClassSlot): string =>
-  `${WEEKDAY_LABELS[slot.weekday]}, ${slot.startTime} às ${endTime(slot.startTime)}`;
+export const formatSlot = (
+  slot: Pick<ClassSlot, "weekday" | "startTime">,
+  sessionMinutes: number = DEFAULT_SETTINGS.sessionMinutes,
+): string =>
+  `${WEEKDAY_LABELS[slot.weekday]}, ${slot.startTime} às ${endTime(slot.startTime, sessionMinutes)}`;
 
 /** Forma curta para listas, por exemplo `Seg 08:00`. */
-export const formatSlotShort = (slot: ClassSlot): string =>
+export const formatSlotShort = (
+  slot: Pick<ClassSlot, "weekday" | "startTime">,
+): string =>
   `${WEEKDAY_LABELS[slot.weekday].slice(0, 3)} ${slot.startTime}`;
 
 /** Devolve a mensagem de erro, ou `null` se o horário pode ser adicionado. */
 export const validateNewSlot = (
   candidate: Pick<ClassSlot, "weekday" | "startTime">,
   existing: ClassSlot[],
+  timing: SlotTiming = DEFAULT_SETTINGS,
 ): string | null => {
   if (!isValidTime(candidate.startTime)) return "Informe um horário válido.";
-  const clash = existing.find((slot) => slotsOverlap(slot, candidate));
-  if (clash) return `Conflita com o horário de ${formatSlot(clash)}.`;
+  const clash = existing.find((slot) => slotsOverlap(slot, candidate, timing));
+  if (clash)
+    return `Conflita com o horário de ${formatSlot(clash, timing.sessionMinutes)}.`;
   return null;
 };

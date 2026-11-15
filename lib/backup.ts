@@ -6,12 +6,14 @@ import type {
   MonthlyPayment,
   Plan,
   Student,
+  StudioSettings,
 } from "@/types/pilates";
 
 export const BACKUP_APP = "agenda-pilates";
-export const BACKUP_VERSION = 2;
+export const BACKUP_VERSION = 3;
 
 export type StudioData = {
+  settings: StudioSettings;
   plans: Plan[];
   slots: ClassSlot[];
   students: Student[];
@@ -52,6 +54,12 @@ const isStrArray = (value: unknown): boolean =>
   Array.isArray(value) && value.every(isStr);
 const isOneOf = (value: unknown, options: readonly string[]): boolean =>
   isStr(value) && options.includes(value);
+
+const isSettings = (v: unknown): boolean =>
+  isRec(v) &&
+  Number.isInteger(v.sessionMinutes) &&
+  Number.isInteger(v.breakMinutes) &&
+  Number.isInteger(v.capacity);
 
 const isPlan = (v: unknown): boolean =>
   isRec(v) &&
@@ -128,7 +136,7 @@ const isPayment = (v: unknown): boolean =>
   typeof v.amount === "number";
 
 const SECTIONS: {
-  key: keyof StudioData;
+  key: Exclude<keyof StudioData, "settings">;
   label: string;
   guard: (value: unknown) => boolean;
 }[] = [
@@ -159,6 +167,11 @@ export const parseBackup = (text: string): ParseResult => {
     return { ok: false, error: "O backup está incompleto ou corrompido." };
 
   const source = raw.data;
+  if (!isSettings(source.settings))
+    return {
+      ok: false,
+      error: "O backup está incompleto ou corrompido (seção de configurações).",
+    };
   for (const { key, label, guard } of SECTIONS) {
     const list = source[key];
     if (!Array.isArray(list) || !list.every(guard))

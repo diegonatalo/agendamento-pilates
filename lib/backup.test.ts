@@ -10,6 +10,7 @@ import {
 import { createEmptyStudent } from "@/lib/students";
 
 const data: StudioData = {
+  settings: { sessionMinutes: 50, breakMinutes: 10, capacity: 4 },
   plans: [{ id: "p1", name: "1x por semana", weeklyClasses: 1, amount: 200 }],
   slots: [{ id: "s1", weekday: 1, startTime: "08:00" }],
   students: [
@@ -64,6 +65,7 @@ describe("parseBackup", () => {
 
   it("aceita um backup com listas vazias", () => {
     const empty: StudioData = {
+      settings: { sessionMinutes: 60, breakMinutes: 0, capacity: 3 },
       plans: [],
       slots: [],
       students: [],
@@ -113,6 +115,8 @@ describe("parseBackup", () => {
       ["horários", (b) => (b.data.slots[0].weekday = 9)],
       ["alunos", (b) => (b.data.students[0].name = 42)],
       ["alunos", (b) => delete b.data.students[0].health],
+      ["configurações", (b) => (b.data.settings.capacity = "3")],
+      ["configurações", (b) => delete b.data.settings],
       ["planos", (b) => (b.data.plans[0].amount = "x")],
       ["alunos", (b) => (b.data.students[0].monthlyFee = { amount: 200, dueDay: 5 })],
       ["alunos", (b) => (b.data.students[0].monthlyFee.planId = null)],

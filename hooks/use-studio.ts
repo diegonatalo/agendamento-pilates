@@ -1,4 +1,5 @@
 import { createLocalStore, useLocalStore } from "@/hooks/use-local-store";
+import { DEFAULT_SETTINGS } from "@/lib/constants";
 import { toDateKey } from "@/lib/dates";
 import { newId } from "@/lib/ids";
 import type { StudioData } from "@/lib/backup";
@@ -21,7 +22,8 @@ import {
   sortBlockedPeriods,
   validateBlockedPeriod,
 } from "@/lib/schedule";
-import { sortSlots, validateNewSlot } from "@/lib/slots";
+import { validateSettings } from "@/lib/settings";
+import { slotsOverlap, sortSlots, validateNewSlot } from "@/lib/slots";
 import { STORAGE_KEYS } from "@/lib/storage-keys";
 import { removeSlotFromStudents, sortStudents } from "@/lib/students";
 import type {
@@ -34,8 +36,13 @@ import type {
   MonthlyPayment,
   Plan,
   Student,
+  StudioSettings,
 } from "@/types/pilates";
 
+const settingsStore = createLocalStore<StudioSettings>(
+  STORAGE_KEYS.settings,
+  DEFAULT_SETTINGS,
+);
 const plansStore = createLocalStore<Plan[]>(STORAGE_KEYS.plans, []);
 const slotsStore = createLocalStore<ClassSlot[]>(STORAGE_KEYS.slots, []);
 const studentsStore = createLocalStore<Student[]>(STORAGE_KEYS.students, []);
@@ -55,6 +62,7 @@ const blockedStore = createLocalStore<BlockedPeriod[]>(
 
 /** Dados do estúdio e as operações que mantêm tudo coerente. */
 export const useStudio = () => {
+  const settingsState = useLocalStore(settingsStore);
   const plansState = useLocalStore(plansStore);
   const slotsState = useLocalStore(slotsStore);
   const studentsState = useLocalStore(studentsStore);
@@ -66,6 +74,15 @@ export const useStudio = () => {
   const students = sortStudents(studentsState.data);
   const blockedPeriods = sortBlockedPeriods(blockedState.data);
   const plans = sortPlans(plansState.data);
+  const settings = settingsState.data;
+
+  /** Devolve a mensagem de erro, ou `null` quando salvou. */
+  const saveSettings = (next: StudioSettings) => {
+    const error = validateSettings(next, slotsState.data);
+    if (error) return error;
+    settingsStore.set(next);
+    return null;
+  };
 
   /** Cria ou atualiza um plano. Devolve a mensagem de erro, ou `null`. */
   const savePlan = (draft: PlanDraft, editingId: string | null) => {
@@ -91,10 +108,21 @@ export const useStudio = () => {
 
   /** Devolve a mensagem de erro, ou `null` quando adicionou. */
   const addSlot = (candidate: Pick<ClassSlot, "weekday" | "startTime">) => {
-    const error = validateNewSlot(candidate, slotsState.data);
+    const error = validateNewSlot(candidate, slotsState.data, settings);
     if (error) return error;
     slotsStore.set([...slotsState.data, { id: newId(), ...candidate }]);
     return null;
+  };
+
+  /** Cria vários horários de uma vez, pulando os que conflitam. Devolve quantos criou. */
+  const addSlots = (candidates: Pick<ClassSlot, "weekday" | "startTime">[]) => {
+    const next = [...slotsState.data];
+    for (const candidate of candidates) {
+      if (next.some((slot) => slotsOverlap(slot, candidate, settings))) continue;
+      next.push({ id: newId(), ...candidate });
+    }
+    slotsStore.set(next);
+    return next.length - slotsState.data.length;
   };
 
   const removeSlot = (slotId: string) => {
@@ -126,6 +154,7 @@ export const useStudio = () => {
 
   /** Substitui todos os dados pelos do backup. */
   const restoreData = (data: StudioData) => {
+    settingsStore.set(data.settings);
     plansStore.set(data.plans);
     slotsStore.set(data.slots);
     studentsStore.set(data.students);
@@ -201,12 +230,16 @@ export const useStudio = () => {
 
   return {
     ready:
+      settingsState.ready &&
       plansState.ready &&
       slotsState.ready &&
       studentsState.ready &&
       bookingsState.ready &&
       blockedState.ready &&
       paymentsState.ready,
+    settings,
+    saveSettings,
+    addSlots,
     plans,
     savePlan,
     removePlan,

@@ -32,6 +32,10 @@ describe("endTime", () => {
     expect(endTime("08:00")).toBe("09:00");
     expect(endTime("17:30")).toBe("18:30");
   });
+
+  it("usa a duração configurada", () => {
+    expect(endTime("08:00", 50)).toBe("08:50");
+  });
 });
 
 describe("slotsOverlap", () => {
@@ -49,6 +53,13 @@ describe("slotsOverlap", () => {
 
   it("ignora dias diferentes", () => {
     expect(slotsOverlap(slot("a", 1, "08:00"), slot("b", 2, "08:00"))).toBe(false);
+  });
+
+  it("considera a duração e o intervalo entre sessões", () => {
+    const a = slot("a", 1, "08:00");
+    const b = slot("b", 1, "08:50");
+    expect(slotsOverlap(a, b, { sessionMinutes: 50, breakMinutes: 0 })).toBe(false);
+    expect(slotsOverlap(a, b, { sessionMinutes: 50, breakMinutes: 10 })).toBe(true);
   });
 });
 

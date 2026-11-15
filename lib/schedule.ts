@@ -1,4 +1,4 @@
-import { CLASS_CAPACITY } from "@/lib/constants";
+import { DEFAULT_SETTINGS } from "@/lib/constants";
 import { creditBalance } from "@/lib/credits";
 import { isValidDateKey, weekdayOf } from "@/lib/dates";
 import { sortSlots } from "@/lib/slots";
@@ -30,6 +30,7 @@ export type Session = {
   attendees: Attendee[];
   /** Alunos que ocupam vaga (quem desmarcou não ocupa). */
   occupied: number;
+  capacity: number;
   vacancies: number;
 };
 
@@ -50,6 +51,7 @@ export const buildSession = (
   students: Student[],
   bookings: Booking[],
   periods: BlockedPeriod[],
+  capacity: number = DEFAULT_SETTINGS.capacity,
 ): Session => {
   const blockedBy = findBlockedPeriod(date, periods);
   if (blockedBy) {
@@ -59,6 +61,7 @@ export const buildSession = (
       blockedBy,
       attendees: [],
       occupied: 0,
+      capacity,
       vacancies: 0,
     };
   }
@@ -110,7 +113,8 @@ export const buildSession = (
     blockedBy: null,
     attendees,
     occupied,
-    vacancies: Math.max(0, CLASS_CAPACITY - occupied),
+    capacity,
+    vacancies: Math.max(0, capacity - occupied),
   };
 };
 
@@ -121,9 +125,10 @@ export const sessionsForDate = (
   students: Student[],
   bookings: Booking[],
   periods: BlockedPeriod[],
+  capacity: number = DEFAULT_SETTINGS.capacity,
 ): Session[] =>
   sortSlots(slots.filter((slot) => slot.weekday === weekdayOf(date))).map(
-    (slot) => buildSession(slot, date, students, bookings, periods),
+    (slot) => buildSession(slot, date, students, bookings, periods, capacity),
   );
 
 type AttendanceTarget = {

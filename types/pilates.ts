@@ -7,7 +7,17 @@ export type MonthKey = string;
 /** 0 = domingo ... 6 = sábado, igual a `Date#getDay`. */
 export type Weekday = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 
-/** Horário fixo da grade semanal. A duração e a capacidade vêm de `lib/constants.ts`. */
+/** Como o estúdio funciona; vale para todos os horários. */
+export type StudioSettings = {
+  /** Duração de cada sessão, em minutos. */
+  sessionMinutes: number;
+  /** Intervalo mínimo entre o fim de uma sessão e o início da próxima. */
+  breakMinutes: number;
+  /** Alunos por turma. */
+  capacity: number;
+};
+
+/** Horário fixo da grade semanal. A duração e a capacidade vêm de `StudioSettings`. */
 export type ClassSlot = {
   id: string;
   weekday: Weekday;

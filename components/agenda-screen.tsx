@@ -24,6 +24,7 @@ export const AgendaScreen = () => {
     cancelBooking,
     bookMakeup,
     bookTrial,
+    settings,
   } = useStudio();
   const today = useToday();
   const [picked, setPicked] = useState<string | null>(null);
@@ -38,7 +39,14 @@ export const AgendaScreen = () => {
   }
 
   const sessionsOf = (date: string) =>
-    sessionsForDate(date, slots, students, bookings, blockedPeriods);
+    sessionsForDate(
+      date,
+      slots,
+      students,
+      bookings,
+      blockedPeriods,
+      settings.capacity,
+    );
   const sessions = sessionsOf(selected);
 
   return (
@@ -107,6 +115,7 @@ export const AgendaScreen = () => {
             <SessionCard
               key={session.slot.id}
               session={session}
+              sessionMinutes={settings.sessionMinutes}
               students={students}
               bookings={bookings}
               onSetStatus={(attendee, status) => {

@@ -2,6 +2,8 @@
 
 import { useState, type FormEvent } from "react";
 import { BlockedPeriodsSection } from "@/components/blocked-periods-section";
+import { SlotGeneratorSection } from "@/components/slot-generator-section";
+import { StudioSettingsSection } from "@/components/studio-settings-section";
 import { EmptyState } from "@/components/empty-state";
 import { Field } from "@/components/field";
 import {
@@ -12,13 +14,22 @@ import {
   INPUT_CLASS,
 } from "@/components/form-styles";
 import { useStudio } from "@/hooks/use-studio";
-import { CLASS_CAPACITY } from "@/lib/constants";
+import { formatMinutes } from "@/lib/settings";
 import { endTime, WEEKDAY_LABELS, WEEKDAY_ORDER } from "@/lib/slots";
 import { studentsInSlot } from "@/lib/students";
 import type { Weekday } from "@/types/pilates";
 
 export const SlotsScreen = () => {
-  const { ready, slots, students, addSlot, removeSlot } = useStudio();
+  const {
+    ready,
+    slots,
+    students,
+    settings,
+    saveSettings,
+    addSlot,
+    addSlots,
+    removeSlot,
+  } = useStudio();
   const [weekday, setWeekday] = useState<Weekday>(1);
   const [startTime, setStartTime] = useState("08:00");
   const [error, setError] = useState<string | null>(null);
@@ -35,13 +46,26 @@ export const SlotsScreen = () => {
         <header>
           <h1 className="text-3xl font-semibold">Horários</h1>
           <p className="text-muted">
-            Grade semanal fixa. Cada horário dura 1h e comporta até{" "}
-            {CLASS_CAPACITY} alunos.
+            Grade semanal fixa. Cada sessão dura{" "}
+            {formatMinutes(settings.sessionMinutes)} e comporta até{" "}
+            {settings.capacity} alunos.
           </p>
         </header>
 
+        {ready ? (
+          <>
+            <StudioSettingsSection settings={settings} onSave={saveSettings} />
+            <SlotGeneratorSection
+              timing={settings}
+              existing={slots}
+              onCreate={addSlots}
+            />
+          </>
+        ) : null}
+
         <form
           onSubmit={handleSubmit}
+          aria-label="Adicionar um horário avulso"
           className={`${CARD} flex flex-col gap-4 p-4 sm:flex-row sm:items-end sm:p-5`}
         >
           <Field label="Dia da semana">
@@ -101,10 +125,11 @@ export const SlotsScreen = () => {
                         >
                           <div>
                             <p className="font-display text-lg font-semibold">
-                              {slot.startTime} às {endTime(slot.startTime)}
+                              {slot.startTime} às{" "}
+                              {endTime(slot.startTime, settings.sessionMinutes)}
                             </p>
                             <p className="text-sm text-muted">
-                              {enrolled}/{CLASS_CAPACITY} alunos fixos
+                              {enrolled}/{settings.capacity} alunos fixos
                             </p>
                           </div>
                           {confirming ? (

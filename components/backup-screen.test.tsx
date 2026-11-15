@@ -50,7 +50,7 @@ describe("BackupScreen", () => {
 
     expect(click).toHaveBeenCalledTimes(1);
     const saved = JSON.parse(await blob!.text());
-    expect(saved).toMatchObject({ app: "agenda-pilates", version: 2 });
+    expect(saved).toMatchObject({ app: "agenda-pilates", version: 3 });
     expect(saved.data.students).toHaveLength(1);
     expect(saved.data.students[0].name).toBe("Ana");
     expect(read(STORAGE_KEYS.lastBackup)).toBe("2026-11-09");
@@ -64,6 +64,7 @@ describe("BackupScreen", () => {
       JSON.stringify([{ ...student, id: "old", name: "Antiga" }]),
     );
     const data: StudioData = {
+      settings: { sessionMinutes: 60, breakMinutes: 0, capacity: 3 },
       plans: [{ id: "p1", name: "2x por semana", weeklyClasses: 2, amount: 280 }],
       slots: [{ id: "s1", weekday: 1, startTime: "08:00" }],
       students: [student],
@@ -83,12 +84,14 @@ describe("BackupScreen", () => {
     expect(read(STORAGE_KEYS.students)).toEqual([student]);
     expect(read(STORAGE_KEYS.slots)).toEqual(data.slots);
     expect(read(STORAGE_KEYS.plans)).toEqual(data.plans);
+    expect(read(STORAGE_KEYS.settings)).toEqual(data.settings);
     expect(screen.getByRole("status")).toHaveTextContent("Backup restaurado.");
   });
 
   it("cancelar não altera os dados atuais", async () => {
     window.localStorage.setItem(STORAGE_KEYS.students, JSON.stringify([student]));
     const data: StudioData = {
+      settings: { sessionMinutes: 60, breakMinutes: 0, capacity: 3 },
       plans: [],
       slots: [],
       students: [],

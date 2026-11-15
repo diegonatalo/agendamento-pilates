@@ -10,7 +10,6 @@ import {
   INPUT_CLASS,
   LINK_BUTTON,
 } from "@/components/form-styles";
-import { CLASS_CAPACITY } from "@/lib/constants";
 import { toDateKey } from "@/lib/dates";
 import { newId } from "@/lib/ids";
 import { formatCurrency } from "@/lib/payments";
@@ -21,13 +20,20 @@ import {
   validateStudent,
   whatsappLink,
 } from "@/lib/students";
-import type { ClassSlot, MonthlyFee, Plan, Student } from "@/types/pilates";
+import type {
+  ClassSlot,
+  MonthlyFee,
+  Plan,
+  Student,
+  StudioSettings,
+} from "@/types/pilates";
 
 type Props = {
   initial: Student;
   isNew: boolean;
   slots: ClassSlot[];
   plans: Plan[];
+  settings: StudioSettings;
   /** Todos os alunos cadastrados, para calcular as vagas dos horários. */
   students: Student[];
   /** Saldo de reposições do aluno. */
@@ -46,6 +52,7 @@ export const StudentForm = ({
   isNew,
   slots,
   plans,
+  settings,
   students,
   credits,
   onSave,
@@ -200,7 +207,7 @@ export const StudentForm = ({
             {slots.map((slot) => {
               const checked = draft.slotIds.includes(slot.id);
               const taken = studentsInSlot(slot.id, others).length;
-              const full = taken >= CLASS_CAPACITY;
+              const full = taken >= settings.capacity;
               return (
                 <li key={slot.id}>
                   <label className="flex min-h-11 items-center gap-3 text-sm">
@@ -212,9 +219,9 @@ export const StudentForm = ({
                       onChange={() => toggleSlot(slot.id)}
                     />
                     <span>
-                      {formatSlot(slot)}{" "}
+                      {formatSlot(slot, settings.sessionMinutes)}{" "}
                       <span className="text-muted">
-                        ({full ? "lotado" : `${taken}/${CLASS_CAPACITY}`})
+                        ({full ? "lotado" : `${taken}/${settings.capacity}`})
                       </span>
                     </span>
                   </label>

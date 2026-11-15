@@ -28,6 +28,7 @@ export const StudentsScreen = () => {
     removeStudent,
     markPayment,
     plans,
+    settings,
   } = useStudio();
   const today = useToday();
   const [creating, setCreating] = useState<Student | null>(null);
@@ -70,6 +71,7 @@ export const StudentsScreen = () => {
           isNew={creating !== null}
           slots={slots}
           plans={plans}
+          settings={settings}
           students={students}
           credits={creditBalance(current.id, bookings)}
           onSave={(student) => {

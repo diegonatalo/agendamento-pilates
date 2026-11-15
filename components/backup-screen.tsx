@@ -39,6 +39,7 @@ export const BackupScreen = () => {
     restoreData,
     recordBackup,
     plans,
+    settings,
   } = useStudio();
   const [pending, setPending] = useState<BackupFile | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -47,7 +48,7 @@ export const BackupScreen = () => {
   const handleExport = () => {
     const now = new Date();
     const backup = buildBackup(
-      { plans, slots, students, bookings, blockedPeriods, payments },
+      { settings, plans, slots, students, bookings, blockedPeriods, payments },
       now.toISOString(),
     );
     const today = toDateKey(now);
