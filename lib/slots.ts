@@ -87,3 +87,19 @@ export const validateNewSlot = (
     return `Conflita com o horário de ${formatSlot(clash, timing.sessionMinutes)}.`;
   return null;
 };
+
+export type Occupancy = "empty" | "open" | "full";
+
+/** Situação de um horário pela quantidade de alunos fixos. */
+export const occupancyOf = (enrolled: number, capacity: number): Occupancy =>
+  enrolled === 0 ? "empty" : enrolled >= capacity ? "full" : "open";
+
+/** Todos os inícios de horário da semana, sem repetir, em ordem. */
+export const startTimesOf = (slots: ClassSlot[]): TimeOfDay[] =>
+  [...new Set(slots.map((slot) => slot.startTime))].sort(
+    (a, b) => timeToMinutes(a) - timeToMinutes(b),
+  );
+
+/** Dias que têm pelo menos um horário, de segunda a domingo. */
+export const weekdaysOf = (slots: ClassSlot[]): Weekday[] =>
+  WEEKDAY_ORDER.filter((day) => slots.some((slot) => slot.weekday === day));

@@ -1,7 +1,8 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { SlotsScreen } from "@/components/slots-screen";
+import { createEmptyStudent } from "@/lib/students";
 import { STORAGE_KEYS } from "@/lib/storage-keys";
 
 const addSlot = async (
@@ -9,6 +10,9 @@ const addSlot = async (
   weekday: string,
   time: string,
 ) => {
+  // O formulário avulso fica recolhido; abre na primeira vez.
+  const toggle = screen.queryByRole("button", { name: "Adicionar horário avulso" });
+  if (toggle) await user.click(toggle);
   await user.selectOptions(screen.getByLabelText("Dia da semana"), weekday);
   const input = screen.getByLabelText("Início");
   await user.clear(input);
@@ -22,6 +26,24 @@ describe("SlotsScreen", () => {
   it("mostra o estado vazio", () => {
     render(<SlotsScreen />);
     expect(screen.getByText("Nenhum horário cadastrado ainda.")).toBeInTheDocument();
+  });
+
+  it("o horário avulso fica recolhido até ser aberto", async () => {
+    const user = userEvent.setup();
+    render(<SlotsScreen />);
+    const toggle = screen.getByRole("button", { name: "Adicionar horário avulso" });
+    expect(toggle).toHaveAttribute("aria-expanded", "false");
+    expect(screen.queryByLabelText("Dia da semana")).not.toBeInTheDocument();
+
+    await user.click(toggle);
+    expect(screen.getByRole("button", { name: "Fechar horário avulso" })).toHaveAttribute(
+      "aria-expanded",
+      "true",
+    );
+    expect(screen.getByLabelText("Dia da semana")).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "Fechar horário avulso" }));
+    expect(screen.queryByLabelText("Dia da semana")).not.toBeInTheDocument();
   });
 
   it("adiciona um horário e persiste", async () => {
@@ -161,11 +183,112 @@ describe("SlotsScreen", () => {
     });
   });
 
+  describe("grade já montada", () => {
+    const seedGrid = () => {
+      window.localStorage.setItem(
+        STORAGE_KEYS.slots,
+        JSON.stringify([
+          { id: "mon7", weekday: 1, startTime: "07:00" },
+          { id: "fri8", weekday: 5, startTime: "08:00" },
+        ]),
+      );
+      window.localStorage.setItem(
+        STORAGE_KEYS.students,
+        JSON.stringify([
+          { ...createEmptyStudent("a", "2026-01-01"), name: "Ana", slotIds: ["fri8"] },
+        ]),
+      );
+    };
+
+    it("mostra a grade primeiro e recolhe a configuração", async () => {
+      seedGrid();
+      const user = userEvent.setup();
+      render(<SlotsScreen />);
+
+      const toggle = screen.getByRole("button", { name: "Configurar grade" });
+      expect(toggle).toHaveAttribute("aria-expanded", "false");
+      expect(screen.queryByLabelText("Duração da sessão (min)")).not.toBeInTheDocument();
+
+      await user.click(toggle);
+      expect(screen.getByLabelText("Duração da sessão (min)")).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: "Fechar configuração" })).toHaveAttribute(
+        "aria-expanded",
+        "true",
+      );
+    });
+
+    it("mostra um dia por vez nas abas", async () => {
+      seedGrid();
+      const user = userEvent.setup();
+      render(<SlotsScreen />);
+
+      expect(screen.getByRole("tab", { name: /Segunda/ })).toHaveAttribute("aria-selected", "true");
+      expect(screen.getByText("07:00 às 08:00")).toBeInTheDocument();
+      expect(screen.queryByText("08:00 às 09:00")).not.toBeInTheDocument();
+
+      await user.click(screen.getByRole("tab", { name: /Sexta/ }));
+      expect(screen.getByText("08:00 às 09:00")).toBeInTheDocument();
+      expect(screen.getByText("1/3 alunos fixos · Ana")).toBeInTheDocument();
+
+      await user.click(screen.getByRole("tab", { name: /Sábado/ }));
+      expect(screen.getByText(/Nenhum horário no\s+sábado/)).toBeInTheDocument();
+    });
+
+    it("navega entre as abas pelo teclado", async () => {
+      seedGrid();
+      const user = userEvent.setup();
+      render(<SlotsScreen />);
+
+      await user.click(screen.getByRole("tab", { name: /Segunda/ }));
+      await user.keyboard("{ArrowRight}");
+      const tuesday = screen.getByRole("tab", { name: /Terça/ });
+      expect(tuesday).toHaveAttribute("aria-selected", "true");
+      expect(tuesday).toHaveFocus();
+      await user.keyboard("{End}");
+      expect(screen.getByRole("tab", { name: /Domingo/ })).toHaveFocus();
+    });
+
+    describe("no computador", () => {
+      const original = window.matchMedia;
+      beforeEach(() => {
+        window.matchMedia = ((query: string) => ({
+          matches: true,
+          media: query,
+          addEventListener: () => {},
+          removeEventListener: () => {},
+        })) as unknown as typeof window.matchMedia;
+      });
+      afterEach(() => {
+        window.matchMedia = original;
+      });
+
+      it("mostra a semana numa tabela e detalha o horário escolhido", async () => {
+        seedGrid();
+        const user = userEvent.setup();
+        render(<SlotsScreen />);
+
+        expect(screen.getByRole("table")).toBeInTheDocument();
+        expect(screen.getByRole("columnheader", { name: "Segunda" })).toBeInTheDocument();
+        expect(screen.getByRole("columnheader", { name: "Sexta" })).toBeInTheDocument();
+        expect(screen.queryByRole("tablist")).not.toBeInTheDocument();
+
+        await user.click(screen.getByRole("button", { name: "Sexta, 08:00: 1 de 3 alunos" }));
+        expect(screen.getByRole("region", { name: "Horário selecionado" })).toHaveTextContent(
+          "Sexta, 08:00 às 09:00",
+        );
+        expect(screen.getByText("1/3 alunos fixos: Ana")).toBeInTheDocument();
+
+        await user.click(screen.getByRole("button", { name: /Remover horário de Sexta/ }));
+        await user.click(screen.getByRole("button", { name: "Confirmar remoção" }));
+        const saved = JSON.parse(window.localStorage.getItem(STORAGE_KEYS.slots) ?? "[]");
+        expect(saved.map((s: { id: string }) => s.id)).toEqual(["mon7"]);
+        expect(screen.queryByRole("region", { name: "Horário selecionado" })).not.toBeInTheDocument();
+      });
+    });
+  });
+
   it("mantém o histórico do horário removido e apaga as sessões futuras", async () => {
-    const user = userEvent.setup();
-    render(<SlotsScreen />);
-    await addSlot(user, "Quinta", "18:00");
-    const [slot] = JSON.parse(window.localStorage.getItem(STORAGE_KEYS.slots) ?? "[]");
+    const slot = { id: "s1", weekday: 4, startTime: "18:00" };
     const entry = (id: string, date: string) => ({
       id,
       slotId: slot.id,
@@ -175,10 +298,13 @@ describe("SlotsScreen", () => {
       studentId: "a",
       guestName: null,
     });
+    window.localStorage.setItem(STORAGE_KEYS.slots, JSON.stringify([slot]));
     window.localStorage.setItem(
       STORAGE_KEYS.bookings,
       JSON.stringify([entry("past", "2000-01-06"), entry("future", "2999-01-03")]),
     );
+    const user = userEvent.setup();
+    render(<SlotsScreen />);
 
     await user.click(screen.getByRole("button", { name: /Remover/ }));
     await user.click(screen.getByRole("button", { name: "Confirmar remoção" }));

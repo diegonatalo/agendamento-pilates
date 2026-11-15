@@ -7,6 +7,9 @@ import {
   slotsOverlap,
   sortSlots,
   validateNewSlot,
+  occupancyOf,
+  startTimesOf,
+  weekdaysOf,
 } from "@/lib/slots";
 import type { ClassSlot } from "@/types/pilates";
 
@@ -60,6 +63,24 @@ describe("slotsOverlap", () => {
     const b = slot("b", 1, "08:50");
     expect(slotsOverlap(a, b, { sessionMinutes: 50, breakMinutes: 0 })).toBe(false);
     expect(slotsOverlap(a, b, { sessionMinutes: 50, breakMinutes: 10 })).toBe(true);
+  });
+});
+
+describe("ajudantes da grade", () => {
+  const slots = [slot("a", 5, "08:00"), slot("b", 1, "18:00"), slot("c", 1, "07:00"), slot("d", 5, "07:00")];
+
+  it("classifica a ocupação", () => {
+    expect(occupancyOf(0, 3)).toBe("empty");
+    expect(occupancyOf(2, 3)).toBe("open");
+    expect(occupancyOf(3, 3)).toBe("full");
+  });
+
+  it("lista os inícios sem repetir, em ordem", () => {
+    expect(startTimesOf(slots)).toEqual(["07:00", "08:00", "18:00"]);
+  });
+
+  it("lista os dias com horário, de segunda a domingo", () => {
+    expect(weekdaysOf([...slots, slot("e", 0, "09:00")])).toEqual([1, 5, 0]);
   });
 });
 
