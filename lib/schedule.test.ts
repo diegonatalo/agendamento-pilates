@@ -1,13 +1,20 @@
 import { describe, expect, it } from "vitest";
 import {
+  addMakeup,
+  addTrial,
   buildSession,
+  canAddToSession,
+  eligibleForMakeup,
   findBlockedPeriod,
+  removeBooking,
   removeBookingsOfSlot,
   removeBookingsOfStudent,
   sessionsForDate,
   setAttendance,
+  setBookingStatus,
   sortBlockedPeriods,
   validateBlockedPeriod,
+  validateGuestName,
 } from "@/lib/schedule";
 import { createEmptyStudent } from "@/lib/students";
 import type { BlockedPeriod, Booking, ClassSlot, Student } from "@/types/pilates";
@@ -226,6 +233,114 @@ describe("validateBlockedPeriod", () => {
 
   it("recusa fim antes do início", () => {
     expect(validateBlockedPeriod("2026-11-10", "2026-11-09")).toMatch(/antes/);
+  });
+});
+
+describe("canAddToSession", () => {
+  it("só com vaga livre e sem bloqueio", () => {
+    const open = buildSession(slot, MONDAY, [student("a")], [], []);
+    expect(canAddToSession(open)).toBe(true);
+
+    const full = buildSession(
+      slot,
+      MONDAY,
+      [student("a"), student("b"), student("c")],
+      [],
+      [],
+    );
+    expect(canAddToSession(full)).toBe(false);
+
+    expect(canAddToSession(buildSession(slot, MONDAY, [], [], [holiday]))).toBe(false);
+  });
+
+  it("volta a ter vaga quando um aluno desmarca", () => {
+    const session = buildSession(
+      slot,
+      MONDAY,
+      [student("a"), student("b"), student("c")],
+      [booking({ status: "cancelled" })],
+      [],
+    );
+    expect(canAddToSession(session)).toBe(true);
+  });
+});
+
+describe("eligibleForMakeup", () => {
+  const credit = (id: string, studentId: string): Booking =>
+    booking({ id, studentId, date: "2026-11-02", status: "cancelled" });
+
+  it("lista só alunos ativos com crédito e que não estão na sessão", () => {
+    const students = [
+      student("a"),
+      student("b", { slotIds: [] }),
+      student("c", { slotIds: [], active: false }),
+      student("d", { slotIds: [] }),
+    ];
+    const bookings = [credit("1", "b"), credit("2", "c"), credit("3", "a")];
+    const session = buildSession(slot, MONDAY, students, bookings, []);
+
+    const result = eligibleForMakeup(session, students, bookings);
+    expect(result.map((e) => [e.student.id, e.credits])).toEqual([["b", 1]]);
+  });
+});
+
+describe("addMakeup", () => {
+  const target = { slotId: "s1", date: MONDAY, studentId: "b" };
+
+  it("cria uma reposição agendada", () => {
+    expect(addMakeup([], target, "m1")).toEqual([
+      {
+        id: "m1",
+        slotId: "s1",
+        date: MONDAY,
+        kind: "makeup",
+        status: "scheduled",
+        studentId: "b",
+        guestName: null,
+      },
+    ]);
+  });
+
+  it("não duplica se o aluno já tem registro na sessão", () => {
+    const existing = [booking({ studentId: "b", status: "cancelled" })];
+    expect(addMakeup(existing, target, "m1")).toBe(existing);
+  });
+});
+
+describe("addTrial", () => {
+  it("cria uma aula experimental com o nome sem espaços nas pontas", () => {
+    const [created] = addTrial(
+      [],
+      { slotId: "s1", date: MONDAY, guestName: "  Visitante " },
+      "t1",
+    );
+    expect(created).toMatchObject({
+      id: "t1",
+      kind: "trial",
+      status: "scheduled",
+      studentId: null,
+      guestName: "Visitante",
+    });
+  });
+});
+
+describe("setBookingStatus e removeBooking", () => {
+  const list = [booking({ id: "1" }), booking({ id: "2", studentId: "b" })];
+
+  it("muda só o registro indicado", () => {
+    const result = setBookingStatus(list, "2", "absent");
+    expect(result.map((b) => b.status)).toEqual(["present", "absent"]);
+  });
+
+  it("remove só o registro indicado", () => {
+    expect(removeBooking(list, "1").map((b) => b.id)).toEqual(["2"]);
+  });
+});
+
+describe("validateGuestName", () => {
+  it("exige um nome", () => {
+    expect(validateGuestName("   ")).toMatch(/nome/);
+    expect(validateGuestName("Ana")).toBeNull();
   });
 });
 

@@ -133,7 +133,8 @@ types/            Tipos compartilhados do domínio
 |---|---|
 | **Turma** | Dia da semana e hora de início; até 3 alunos; 1h de duração; sem sobreposição. |
 | **Sessão** | Uma turma em uma data, com a presença de cada aluno. |
-| **Reposição** | Desmarcar gera 1 crédito, sem expiração; usar uma vaga livre consome 1. |
+| **Reposição** | Desmarcar gera 1 crédito, sem expiração; encaixar o aluno em uma vaga livre consome 1; cancelar a reposição devolve. |
+| **Aula experimental** | Vaga livre para quem ainda não é aluno, só com o nome. |
 | **Bloqueio** | Feriados e férias bloqueiam as sessões e não geram crédito. |
 | **Mensalidade** | Cada mês fica como pago ou pendente. |
 
@@ -146,7 +147,7 @@ Ainda não publicado. Os dados ficam no `localStorage` do navegador da instrutor
 - [x] Setup do projeto e testes
 - [x] Alunos e grade de horários
 - [x] Agenda, presença e bloqueio de datas
-- [ ] Desmarcar, reposição e aula experimental
+- [x] Desmarcar, reposição e aula experimental
 - [ ] Mensalidade
 - [ ] Backup, acessibilidade e deploy
 

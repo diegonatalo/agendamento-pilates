@@ -110,8 +110,8 @@ export const BlockedPeriodsSection = () => {
                 className={BUTTON_SECONDARY}
                 onClick={() => removeBlockedPeriod(period.id)}
               >
-                Remover
-                <span className="sr-only"> bloqueio de {period.reason}</span>
+                Remover{" "}
+                <span className="sr-only">bloqueio de {period.reason}</span>
               </button>
             </li>
           ))}

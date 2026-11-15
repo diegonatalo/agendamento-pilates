@@ -12,8 +12,18 @@ import { sessionsForDate } from "@/lib/schedule";
 import { WEEKDAY_LABELS } from "@/lib/slots";
 
 export const AgendaScreen = () => {
-  const { ready, slots, students, bookings, blockedPeriods, markAttendance } =
-    useStudio();
+  const {
+    ready,
+    slots,
+    students,
+    bookings,
+    blockedPeriods,
+    markAttendance,
+    markBooking,
+    cancelBooking,
+    bookMakeup,
+    bookTrial,
+  } = useStudio();
   const today = useToday();
   const [picked, setPicked] = useState<string | null>(null);
   const selected = picked ?? today;
@@ -98,11 +108,38 @@ export const AgendaScreen = () => {
             <SessionCard
               key={session.slot.id}
               session={session}
-              onMark={(studentId, status) =>
-                markAttendance(
-                  { slotId: session.slot.id, date: session.date, studentId },
-                  status,
-                )
+              students={students}
+              bookings={bookings}
+              onSetStatus={(attendee, status) => {
+                if (attendee.kind === "regular" && attendee.student) {
+                  markAttendance(
+                    {
+                      slotId: session.slot.id,
+                      date: session.date,
+                      studentId: attendee.student.id,
+                    },
+                    status,
+                  );
+                } else if (attendee.bookingId) {
+                  markBooking(attendee.bookingId, status);
+                }
+              }}
+              onRemove={(attendee) => {
+                if (attendee.bookingId) cancelBooking(attendee.bookingId);
+              }}
+              onBookMakeup={(studentId) =>
+                bookMakeup({
+                  slotId: session.slot.id,
+                  date: session.date,
+                  studentId,
+                })
+              }
+              onBookTrial={(guestName) =>
+                bookTrial({
+                  slotId: session.slot.id,
+                  date: session.date,
+                  guestName,
+                })
               }
             />
           ))}

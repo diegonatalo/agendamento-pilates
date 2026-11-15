@@ -1,9 +1,13 @@
 import { createLocalStore, useLocalStore } from "@/hooks/use-local-store";
 import { newId } from "@/lib/ids";
 import {
+  addMakeup,
+  addTrial,
+  removeBooking,
   removeBookingsOfSlot,
   removeBookingsOfStudent,
   setAttendance,
+  setBookingStatus,
   sortBlockedPeriods,
   validateBlockedPeriod,
 } from "@/lib/schedule";
@@ -73,6 +77,24 @@ export const useStudio = () => {
       setAttendance(bookingsState.data, target, status, newId()),
     );
 
+  const bookMakeup = (target: {
+    slotId: string;
+    date: DateKey;
+    studentId: string;
+  }) => bookingsStore.set(addMakeup(bookingsState.data, target, newId()));
+
+  const bookTrial = (target: {
+    slotId: string;
+    date: DateKey;
+    guestName: string;
+  }) => bookingsStore.set(addTrial(bookingsState.data, target, newId()));
+
+  const markBooking = (bookingId: string, status: BookingStatus) =>
+    bookingsStore.set(setBookingStatus(bookingsState.data, bookingId, status));
+
+  const cancelBooking = (bookingId: string) =>
+    bookingsStore.set(removeBooking(bookingsState.data, bookingId));
+
   /** Devolve a mensagem de erro, ou `null` quando bloqueou. */
   const addBlockedPeriod = (
     startDate: DateKey,
@@ -111,6 +133,10 @@ export const useStudio = () => {
     saveStudent,
     removeStudent,
     markAttendance,
+    bookMakeup,
+    bookTrial,
+    markBooking,
+    cancelBooking,
     addBlockedPeriod,
     removeBlockedPeriod,
   };

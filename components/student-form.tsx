@@ -26,6 +26,8 @@ type Props = {
   slots: ClassSlot[];
   /** Todos os alunos cadastrados, para calcular as vagas dos horários. */
   students: Student[];
+  /** Saldo de reposições do aluno. */
+  credits: number;
   onSave: (student: Student) => void;
   onCancel: () => void;
   onDelete: (studentId: string) => void;
@@ -40,6 +42,7 @@ export const StudentForm = ({
   isNew,
   slots,
   students,
+  credits,
   onSave,
   onCancel,
   onDelete,
@@ -169,6 +172,9 @@ export const StudentForm = ({
 
       <fieldset className={SECTION}>
         <legend className={LEGEND}>Horários fixos</legend>
+        <p className="text-sm">
+          Créditos de reposição: <strong>{credits}</strong>
+        </p>
         {slots.length === 0 ? (
           <p className="text-sm text-zinc-600 dark:text-zinc-400">
             Cadastre horários na aba Horários para matricular o aluno.

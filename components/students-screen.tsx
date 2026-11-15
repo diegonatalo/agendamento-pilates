@@ -9,13 +9,15 @@ import {
 import { StudentForm } from "@/components/student-form";
 import { useStudio } from "@/hooks/use-studio";
 import { toDateKey } from "@/lib/dates";
+import { creditBalance } from "@/lib/credits";
 import { newId } from "@/lib/ids";
 import { formatSlotShort } from "@/lib/slots";
 import { createEmptyStudent } from "@/lib/students";
 import type { Student } from "@/types/pilates";
 
 export const StudentsScreen = () => {
-  const { ready, slots, students, saveStudent, removeStudent } = useStudio();
+  const { ready, slots, students, bookings, saveStudent, removeStudent } =
+    useStudio();
   const [creating, setCreating] = useState<Student | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [query, setQuery] = useState("");
@@ -44,6 +46,7 @@ export const StudentsScreen = () => {
           isNew={creating !== null}
           slots={slots}
           students={students}
+          credits={creditBalance(current.id, bookings)}
           onSave={(student) => {
             saveStudent(student);
             close();
@@ -97,6 +100,7 @@ export const StudentsScreen = () => {
             const studentSlots = slots.filter((slot) =>
               student.slotIds.includes(slot.id),
             );
+            const credits = creditBalance(student.id, bookings);
             return (
               <li key={student.id}>
                 <button
@@ -109,6 +113,11 @@ export const StudentsScreen = () => {
                     {!student.active ? (
                       <span className="rounded bg-zinc-200 px-1.5 py-0.5 text-xs dark:bg-zinc-800">
                         Inativo
+                      </span>
+                    ) : null}
+                    {credits > 0 ? (
+                      <span className="rounded bg-teal-100 px-1.5 py-0.5 text-xs text-teal-950">
+                        {credits} {credits === 1 ? "reposição" : "reposições"}
                       </span>
                     ) : null}
                     {student.attention.trim() ? (

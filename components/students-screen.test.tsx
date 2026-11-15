@@ -68,6 +68,30 @@ describe("StudentsScreen", () => {
     expect(screen.getByText(/lotado/)).toBeInTheDocument();
   });
 
+  it("mostra o saldo de reposição na lista e na ficha", async () => {
+    seed([], [person("a", "Ana")]);
+    window.localStorage.setItem(
+      STORAGE_KEYS.bookings,
+      JSON.stringify([
+        {
+          id: "b1",
+          slotId: "s1",
+          date: "2026-11-02",
+          kind: "regular",
+          status: "cancelled",
+          studentId: "a",
+          guestName: null,
+        },
+      ]),
+    );
+    const user = userEvent.setup();
+    render(<StudentsScreen />);
+    expect(screen.getByText("1 reposição")).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: /Ana/ }));
+    expect(screen.getByText(/Créditos de reposição/)).toHaveTextContent("1");
+  });
+
   it("filtra a lista pelo nome", async () => {
     seed([], [person("a", "Ana"), person("b", "Beatriz")]);
     const user = userEvent.setup();

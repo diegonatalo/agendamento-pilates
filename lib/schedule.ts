@@ -1,4 +1,5 @@
 import { CLASS_CAPACITY } from "@/lib/constants";
+import { creditBalance } from "@/lib/credits";
 import { isValidDateKey, weekdayOf } from "@/lib/dates";
 import { sortSlots } from "@/lib/slots";
 import type {
@@ -13,6 +14,8 @@ import type {
 
 export type Attendee = {
   key: string;
+  /** Registro de presença; `null` para aluno fixo ainda sem marcação. */
+  bookingId: string | null;
   kind: BookingKind;
   status: BookingStatus;
   /** `null` para aula experimental ou aluno que já foi excluído. */
@@ -77,6 +80,7 @@ export const buildSession = (
     );
     attendees.push({
       key: `regular:${student.id}`,
+      bookingId: booking?.id ?? null,
       kind: "regular",
       status: booking?.status ?? "scheduled",
       student,
@@ -91,6 +95,7 @@ export const buildSession = (
     if (alreadyListed) continue;
     attendees.push({
       key: `booking:${booking.id}`,
+      bookingId: booking.id,
       kind: booking.kind,
       status: booking.status,
       student: students.find((s) => s.id === booking.studentId) ?? null,
@@ -163,6 +168,86 @@ export const setAttendance = (
     },
   ];
 };
+
+/** Só dá para encaixar alguém em dia sem bloqueio e com vaga livre. */
+export const canAddToSession = (session: Session): boolean =>
+  session.blockedBy === null && session.vacancies > 0;
+
+/** Alunos ativos com crédito que ainda não têm lugar nesta sessão. */
+export const eligibleForMakeup = (
+  session: Session,
+  students: Student[],
+  bookings: Booking[],
+): { student: Student; credits: number }[] => {
+  const present = new Set(session.attendees.map((a) => a.student?.id));
+  return students
+    .filter((s) => s.active && !present.has(s.id))
+    .map((student) => ({ student, credits: creditBalance(student.id, bookings) }))
+    .filter((entry) => entry.credits > 0);
+};
+
+type SessionTarget = { slotId: string; date: DateKey };
+
+/** Marca uma reposição. Ignora se o aluno já tem registro naquela sessão. */
+export const addMakeup = (
+  bookings: Booking[],
+  target: SessionTarget & { studentId: string },
+  newId: string,
+): Booking[] => {
+  const duplicated = bookings.some(
+    (b) =>
+      b.slotId === target.slotId &&
+      b.date === target.date &&
+      b.studentId === target.studentId,
+  );
+  if (duplicated) return bookings;
+  return [
+    ...bookings,
+    {
+      id: newId,
+      slotId: target.slotId,
+      date: target.date,
+      kind: "makeup",
+      status: "scheduled",
+      studentId: target.studentId,
+      guestName: null,
+    },
+  ];
+};
+
+export const addTrial = (
+  bookings: Booking[],
+  target: SessionTarget & { guestName: string },
+  newId: string,
+): Booking[] => [
+  ...bookings,
+  {
+    id: newId,
+    slotId: target.slotId,
+    date: target.date,
+    kind: "trial",
+    status: "scheduled",
+    studentId: null,
+    guestName: target.guestName.trim(),
+  },
+];
+
+/** Muda o status de um registro (reposição ou experimental). */
+export const setBookingStatus = (
+  bookings: Booking[],
+  bookingId: string,
+  status: BookingStatus,
+): Booking[] =>
+  bookings.map((b) => (b.id === bookingId ? { ...b, status } : b));
+
+/** Apaga um registro; apagar uma reposição devolve o crédito. */
+export const removeBooking = (
+  bookings: Booking[],
+  bookingId: string,
+): Booking[] => bookings.filter((b) => b.id !== bookingId);
+
+export const validateGuestName = (name: string): string | null =>
+  name.trim() ? null : "Informe o nome de quem vai fazer a aula experimental.";
 
 export const removeBookingsOfStudent = (
   bookings: Booking[],
