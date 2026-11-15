@@ -29,9 +29,12 @@ type Action = "present" | "absent" | "cancelled";
 const KIND_LABEL = { regular: null, makeup: "Reposição", trial: "Experimental" };
 
 const ACTIONS: Record<Action, { label: string; tone: string }> = {
-  present: { label: "Presente", tone: "border-primary bg-primary text-primary-fg" },
-  absent: { label: "Faltou", tone: "border-danger bg-danger text-danger-fg" },
-  cancelled: { label: "Desmarcou", tone: "border-fg bg-fg text-bg" },
+  present: { label: "Presente", tone: "bg-primary text-primary-fg shadow-xs" },
+  absent: { label: "Faltou", tone: "bg-danger text-danger-fg shadow-xs" },
+  cancelled: {
+    label: "Desmarcou",
+    tone: "bg-surface text-fg shadow-xs ring-1 ring-line-strong",
+  },
 };
 
 /** Aluno fixo pode desmarcar; reposição e experimental são removidas. */
@@ -47,8 +50,8 @@ const Pips = ({ occupied }: { occupied: number }) => (
       <span
         key={i}
         className={cn(
-          "size-2.5 rounded-full border border-primary",
-          i < occupied ? "bg-primary" : "bg-transparent",
+          "h-1.5 w-4 rounded-full",
+          i < occupied ? "bg-primary" : "bg-line-strong",
         )}
       />
     ))}
@@ -73,7 +76,7 @@ export const SessionCard = ({
       className={cn(CARD, "flex flex-col gap-4 p-4 sm:p-5", blockedBy && "bg-surface-2 shadow-none")}
     >
       <header className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1">
-        <h3 id={titleId} className="font-display text-xl font-semibold">
+        <h3 id={titleId} className="font-display text-lg font-semibold">
           {slot.startTime} às {endTime(slot.startTime)}
         </h3>
         {blockedBy ? null : (
@@ -130,12 +133,12 @@ export const SessionCard = ({
                       </p>
                     </div>
                     {attention ? (
-                      <p className="rounded-xl bg-warn-soft px-3.5 py-2.5 text-sm text-warn-soft-fg">
+                      <p className="rounded-lg bg-warn-soft px-3 py-2 text-sm text-warn-soft-fg">
                         <strong>Atenção:</strong> {attention}
                       </p>
                     ) : null}
                     {canMark ? (
-                      <div className="flex gap-2">
+                      <div className="flex gap-1 rounded-xl bg-surface-2 p-1">
                         {actionsFor(attendee).map((action) => {
                           const pressed = attendee.status === action;
                           return (
@@ -144,11 +147,11 @@ export const SessionCard = ({
                               type="button"
                               aria-pressed={pressed}
                               className={cn(
-                                "inline-flex min-h-11 flex-1 items-center justify-center rounded-xl border px-3 text-sm font-semibold",
+                                "inline-flex min-h-10 flex-1 items-center justify-center rounded-lg px-3 text-sm font-medium",
                                 FOCUS_RING,
                                 pressed
                                   ? ACTIONS[action].tone
-                                  : "border-line-strong bg-surface hover:bg-surface-2",
+                                  : "text-muted hover:bg-surface hover:text-fg",
                               )}
                               // Clicar de novo no estado ativo volta para "agendado".
                               onClick={() =>

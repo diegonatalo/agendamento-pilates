@@ -31,17 +31,17 @@ export const WeekStrip = ({ selected, today, countFor, onSelect }: Props) => {
               aria-label={`${label}, ${formatDayMonth(date)}, ${count} ${count === 1 ? "aula" : "aulas"}`}
               onClick={() => onSelect(date)}
               className={cn(
-                "flex min-h-[4.5rem] w-full flex-col items-center justify-center gap-0.5 rounded-2xl border text-xs focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary",
+                "flex min-h-[4.5rem] w-full flex-col items-center justify-center gap-0.5 rounded-xl border text-xs focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary",
                 isSelected
-                  ? "border-primary bg-primary text-primary-fg shadow-card"
-                  : "border-line bg-surface hover:bg-surface-2",
+                  ? "border-fg bg-fg text-bg"
+                  : "border-line bg-surface hover:border-line-strong",
                 isToday && !isSelected && "border-primary",
               )}
             >
               <span aria-hidden="true" className="font-medium uppercase tracking-wide opacity-80">
                 {label.slice(0, 3)}
               </span>
-              <span aria-hidden="true" className="font-display text-xl font-semibold leading-none">
+              <span aria-hidden="true" className="font-display text-lg font-semibold leading-none">
                 {date.slice(8)}
               </span>
               <span
@@ -51,7 +51,7 @@ export const WeekStrip = ({ selected, today, countFor, onSelect }: Props) => {
                   count === 0
                     ? "bg-transparent"
                     : isSelected
-                      ? "bg-primary-fg"
+                      ? "bg-accent"
                       : "bg-primary",
                 )}
               />

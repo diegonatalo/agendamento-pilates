@@ -100,7 +100,7 @@ export const SlotsScreen = () => {
                           className={`${CARD} flex flex-col gap-3 p-4`}
                         >
                           <div>
-                            <p className="font-display text-xl font-semibold">
+                            <p className="font-display text-lg font-semibold">
                               {slot.startTime} às {endTime(slot.startTime)}
                             </p>
                             <p className="text-sm text-muted">

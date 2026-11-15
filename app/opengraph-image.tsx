@@ -17,24 +17,24 @@ export default function OpengraphImage() {
           alignItems: "center",
           justifyContent: "center",
           gap: 36,
-          background: "#f6f3ee",
-          color: "#1d2623",
+          background: "#fafafa",
+          color: "#18181b",
         }}
       >
         <svg width="180" height="180" viewBox="0 0 40 40" fill="none">
-          <rect width="40" height="40" rx="12" fill="#2f6b57" />
+          <rect width="40" height="40" rx="12" fill="#047857" />
           <path
             d="M9 24c3-9 9-13 11-13s8 4 11 13"
             stroke="#ffffff"
             strokeWidth="3"
             strokeLinecap="round"
           />
-          <circle cx="20" cy="29" r="3" fill="#e08a6c" />
+          <circle cx="20" cy="29" r="3" fill="#34d399" />
         </svg>
         <div style={{ display: "flex", fontSize: 88, fontWeight: 700 }}>
           {SITE_NAME}
         </div>
-        <div style={{ display: "flex", fontSize: 34, color: "#5d6965" }}>
+        <div style={{ display: "flex", fontSize: 34, color: "#6b6b74" }}>
           {SITE_DESCRIPTION}
         </div>
       </div>

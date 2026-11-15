@@ -26,7 +26,7 @@ export const Logo = () => (
     className="flex items-center gap-2.5 rounded-lg focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary"
   >
     <LogoMark className="size-9" />
-    <span className="font-display text-xl font-semibold tracking-tight">
+    <span className="font-display text-lg font-semibold">
       {SITE_NAME}
     </span>
   </Link>

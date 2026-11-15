@@ -3,10 +3,11 @@
 import { useState } from "react";
 import { EmptyState } from "@/components/empty-state";
 import { Field } from "@/components/field";
-import { BUTTON_PRIMARY, INPUT_CLASS } from "@/components/form-styles";
+import { BUTTON_PRIMARY, CARD, INPUT_CLASS } from "@/components/form-styles";
 import { PaymentToolbar } from "@/components/payment-toolbar";
 import { StudentForm } from "@/components/student-form";
 import { StudentRow } from "@/components/student-row";
+import { cn } from "@/lib/cn";
 import { useStudio } from "@/hooks/use-studio";
 import { useToday } from "@/hooks/use-today";
 import { creditBalance } from "@/lib/credits";
@@ -129,7 +130,7 @@ export const StudentsScreen = () => {
           }
         />
       ) : (
-        <ul className="flex flex-col gap-3">
+        <ul className={cn(CARD, "flex flex-col divide-y divide-line p-1.5")}>
           {visible.map((student) => {
             const status = statusOf(student);
             return (

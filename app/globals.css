@@ -2,57 +2,55 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
-/* Paleta "eucalipto": areia quente e verde profundo no claro; verde-tinta e
-   verde-sálvia no escuro. Os componentes usam só os nomes semânticos abaixo. */
+/* Paleta "clean neutro": cinzas frios (zinco) com verde esmeralda como marca.
+   Os componentes usam só os nomes semânticos abaixo. */
 :root {
-  --bg: #f6f3ee;
+  --bg: #fafafa;
   --surface: #ffffff;
-  --surface-2: #efebe4;
-  --line: #e3ddd2;
-  --line-strong: #cbc3b4;
-  --fg: #1d2623;
-  --muted: #5d6965;
-  --primary: #2f6b57;
-  --primary-hover: #265a49;
+  --surface-2: #f4f4f5;
+  --line: #e4e4e7;
+  --line-strong: #d4d4d8;
+  --fg: #18181b;
+  --muted: #6b6b74;
+  --primary: #047857;
+  --primary-hover: #065f46;
   --primary-fg: #ffffff;
-  --primary-soft: #dcebe4;
-  --primary-soft-fg: #1f4a3c;
-  --accent: #c4684a;
-  --danger: #b4332a;
-  --danger-hover: #982a22;
+  --primary-soft: #d1fae5;
+  --primary-soft-fg: #065f46;
+  --accent: #34d399;
+  --danger: #dc2626;
+  --danger-hover: #b91c1c;
   --danger-fg: #ffffff;
-  --danger-soft: #f8dedb;
-  --danger-soft-fg: #7a1f19;
-  --warn-soft: #fbeccb;
-  --warn-soft-fg: #5e4004;
-  --shadow-card:
-    0 1px 2px rgb(29 38 35 / 0.05), 0 10px 28px -14px rgb(29 38 35 / 0.18);
+  --danger-soft: #fee2e2;
+  --danger-soft-fg: #991b1b;
+  --warn-soft: #fef3c7;
+  --warn-soft-fg: #92400e;
+  --shadow-card: 0 1px 2px rgb(24 24 27 / 0.04), 0 1px 3px rgb(24 24 27 / 0.04);
   color-scheme: light;
 }
 
 .dark {
-  --bg: #0e1411;
-  --surface: #151d19;
-  --surface-2: #1d2823;
-  --line: #26332e;
-  --line-strong: #3a4b44;
-  --fg: #e9efec;
-  --muted: #9db0a7;
-  --primary: #7fc4a8;
-  --primary-hover: #98d3ba;
-  --primary-fg: #0a1511;
-  --primary-soft: #1d3a2f;
-  --primary-soft-fg: #a9dcc6;
-  --accent: #e08a6c;
-  --danger: #f08a80;
-  --danger-hover: #f5a39b;
-  --danger-fg: #1b0b09;
-  --danger-soft: #3a1f1d;
-  --danger-soft-fg: #f6b9b3;
-  --warn-soft: #3a2f12;
-  --warn-soft-fg: #f1d28a;
-  --shadow-card:
-    0 1px 2px rgb(0 0 0 / 0.4), 0 10px 28px -14px rgb(0 0 0 / 0.6);
+  --bg: #09090b;
+  --surface: #131316;
+  --surface-2: #1f1f23;
+  --line: #26262b;
+  --line-strong: #3f3f46;
+  --fg: #fafafa;
+  --muted: #a1a1aa;
+  --primary: #34d399;
+  --primary-hover: #6ee7b7;
+  --primary-fg: #022c22;
+  --primary-soft: #0c2a21;
+  --primary-soft-fg: #6ee7b7;
+  --accent: #a7f3d0;
+  --danger: #f87171;
+  --danger-hover: #fca5a5;
+  --danger-fg: #1f0707;
+  --danger-soft: #331414;
+  --danger-soft-fg: #fca5a5;
+  --warn-soft: #33270a;
+  --warn-soft-fg: #fcd34d;
+  --shadow-card: 0 1px 2px rgb(0 0 0 / 0.5);
   color-scheme: dark;
 }
 
@@ -78,8 +76,8 @@
   --color-warn-soft: var(--warn-soft);
   --color-warn-soft-fg: var(--warn-soft-fg);
   --shadow-card: var(--shadow-card);
-  --font-sans: var(--font-jakarta);
-  --font-display: var(--font-fraunces);
+  --font-sans: var(--font-geist);
+  --font-display: var(--font-geist);
 }
 
 body {
@@ -90,9 +88,15 @@ body {
 }
 
 h1,
-h2 {
-  font-family: var(--font-display), Georgia, serif;
-  letter-spacing: -0.015em;
+h2,
+h3,
+.font-display {
+  letter-spacing: -0.025em;
+}
+
+/* Horários e valores alinhados em colunas. */
+body {
+  font-variant-numeric: tabular-nums;
 }
 
 ::selection {

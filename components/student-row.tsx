@@ -3,7 +3,6 @@ import {
   BADGE_NEUTRAL,
   BADGE_PRIMARY,
   BADGE_WARN,
-  CARD,
   FOCUS_RING,
 } from "@/components/form-styles";
 import { cn } from "@/lib/cn";
@@ -22,10 +21,17 @@ type Props = {
 
 const STATUS_LABEL = { paid: "Pago", pending: "Pendente", overdue: "Atrasado" };
 
+/** Pílula de status; o botão em volta mantém a área de toque de 44px. */
 const STATUS_TONE = {
-  paid: "border-primary bg-primary text-primary-fg",
-  pending: "border-line-strong bg-surface hover:bg-surface-2",
-  overdue: "border-danger bg-danger text-danger-fg",
+  paid: "bg-primary-soft text-primary-soft-fg",
+  pending: "bg-surface-2 text-muted group-hover:text-fg",
+  overdue: "bg-danger-soft text-danger-soft-fg",
+};
+
+const STATUS_DOT = {
+  paid: "bg-primary",
+  pending: "bg-line-strong",
+  overdue: "bg-danger",
 };
 
 export const StudentRow = ({
@@ -40,13 +46,12 @@ export const StudentRow = ({
   const fee = student.monthlyFee;
 
   return (
-    <li className="flex items-center gap-2">
+    <li className="flex items-center gap-2 pr-2">
       <button
         type="button"
         onClick={onOpen}
         className={cn(
-          CARD,
-          "flex min-w-0 flex-1 items-center gap-3 p-3.5 text-left hover:bg-surface-2",
+          "flex min-w-0 flex-1 items-center gap-3 rounded-lg p-3 text-left hover:bg-surface-2",
           FOCUS_RING,
         )}
       >
@@ -81,12 +86,22 @@ export const StudentRow = ({
           type="button"
           onClick={onTogglePaid}
           className={cn(
-            "min-h-11 min-w-24 rounded-xl border px-3 text-sm font-semibold",
-            STATUS_TONE[status],
+            "group inline-flex min-h-11 items-center rounded-full",
             FOCUS_RING,
           )}
         >
-          {STATUS_LABEL[status]}{" "}
+          <span
+            className={cn(
+              "inline-flex min-w-24 items-center justify-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium",
+              STATUS_TONE[status],
+            )}
+          >
+            <span
+              aria-hidden="true"
+              className={cn("size-1.5 rounded-full", STATUS_DOT[status])}
+            />
+            {STATUS_LABEL[status]}
+          </span>{" "}
           <span className="sr-only">
             {status === "paid"
               ? `— desfazer pagamento de ${student.name}`

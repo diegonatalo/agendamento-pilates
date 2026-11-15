@@ -30,16 +30,16 @@ export const MainNav = () => {
                 href={item.href}
                 aria-current={active ? "page" : undefined}
                 className={cn(
-                  "flex min-h-12 flex-col items-center justify-center gap-0.5 rounded-xl px-3 text-xs font-medium focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary md:min-h-11 md:flex-row md:gap-2 md:rounded-full md:px-4 md:text-sm",
+                  "flex min-h-12 flex-col items-center justify-center gap-0.5 rounded-xl px-3 text-xs font-medium focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary md:min-h-11 md:flex-row md:gap-2 md:rounded-lg md:px-3 md:text-sm",
                   active
-                    ? "bg-primary-soft text-primary-soft-fg"
+                    ? "bg-surface-2 text-fg md:bg-surface md:shadow-xs md:ring-1 md:ring-line"
                     : "text-muted hover:bg-surface-2 hover:text-fg",
                 )}
               >
                 <svg
                   aria-hidden="true"
                   viewBox="0 0 24 24"
-                  className="size-6 md:size-5"
+                  className="size-6 md:size-4"
                   fill="none"
                   stroke="currentColor"
                   strokeWidth="2"
