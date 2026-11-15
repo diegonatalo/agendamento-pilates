@@ -4,6 +4,13 @@ import { newId } from "@/lib/ids";
 import type { StudioData } from "@/lib/backup";
 import { removePaymentsOfStudent, setPayment } from "@/lib/payments";
 import {
+  feeAmount,
+  sortPlans,
+  studentsOnPlan,
+  validatePlan,
+  type PlanDraft,
+} from "@/lib/plans";
+import {
   addMakeup,
   addTrial,
   removeBooking,
@@ -25,9 +32,11 @@ import type {
   DateKey,
   MonthKey,
   MonthlyPayment,
+  Plan,
   Student,
 } from "@/types/pilates";
 
+const plansStore = createLocalStore<Plan[]>(STORAGE_KEYS.plans, []);
 const slotsStore = createLocalStore<ClassSlot[]>(STORAGE_KEYS.slots, []);
 const studentsStore = createLocalStore<Student[]>(STORAGE_KEYS.students, []);
 const bookingsStore = createLocalStore<Booking[]>(STORAGE_KEYS.bookings, []);
@@ -46,6 +55,7 @@ const blockedStore = createLocalStore<BlockedPeriod[]>(
 
 /** Dados do estúdio e as operações que mantêm tudo coerente. */
 export const useStudio = () => {
+  const plansState = useLocalStore(plansStore);
   const slotsState = useLocalStore(slotsStore);
   const studentsState = useLocalStore(studentsStore);
   const bookingsState = useLocalStore(bookingsStore);
@@ -55,6 +65,29 @@ export const useStudio = () => {
   const slots = sortSlots(slotsState.data);
   const students = sortStudents(studentsState.data);
   const blockedPeriods = sortBlockedPeriods(blockedState.data);
+  const plans = sortPlans(plansState.data);
+
+  /** Cria ou atualiza um plano. Devolve a mensagem de erro, ou `null`. */
+  const savePlan = (draft: PlanDraft, editingId: string | null) => {
+    const clean = { ...draft, name: draft.name.trim() };
+    const error = validatePlan(clean, plansState.data, editingId);
+    if (error) return error;
+    plansStore.set(
+      editingId
+        ? plansState.data.map((p) => (p.id === editingId ? { ...p, ...clean } : p))
+        : [...plansState.data, { id: newId(), ...clean }],
+    );
+    return null;
+  };
+
+  /** Só exclui plano sem alunos. Devolve a mensagem de erro, ou `null`. */
+  const removePlan = (planId: string) => {
+    const using = studentsOnPlan(planId, studentsState.data).length;
+    if (using > 0)
+      return `Este plano está na ficha de ${using} ${using === 1 ? "aluno" : "alunos"}. Troque o plano deles antes de excluir.`;
+    plansStore.set(plansState.data.filter((p) => p.id !== planId));
+    return null;
+  };
 
   /** Devolve a mensagem de erro, ou `null` quando adicionou. */
   const addSlot = (candidate: Pick<ClassSlot, "weekday" | "startTime">) => {
@@ -93,6 +126,7 @@ export const useStudio = () => {
 
   /** Substitui todos os dados pelos do backup. */
   const restoreData = (data: StudioData) => {
+    plansStore.set(data.plans);
     slotsStore.set(data.slots);
     studentsStore.set(data.students);
     bookingsStore.set(data.bookings);
@@ -102,15 +136,19 @@ export const useStudio = () => {
 
   const recordBackup = (date: DateKey) => lastBackupStore.set(date);
 
+  /** Ao marcar como pago, grava o valor atual da mensalidade do aluno. */
   const markPayment = (
     studentId: string,
     month: MonthKey,
     paid: boolean,
     today: DateKey,
-  ) =>
+  ) => {
+    const fee = studentsState.data.find((s) => s.id === studentId)?.monthlyFee;
+    const amount = fee ? (feeAmount(fee, plansState.data) ?? 0) : 0;
     paymentsStore.set(
-      setPayment(paymentsState.data, studentId, month, paid, today),
+      setPayment(paymentsState.data, studentId, month, paid, today, amount),
     );
+  };
 
   const markAttendance = (
     target: { slotId: string; date: DateKey; studentId: string },
@@ -163,11 +201,15 @@ export const useStudio = () => {
 
   return {
     ready:
+      plansState.ready &&
       slotsState.ready &&
       studentsState.ready &&
       bookingsState.ready &&
       blockedState.ready &&
       paymentsState.ready,
+    plans,
+    savePlan,
+    removePlan,
     slots,
     students,
     payments: paymentsState.data,

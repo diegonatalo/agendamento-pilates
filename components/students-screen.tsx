@@ -27,6 +27,7 @@ export const StudentsScreen = () => {
     saveStudent,
     removeStudent,
     markPayment,
+    plans,
   } = useStudio();
   const today = useToday();
   const [creating, setCreating] = useState<Student | null>(null);
@@ -68,6 +69,7 @@ export const StudentsScreen = () => {
           initial={current}
           isNew={creating !== null}
           slots={slots}
+          plans={plans}
           students={students}
           credits={creditBalance(current.id, bookings)}
           onSave={(student) => {
@@ -99,7 +101,7 @@ export const StudentsScreen = () => {
       {month && today ? (
         <PaymentToolbar
           month={month}
-          summary={summarizeMonth(students, month, payments, today)}
+          summary={summarizeMonth(students, plans, month, payments, today)}
           onlyUnpaid={onlyUnpaid}
           onMonthChange={setPickedMonth}
           onOnlyUnpaidChange={setOnlyUnpaid}
@@ -138,6 +140,7 @@ export const StudentsScreen = () => {
                 key={student.id}
                 student={student}
                 slots={slots}
+                plans={plans}
                 credits={creditBalance(student.id, bookings)}
                 status={status}
                 onOpen={() => setSelectedId(student.id)}

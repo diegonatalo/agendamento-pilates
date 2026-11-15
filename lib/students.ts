@@ -1,5 +1,6 @@
 import { CLASS_CAPACITY } from "@/lib/constants";
-import type { DateKey, Student } from "@/types/pilates";
+import { findPlan } from "@/lib/plans";
+import type { DateKey, Plan, Student } from "@/types/pilates";
 
 export const createEmptyStudent = (id: string, today: DateKey): Student => ({
   id,
@@ -23,11 +24,21 @@ export const createEmptyStudent = (id: string, today: DateKey): Student => ({
 });
 
 /** Devolve a mensagem de erro, ou `null` se a ficha pode ser salva. */
-export const validateStudent = (student: Student): string | null => {
+export const validateStudent = (
+  student: Student,
+  plans: Plan[],
+): string | null => {
   if (!student.name.trim()) return "Informe o nome do aluno.";
   const fee = student.monthlyFee;
   if (fee) {
-    if (!Number.isFinite(fee.amount) || fee.amount < 0)
+    if (fee.planId !== null && !findPlan(fee.planId, plans))
+      return "O plano escolhido não existe mais. Escolha outro.";
+    if (fee.planId === null && fee.customAmount === null)
+      return "Escolha um plano ou informe o valor da mensalidade.";
+    if (
+      fee.customAmount !== null &&
+      (!Number.isFinite(fee.customAmount) || fee.customAmount < 0)
+    )
       return "Informe um valor de mensalidade válido.";
     if (!Number.isInteger(fee.dueDay) || fee.dueDay < 1 || fee.dueDay > 31)
       return "O dia de vencimento deve estar entre 1 e 31.";

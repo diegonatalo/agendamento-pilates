@@ -95,7 +95,7 @@ describe("StudentsScreen", () => {
   describe("mensalidade", () => {
     const withFee = (id: string, name: string, dueDay = 5): Student => ({
       ...person(id, name),
-      monthlyFee: { amount: 200, dueDay },
+      monthlyFee: { planId: null, customAmount: 200, dueDay },
     });
     const savedPayments = (): MonthlyPayment[] =>
       JSON.parse(window.localStorage.getItem(STORAGE_KEYS.payments) ?? "[]");
@@ -111,7 +111,7 @@ describe("StudentsScreen", () => {
       seed([], [withFee("a", "Ana", 5), withFee("b", "Bia", 20), person("c", "Carla")]);
       window.localStorage.setItem(
         STORAGE_KEYS.payments,
-        JSON.stringify([{ studentId: "b", month: "2026-11", paid: true, paidAt: "2026-11-02" }]),
+        JSON.stringify([{ studentId: "b", month: "2026-11", paid: true, paidAt: "2026-11-02", amount: 200 }]),
       );
       render(<StudentsScreen />);
 
@@ -132,7 +132,7 @@ describe("StudentsScreen", () => {
       await user.click(screen.getByRole("button", { name: /marcar mensalidade de Ana/ }));
       expect(screen.getByRole("button", { name: /desfazer pagamento de Ana/ })).toBeInTheDocument();
       expect(savedPayments()).toEqual([
-        { studentId: "a", month: "2026-11", paid: true, paidAt: "2026-11-10" },
+        { studentId: "a", month: "2026-11", paid: true, paidAt: "2026-11-10", amount: 200 },
       ]);
       expect(screen.getByText(/1 de 1 pagas/)).toBeInTheDocument();
 
@@ -161,7 +161,7 @@ describe("StudentsScreen", () => {
       seed([], [withFee("a", "Ana"), withFee("b", "Bia"), person("c", "Carla")]);
       window.localStorage.setItem(
         STORAGE_KEYS.payments,
-        JSON.stringify([{ studentId: "b", month: "2026-11", paid: true, paidAt: "2026-11-02" }]),
+        JSON.stringify([{ studentId: "b", month: "2026-11", paid: true, paidAt: "2026-11-02", amount: 200 }]),
       );
       const user = userEvent.setup();
       render(<StudentsScreen />);
@@ -177,7 +177,7 @@ describe("StudentsScreen", () => {
       seed([], [{ ...withFee("a", "Ana"), startedAt: "2026-11-01" }]);
       window.localStorage.setItem(
         STORAGE_KEYS.payments,
-        JSON.stringify([{ studentId: "a", month: "2026-11", paid: true, paidAt: "2026-11-02" }]),
+        JSON.stringify([{ studentId: "a", month: "2026-11", paid: true, paidAt: "2026-11-02", amount: 200 }]),
       );
       const user = userEvent.setup();
       render(<StudentsScreen />);
@@ -188,11 +188,75 @@ describe("StudentsScreen", () => {
       expect(screen.getByText("Nenhum aluno com mensalidade neste mês.")).toBeInTheDocument();
     });
 
+    describe("com planos", () => {
+      const twice = { id: "p2", name: "2x por semana", weeklyClasses: 2, amount: 280 };
+      const savedStudents = (): Student[] =>
+        JSON.parse(window.localStorage.getItem(STORAGE_KEYS.students) ?? "[]");
+
+      beforeEach(() =>
+        window.localStorage.setItem(STORAGE_KEYS.plans, JSON.stringify([twice])),
+      );
+
+      it("cadastra o aluno no plano e grava o valor do plano ao pagar", async () => {
+        seed([], []);
+        const user = userEvent.setup();
+        render(<StudentsScreen />);
+
+        await user.click(screen.getByRole("button", { name: "Novo aluno" }));
+        await user.type(screen.getByLabelText("Nome"), "Marina");
+        await user.click(screen.getByRole("checkbox", { name: "Cobrar mensalidade" }));
+        expect(screen.getByLabelText("Plano")).toHaveValue("p2");
+        expect(screen.queryByLabelText("Valor (R$)")).not.toBeInTheDocument();
+        await user.click(screen.getByRole("button", { name: "Salvar aluno" }));
+
+        expect(savedStudents()[0].monthlyFee).toEqual({
+          planId: "p2",
+          customAmount: null,
+          dueDay: 5,
+        });
+        expect(screen.getByText(/2x por semana · R\$\s280,00 · vence dia 5/)).toBeInTheDocument();
+
+        await user.click(screen.getByRole("button", { name: /marcar mensalidade de Marina/ }));
+        expect(savedPayments()[0].amount).toBe(280);
+      });
+
+      it("aceita valor diferente do plano", async () => {
+        seed([], [{ ...person("a", "Ana"), monthlyFee: { planId: "p2", customAmount: null, dueDay: 5 } }]);
+        const user = userEvent.setup();
+        render(<StudentsScreen />);
+
+        await user.click(screen.getByRole("button", { name: /^Ana/ }));
+        await user.click(screen.getByRole("checkbox", { name: /Valor diferente do plano/ }));
+        const amount = screen.getByLabelText("Valor (R$)");
+        expect(amount).toHaveValue(280);
+        await user.clear(amount);
+        await user.type(amount, "250");
+        await user.click(screen.getByRole("button", { name: "Salvar aluno" }));
+
+        expect(savedStudents()[0].monthlyFee).toMatchObject({ planId: "p2", customAmount: 250 });
+      });
+
+      it("avisa quando o aluno tem mais horários que o plano", async () => {
+        const slots = [slot("s1"), slot("s2"), slot("s3")];
+        seed(slots, [
+          {
+            ...person("a", "Ana", ["s1", "s2", "s3"]),
+            monthlyFee: { planId: "p2", customAmount: null, dueDay: 5 },
+          },
+        ]);
+        const user = userEvent.setup();
+        render(<StudentsScreen />);
+        await user.click(screen.getByRole("button", { name: /^Ana/ }));
+
+        expect(screen.getByText(/plano dá direito a 2x por semana, mas o aluno tem 3 horários/)).toBeInTheDocument();
+      });
+    });
+
     it("excluir o aluno apaga os pagamentos dele", async () => {
       seed([], [withFee("a", "Ana")]);
       window.localStorage.setItem(
         STORAGE_KEYS.payments,
-        JSON.stringify([{ studentId: "a", month: "2026-11", paid: true, paidAt: "2026-11-02" }]),
+        JSON.stringify([{ studentId: "a", month: "2026-11", paid: true, paidAt: "2026-11-02", amount: 200 }]),
       );
       const user = userEvent.setup();
       render(<StudentsScreen />);

@@ -7,12 +7,14 @@ import {
 } from "@/components/form-styles";
 import { cn } from "@/lib/cn";
 import { formatCurrency, type PaymentStatus } from "@/lib/payments";
+import { feeAmount, findPlan } from "@/lib/plans";
 import { formatSlotShort } from "@/lib/slots";
-import type { ClassSlot, Student } from "@/types/pilates";
+import type { ClassSlot, Plan, Student } from "@/types/pilates";
 
 type Props = {
   student: Student;
   slots: ClassSlot[];
+  plans: Plan[];
   credits: number;
   status: PaymentStatus;
   onOpen: () => void;
@@ -37,6 +39,7 @@ const STATUS_DOT = {
 export const StudentRow = ({
   student,
   slots,
+  plans,
   credits,
   status,
   onOpen,
@@ -76,7 +79,11 @@ export const StudentRow = ({
           </span>
           {fee ? (
             <span className="text-sm text-muted">
-              {formatCurrency(fee.amount)} · vence dia {fee.dueDay}
+              {[
+                findPlan(fee.planId, plans)?.name ?? "Valor combinado",
+                formatCurrency(feeAmount(fee, plans) ?? 0),
+                `vence dia ${fee.dueDay}`,
+              ].join(" · ")}
             </span>
           ) : null}
         </span>

@@ -10,6 +10,7 @@ import {
 import { createEmptyStudent } from "@/lib/students";
 
 const data: StudioData = {
+  plans: [{ id: "p1", name: "1x por semana", weeklyClasses: 1, amount: 200 }],
   slots: [{ id: "s1", weekday: 1, startTime: "08:00" }],
   students: [
     {
@@ -17,7 +18,7 @@ const data: StudioData = {
       name: "Ana",
       slotIds: ["s1"],
       birthDate: "1990-05-01",
-      monthlyFee: { amount: 200, dueDay: 5 },
+      monthlyFee: { planId: "p1", customAmount: null, dueDay: 5 },
       evolution: [{ id: "n1", date: "2026-02-01", text: "Melhorou" }],
     },
   ],
@@ -35,7 +36,9 @@ const data: StudioData = {
   blockedPeriods: [
     { id: "p1", startDate: "2026-12-24", endDate: "2026-12-25", reason: "Natal" },
   ],
-  payments: [{ studentId: "a", month: "2026-11", paid: true, paidAt: "2026-11-02" }],
+  payments: [
+    { studentId: "a", month: "2026-11", paid: true, paidAt: "2026-11-02", amount: 200 },
+  ],
 };
 
 const roundTrip = () => JSON.stringify(buildBackup(data, "2026-11-09T12:00:00.000Z"));
@@ -61,6 +64,7 @@ describe("parseBackup", () => {
 
   it("aceita um backup com listas vazias", () => {
     const empty: StudioData = {
+      plans: [],
       slots: [],
       students: [],
       bookings: [],
@@ -109,10 +113,13 @@ describe("parseBackup", () => {
       ["horários", (b) => (b.data.slots[0].weekday = 9)],
       ["alunos", (b) => (b.data.students[0].name = 42)],
       ["alunos", (b) => delete b.data.students[0].health],
-      ["alunos", (b) => (b.data.students[0].monthlyFee = { amount: "x", dueDay: 5 })],
+      ["planos", (b) => (b.data.plans[0].amount = "x")],
+      ["alunos", (b) => (b.data.students[0].monthlyFee = { amount: 200, dueDay: 5 })],
+      ["alunos", (b) => (b.data.students[0].monthlyFee.planId = null)],
       ["presenças", (b) => (b.data.bookings[0].status = "talvez")],
       ["datas bloqueadas", (b) => delete b.data.blockedPeriods[0].reason],
       ["pagamentos", (b) => (b.data.payments[0].paid = "sim")],
+      ["pagamentos", (b) => delete b.data.payments[0].amount],
     ];
     for (const [section, mutate] of cases) {
       const backup = JSON.parse(roundTrip());
@@ -127,6 +134,7 @@ describe("parseBackup", () => {
 describe("countBackup", () => {
   it("conta cada lista", () => {
     expect(countBackup(data)).toEqual({
+      plans: 1,
       students: 1,
       slots: 1,
       bookings: 1,

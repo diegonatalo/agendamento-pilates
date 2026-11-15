@@ -38,6 +38,7 @@ export const BackupScreen = () => {
     lastBackup,
     restoreData,
     recordBackup,
+    plans,
   } = useStudio();
   const [pending, setPending] = useState<BackupFile | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -46,7 +47,7 @@ export const BackupScreen = () => {
   const handleExport = () => {
     const now = new Date();
     const backup = buildBackup(
-      { slots, students, bookings, blockedPeriods, payments },
+      { plans, slots, students, bookings, blockedPeriods, payments },
       now.toISOString(),
     );
     const today = toDateKey(now);
@@ -151,7 +152,8 @@ export const BackupScreen = () => {
           <div className="flex flex-col gap-3 rounded-xl bg-surface-2 p-4">
             <p className="text-sm">
               Backup de {formatDateBr(pending.exportedAt.slice(0, 10))}:{" "}
-              {counts.students} alunos, {counts.slots} horários,{" "}
+              {counts.students} alunos, {counts.plans} planos,{" "}
+              {counts.slots} horários,{" "}
               {counts.bookings} presenças, {counts.blockedPeriods} datas
               bloqueadas e {counts.payments} pagamentos.
             </p>

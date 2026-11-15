@@ -13,18 +13,21 @@ import {
 import { CLASS_CAPACITY } from "@/lib/constants";
 import { toDateKey } from "@/lib/dates";
 import { newId } from "@/lib/ids";
+import { formatCurrency } from "@/lib/payments";
+import { findPlan, formatWeeklyClasses, slotsOverPlan } from "@/lib/plans";
 import { formatSlot } from "@/lib/slots";
 import {
   studentsInSlot,
   validateStudent,
   whatsappLink,
 } from "@/lib/students";
-import type { ClassSlot, Student } from "@/types/pilates";
+import type { ClassSlot, MonthlyFee, Plan, Student } from "@/types/pilates";
 
 type Props = {
   initial: Student;
   isNew: boolean;
   slots: ClassSlot[];
+  plans: Plan[];
   /** Todos os alunos cadastrados, para calcular as vagas dos horários. */
   students: Student[];
   /** Saldo de reposições do aluno. */
@@ -42,6 +45,7 @@ export const StudentForm = ({
   initial,
   isNew,
   slots,
+  plans,
   students,
   credits,
   onSave,
@@ -64,6 +68,17 @@ export const StudentForm = ({
       ...current,
       health: { ...current.health, [key]: value },
     }));
+
+  const fee = draft.monthlyFee;
+  const selectedPlan = findPlan(fee?.planId ?? null, plans);
+  const overPlan = slotsOverPlan(draft, plans);
+
+  const setFee = (changes: Partial<MonthlyFee>) =>
+    setDraft((current) =>
+      current.monthlyFee
+        ? { ...current, monthlyFee: { ...current.monthlyFee, ...changes } }
+        : current,
+    );
 
   const toggleSlot = (slotId: string) =>
     setField(
@@ -92,7 +107,7 @@ export const StudentForm = ({
   const handleSubmit = (event: FormEvent) => {
     event.preventDefault();
     const candidate = { ...draft, name: draft.name.trim() };
-    const problem = validateStudent(candidate);
+    const problem = validateStudent(candidate, plans);
     if (problem) {
       setError(problem);
       return;
@@ -278,51 +293,105 @@ export const StudentForm = ({
           <input
             type="checkbox"
             className="size-5 accent-primary"
-            checked={draft.monthlyFee !== null}
+            checked={fee !== null}
             onChange={(e) =>
               setField(
                 "monthlyFee",
-                e.target.checked ? { amount: 0, dueDay: 5 } : null,
+                e.target.checked
+                  ? {
+                      planId: plans[0]?.id ?? null,
+                      customAmount: null,
+                      dueDay: 5,
+                    }
+                  : null,
               )
             }
           />
           Cobrar mensalidade
         </label>
-        {draft.monthlyFee ? (
-          <div className="grid gap-4 sm:grid-cols-2">
-            <Field label="Valor (R$)">
-              <input
-                type="number"
-                min="0"
-                step="0.01"
-                inputMode="decimal"
-                className={INPUT_CLASS}
-                value={draft.monthlyFee.amount}
-                onChange={(e) =>
-                  setField("monthlyFee", {
-                    amount: e.target.valueAsNumber,
-                    dueDay: draft.monthlyFee?.dueDay ?? 5,
-                  })
-                }
-              />
-            </Field>
-            <Field label="Dia de vencimento">
-              <input
-                type="number"
-                min="1"
-                max="31"
-                inputMode="numeric"
-                className={INPUT_CLASS}
-                value={draft.monthlyFee.dueDay}
-                onChange={(e) =>
-                  setField("monthlyFee", {
-                    amount: draft.monthlyFee?.amount ?? 0,
-                    dueDay: e.target.valueAsNumber,
-                  })
-                }
-              />
-            </Field>
-          </div>
+        {fee ? (
+          <>
+            {plans.length === 0 ? (
+              <p className="text-sm text-muted">
+                Nenhum plano cadastrado. Cadastre os planos na aba Planos ou
+                informe um valor combinado abaixo.
+              </p>
+            ) : (
+              <Field label="Plano">
+                <select
+                  className={INPUT_CLASS}
+                  value={fee.planId ?? ""}
+                  onChange={(e) =>
+                    setFee({
+                      planId: e.target.value || null,
+                      customAmount: e.target.value ? null : fee.customAmount,
+                    })
+                  }
+                >
+                  {plans.map((plan) => (
+                    <option key={plan.id} value={plan.id}>
+                      {plan.name} — {formatCurrency(plan.amount)}
+                    </option>
+                  ))}
+                  <option value="">Sem plano (valor combinado)</option>
+                </select>
+              </Field>
+            )}
+            {selectedPlan ? (
+              <label className="flex items-center gap-3 text-sm font-medium">
+                <input
+                  type="checkbox"
+                  className="size-5 accent-primary"
+                  checked={fee.customAmount !== null}
+                  onChange={(e) =>
+                    setFee({
+                      customAmount: e.target.checked ? selectedPlan.amount : null,
+                    })
+                  }
+                />
+                Valor diferente do plano (desconto ou valor combinado)
+              </label>
+            ) : null}
+            <div className="grid gap-4 sm:grid-cols-2">
+              {fee.customAmount !== null || !selectedPlan ? (
+                <Field label="Valor (R$)">
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    inputMode="decimal"
+                    className={INPUT_CLASS}
+                    value={
+                      fee.customAmount === null || Number.isNaN(fee.customAmount)
+                        ? ""
+                        : fee.customAmount
+                    }
+                    onChange={(e) =>
+                      setFee({ customAmount: e.target.valueAsNumber })
+                    }
+                  />
+                </Field>
+              ) : null}
+              <Field label="Dia de vencimento">
+                <input
+                  type="number"
+                  min="1"
+                  max="31"
+                  inputMode="numeric"
+                  className={INPUT_CLASS}
+                  value={Number.isNaN(fee.dueDay) ? "" : fee.dueDay}
+                  onChange={(e) => setFee({ dueDay: e.target.valueAsNumber })}
+                />
+              </Field>
+            </div>
+            {selectedPlan && overPlan > 0 ? (
+              <p className="rounded-lg bg-warn-soft px-3 py-2 text-sm text-warn-soft-fg">
+                Este plano dá direito a{" "}
+                {formatWeeklyClasses(selectedPlan.weeklyClasses)}, mas o aluno
+                tem {draft.slotIds.length} horários fixos.
+              </p>
+            ) : null}
+          </>
         ) : null}
       </fieldset>
 

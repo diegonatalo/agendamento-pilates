@@ -12,20 +12,29 @@ import {
   summarizeMonth,
 } from "@/lib/payments";
 import { createEmptyStudent } from "@/lib/students";
-import type { MonthlyPayment, Student } from "@/types/pilates";
+import type { MonthlyFee, MonthlyPayment, Plan, Student } from "@/types/pilates";
+
+function fee(customAmount: number, dueDay: number): MonthlyFee {
+  return { planId: null, customAmount, dueDay };
+}
 
 const student = (id: string, overrides: Partial<Student> = {}): Student => ({
   ...createEmptyStudent(id, "2026-01-10"),
   name: `Aluno ${id}`,
-  monthlyFee: { amount: 200, dueDay: 5 },
+  monthlyFee: fee(200, 5),
   ...overrides,
 });
 
-const paid = (studentId: string, month: string): MonthlyPayment => ({
+const paid = (
+  studentId: string,
+  month: string,
+  amount = 200,
+): MonthlyPayment => ({
   studentId,
   month,
   paid: true,
   paidAt: `${month}-03`,
+  amount,
 });
 
 describe("meses", () => {
@@ -118,12 +127,12 @@ describe("summarizeMonth", () => {
   it("soma cobrados, pagos, atrasados e valores", () => {
     const students = [
       student("a"),
-      student("b", { monthlyFee: { amount: 300, dueDay: 10 } }),
-      student("c", { monthlyFee: { amount: 100, dueDay: 28 } }),
+      student("b", { monthlyFee: fee(300, 10) }),
+      student("c", { monthlyFee: fee(100, 28) }),
       student("d", { monthlyFee: null }),
       student("e", { active: false }),
     ];
-    const summary = summarizeMonth(students, month, [paid("b", month)], "2026-11-15");
+    const summary = summarizeMonth(students, [], month, [paid("b", month, 300)], "2026-11-15");
     expect(summary).toEqual({
       billed: 3,
       paid: 1,
@@ -134,7 +143,7 @@ describe("summarizeMonth", () => {
   });
 
   it("zera quando ninguém é cobrado", () => {
-    expect(summarizeMonth([student("a", { monthlyFee: null })], month, [], "2026-11-15")).toEqual({
+    expect(summarizeMonth([student("a", { monthlyFee: null })], [], month, [], "2026-11-15")).toEqual({
       billed: 0,
       paid: 0,
       overdue: 0,
@@ -142,24 +151,36 @@ describe("summarizeMonth", () => {
       received: 0,
     });
   });
+
+  it("usa o valor gravado no pagamento e o preço atual do plano para quem falta", () => {
+    const plans: Plan[] = [{ id: "p2", name: "2x", weeklyClasses: 2, amount: 300 }];
+    const onPlan: MonthlyFee = { planId: "p2", customAmount: null, dueDay: 5 };
+    const students = [
+      student("a", { monthlyFee: onPlan }),
+      student("b", { monthlyFee: onPlan }),
+    ];
+    // Ana pagou 280 antes do reajuste para 300.
+    const summary = summarizeMonth(students, plans, month, [paid("a", month, 280)], "2026-11-15");
+    expect(summary).toMatchObject({ paid: 1, received: 280, expected: 580 });
+  });
 });
 
 describe("setPayment", () => {
-  it("marcar como pago grava a data", () => {
-    expect(setPayment([], "a", "2026-11", true, "2026-11-09")).toEqual([
-      { studentId: "a", month: "2026-11", paid: true, paidAt: "2026-11-09" },
+  it("marcar como pago grava a data e o valor", () => {
+    expect(setPayment([], "a", "2026-11", true, "2026-11-09", 250)).toEqual([
+      { studentId: "a", month: "2026-11", paid: true, paidAt: "2026-11-09", amount: 250 },
     ]);
   });
 
   it("marcar de novo não duplica e atualiza a data", () => {
-    const result = setPayment([paid("a", "2026-11")], "a", "2026-11", true, "2026-11-20");
+    const result = setPayment([paid("a", "2026-11")], "a", "2026-11", true, "2026-11-20", 200);
     expect(result).toHaveLength(1);
     expect(result[0].paidAt).toBe("2026-11-20");
   });
 
   it("desfazer apaga só aquele mês daquele aluno", () => {
     const list = [paid("a", "2026-11"), paid("a", "2026-10"), paid("b", "2026-11")];
-    const result = setPayment(list, "a", "2026-11", false, "2026-11-20");
+    const result = setPayment(list, "a", "2026-11", false, "2026-11-20", 200);
     expect(result.map((p) => `${p.studentId}:${p.month}`)).toEqual(["a:2026-10", "b:2026-11"]);
   });
 });

@@ -29,9 +29,10 @@ const seed = () => {
     name: "Ana",
     slotIds: ["s1"],
     attention: "Evitar flexão de coluna",
-    monthlyFee: { amount: 200, dueDay: 5 },
+    monthlyFee: { planId: "p1", customAmount: null, dueDay: 5 },
   };
   const bia = { ...createEmptyStudent("b", "2026-01-01"), name: "Bia" };
+  set(STORAGE_KEYS.plans, [{ id: "p1", name: "1x por semana", weeklyClasses: 1, amount: 200 }]);
   set(STORAGE_KEYS.slots, [{ id: "s1", weekday: 1, startTime: "08:00" }]);
   set(STORAGE_KEYS.students, [ana, bia]);
   set(STORAGE_KEYS.bookings, [

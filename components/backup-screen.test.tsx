@@ -50,7 +50,7 @@ describe("BackupScreen", () => {
 
     expect(click).toHaveBeenCalledTimes(1);
     const saved = JSON.parse(await blob!.text());
-    expect(saved).toMatchObject({ app: "agenda-pilates", version: 1 });
+    expect(saved).toMatchObject({ app: "agenda-pilates", version: 2 });
     expect(saved.data.students).toHaveLength(1);
     expect(saved.data.students[0].name).toBe("Ana");
     expect(read(STORAGE_KEYS.lastBackup)).toBe("2026-11-09");
@@ -64,6 +64,7 @@ describe("BackupScreen", () => {
       JSON.stringify([{ ...student, id: "old", name: "Antiga" }]),
     );
     const data: StudioData = {
+      plans: [{ id: "p1", name: "2x por semana", weeklyClasses: 2, amount: 280 }],
       slots: [{ id: "s1", weekday: 1, startTime: "08:00" }],
       students: [student],
       bookings: [],
@@ -74,19 +75,21 @@ describe("BackupScreen", () => {
     render(<BackupScreen />);
 
     await user.upload(screen.getByLabelText(/Arquivo de backup/), fileOf(data));
-    expect(await screen.findByText(/1 alunos, 1 horários/)).toBeInTheDocument();
+    expect(await screen.findByText(/1 alunos, 1 planos,\s+1 horários/)).toBeInTheDocument();
     expect(read(STORAGE_KEYS.students)[0].name).toBe("Antiga");
 
     await user.click(screen.getByRole("button", { name: "Substituir dados atuais" }));
 
     expect(read(STORAGE_KEYS.students)).toEqual([student]);
     expect(read(STORAGE_KEYS.slots)).toEqual(data.slots);
+    expect(read(STORAGE_KEYS.plans)).toEqual(data.plans);
     expect(screen.getByRole("status")).toHaveTextContent("Backup restaurado.");
   });
 
   it("cancelar não altera os dados atuais", async () => {
     window.localStorage.setItem(STORAGE_KEYS.students, JSON.stringify([student]));
     const data: StudioData = {
+      plans: [],
       slots: [],
       students: [],
       bookings: [],

@@ -1,7 +1,9 @@
+import { feeAmount } from "@/lib/plans";
 import type {
   DateKey,
   MonthKey,
   MonthlyPayment,
+  Plan,
   Student,
 } from "@/types/pilates";
 
@@ -21,6 +23,15 @@ const MONTH_NAMES = [
 ];
 
 export type PaymentStatus = "not-billed" | "paid" | "pending" | "overdue";
+
+export const findPayment = (
+  payments: MonthlyPayment[],
+  studentId: string,
+  month: MonthKey,
+): MonthlyPayment | null =>
+  payments.find(
+    (p) => p.studentId === studentId && p.month === month && p.paid,
+  ) ?? null;
 
 export const monthOf = (date: DateKey): MonthKey => date.slice(0, 7);
 
@@ -62,10 +73,7 @@ export const paymentStatus = (
   today: DateKey,
 ): PaymentStatus => {
   if (!student.monthlyFee || !isBilledIn(student, month)) return "not-billed";
-  const paid = payments.some(
-    (p) => p.studentId === student.id && p.month === month && p.paid,
-  );
-  if (paid) return "paid";
+  if (findPayment(payments, student.id, month)) return "paid";
   return today > dueDateOf(month, student.monthlyFee.dueDay)
     ? "overdue"
     : "pending";
@@ -75,14 +83,15 @@ export type MonthSummary = {
   billed: number;
   paid: number;
   overdue: number;
-  /** Soma das mensalidades dos alunos cobrados no mês. */
+  /** O que já foi recebido mais a mensalidade atual de quem falta pagar. */
   expected: number;
+  /** Soma dos valores gravados nos pagamentos do mês. */
   received: number;
 };
 
-/** Os valores usam a mensalidade atual de cada ficha. */
 export const summarizeMonth = (
   students: Student[],
+  plans: Plan[],
   month: MonthKey,
   payments: MonthlyPayment[],
   today: DateKey,
@@ -98,29 +107,33 @@ export const summarizeMonth = (
     const status = paymentStatus(student, month, payments, today);
     if (status === "not-billed" || !student.monthlyFee) continue;
     summary.billed += 1;
-    summary.expected += student.monthlyFee.amount;
-    if (status === "paid") {
+    const payment = findPayment(payments, student.id, month);
+    if (payment) {
       summary.paid += 1;
-      summary.received += student.monthlyFee.amount;
+      summary.received += payment.amount;
+      summary.expected += payment.amount;
+    } else {
+      summary.expected += feeAmount(student.monthlyFee, plans) ?? 0;
     }
     if (status === "overdue") summary.overdue += 1;
   }
   return summary;
 };
 
-/** Marcar como pago grava a data; desmarcar apaga o registro. */
+/** Marcar como pago grava a data e o valor; desmarcar apaga o registro. */
 export const setPayment = (
   payments: MonthlyPayment[],
   studentId: string,
   month: MonthKey,
   paid: boolean,
   today: DateKey,
+  amount: number,
 ): MonthlyPayment[] => {
   const others = payments.filter(
     (p) => !(p.studentId === studentId && p.month === month),
   );
   return paid
-    ? [...others, { studentId, month, paid: true, paidAt: today }]
+    ? [...others, { studentId, month, paid: true, paidAt: today, amount }]
     : others;
 };
 

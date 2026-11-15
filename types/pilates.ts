@@ -14,6 +14,26 @@ export type ClassSlot = {
   startTime: TimeOfDay;
 };
 
+/** Plano do estúdio, por exemplo "2x por semana" por R$ 280. */
+export type Plan = {
+  id: string;
+  name: string;
+  /** Aulas por semana que o plano dá direito. */
+  weeklyClasses: number;
+  /** Mensalidade em reais. */
+  amount: number;
+};
+
+/**
+ * Mensalidade do aluno. O valor cobrado é `customAmount` quando preenchido
+ * (desconto ou valor combinado), senão o preço atual do plano.
+ */
+export type MonthlyFee = {
+  planId: string | null;
+  customAmount: number | null;
+  dueDay: number;
+};
+
 export type EvolutionNote = {
   id: string;
   date: DateKey;
@@ -40,7 +60,7 @@ export type Student = {
   attention: string;
   goals: string;
   evolution: EvolutionNote[];
-  monthlyFee: { amount: number; dueDay: number } | null;
+  monthlyFee: MonthlyFee | null;
 };
 
 export type BookingKind = "regular" | "makeup" | "trial";
@@ -72,4 +92,6 @@ export type MonthlyPayment = {
   month: MonthKey;
   paid: boolean;
   paidAt: DateKey | null;
+  /** Valor recebido, gravado no pagamento: reajustes não mudam meses passados. */
+  amount: number;
 };

@@ -4,13 +4,15 @@ import type {
   Booking,
   ClassSlot,
   MonthlyPayment,
+  Plan,
   Student,
 } from "@/types/pilates";
 
 export const BACKUP_APP = "agenda-pilates";
-export const BACKUP_VERSION = 1;
+export const BACKUP_VERSION = 2;
 
 export type StudioData = {
+  plans: Plan[];
   slots: ClassSlot[];
   students: Student[];
   bookings: Booking[];
@@ -51,6 +53,13 @@ const isStrArray = (value: unknown): boolean =>
 const isOneOf = (value: unknown, options: readonly string[]): boolean =>
   isStr(value) && options.includes(value);
 
+const isPlan = (v: unknown): boolean =>
+  isRec(v) &&
+  isStr(v.id) &&
+  isStr(v.name) &&
+  Number.isInteger(v.weeklyClasses) &&
+  typeof v.amount === "number";
+
 const isSlot = (v: unknown): boolean =>
   isRec(v) &&
   isStr(v.id) &&
@@ -86,7 +95,9 @@ const isStudent = (v: unknown): boolean => {
     ) &&
     (fee === null ||
       (isRec(fee) &&
-        typeof fee.amount === "number" &&
+        isNullableStr(fee.planId) &&
+        (fee.customAmount === null || typeof fee.customAmount === "number") &&
+        (fee.planId !== null || fee.customAmount !== null) &&
         typeof fee.dueDay === "number"))
   );
 };
@@ -113,13 +124,15 @@ const isPayment = (v: unknown): boolean =>
   isStr(v.studentId) &&
   isStr(v.month) &&
   typeof v.paid === "boolean" &&
-  isNullableStr(v.paidAt);
+  isNullableStr(v.paidAt) &&
+  typeof v.amount === "number";
 
 const SECTIONS: {
   key: keyof StudioData;
   label: string;
   guard: (value: unknown) => boolean;
 }[] = [
+  { key: "plans", label: "planos", guard: isPlan },
   { key: "slots", label: "horários", guard: isSlot },
   { key: "students", label: "alunos", guard: isStudent },
   { key: "bookings", label: "presenças", guard: isBooking },
@@ -167,6 +180,7 @@ export const parseBackup = (text: string): ParseResult => {
 };
 
 export const countBackup = (data: StudioData) => ({
+  plans: data.plans.length,
   students: data.students.length,
   slots: data.slots.length,
   bookings: data.bookings.length,

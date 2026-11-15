@@ -6,10 +6,10 @@ const pathname = vi.hoisted(() => ({ current: "/" }));
 vi.mock("next/navigation", () => ({ usePathname: () => pathname.current }));
 
 describe("MainNav", () => {
-  it("lista as quatro seções", () => {
+  it("lista as cinco seções", () => {
     render(<MainNav />);
     const names = screen.getAllByRole("link").map((l) => l.textContent);
-    expect(names).toEqual(["Agenda", "Alunos", "Horários", "Backup"]);
+    expect(names).toEqual(["Agenda", "Alunos", "Planos", "Horários", "Backup"]);
   });
 
   it("marca só a seção atual", () => {

@@ -31,23 +31,33 @@ describe("createEmptyStudent", () => {
 });
 
 describe("validateStudent", () => {
+  const plans = [{ id: "p1", name: "2x", weeklyClasses: 2, amount: 280 }];
+
   it("exige nome", () => {
-    expect(validateStudent(student("a", { name: "  " }))).toMatch(/nome/);
+    expect(validateStudent(student("a", { name: "  " }), plans)).toMatch(/nome/);
   });
 
   it("aceita aluno sem mensalidade", () => {
-    expect(validateStudent(student("a"))).toBeNull();
+    expect(validateStudent(student("a"), plans)).toBeNull();
   });
 
   it("valida o valor e o dia de vencimento", () => {
     const withFee = (amount: number, dueDay: number) =>
-      student("a", { monthlyFee: { amount, dueDay } });
-    expect(validateStudent(withFee(200, 5))).toBeNull();
-    expect(validateStudent(withFee(Number.NaN, 5))).toMatch(/valor/);
-    expect(validateStudent(withFee(-1, 5))).toMatch(/valor/);
-    expect(validateStudent(withFee(200, 0))).toMatch(/vencimento/);
-    expect(validateStudent(withFee(200, 32))).toMatch(/vencimento/);
-    expect(validateStudent(withFee(200, 1.5))).toMatch(/vencimento/);
+      student("a", { monthlyFee: { planId: null, customAmount: amount, dueDay } });
+    expect(validateStudent(withFee(200, 5), plans)).toBeNull();
+    expect(validateStudent(withFee(Number.NaN, 5), plans)).toMatch(/valor/);
+    expect(validateStudent(withFee(-1, 5), plans)).toMatch(/valor/);
+    expect(validateStudent(withFee(200, 0), plans)).toMatch(/vencimento/);
+    expect(validateStudent(withFee(200, 32), plans)).toMatch(/vencimento/);
+    expect(validateStudent(withFee(200, 1.5), plans)).toMatch(/vencimento/);
+  });
+
+  it("aceita plano existente e recusa plano excluído ou mensalidade sem valor", () => {
+    const withPlan = (planId: string | null) =>
+      student("a", { monthlyFee: { planId, customAmount: null, dueDay: 5 } });
+    expect(validateStudent(withPlan("p1"), plans)).toBeNull();
+    expect(validateStudent(withPlan("sumiu"), plans)).toMatch(/plano/);
+    expect(validateStudent(withPlan(null), plans)).toMatch(/plano ou informe o valor/);
   });
 });
 
