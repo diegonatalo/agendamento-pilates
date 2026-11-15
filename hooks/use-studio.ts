@@ -1,5 +1,6 @@
 import { createLocalStore, useLocalStore } from "@/hooks/use-local-store";
 import { newId } from "@/lib/ids";
+import { removePaymentsOfStudent, setPayment } from "@/lib/payments";
 import {
   addMakeup,
   addTrial,
@@ -20,12 +21,18 @@ import type {
   BookingStatus,
   ClassSlot,
   DateKey,
+  MonthKey,
+  MonthlyPayment,
   Student,
 } from "@/types/pilates";
 
 const slotsStore = createLocalStore<ClassSlot[]>(STORAGE_KEYS.slots, []);
 const studentsStore = createLocalStore<Student[]>(STORAGE_KEYS.students, []);
 const bookingsStore = createLocalStore<Booking[]>(STORAGE_KEYS.bookings, []);
+const paymentsStore = createLocalStore<MonthlyPayment[]>(
+  STORAGE_KEYS.payments,
+  [],
+);
 const blockedStore = createLocalStore<BlockedPeriod[]>(
   STORAGE_KEYS.blockedPeriods,
   [],
@@ -37,6 +44,7 @@ export const useStudio = () => {
   const studentsState = useLocalStore(studentsStore);
   const bookingsState = useLocalStore(bookingsStore);
   const blockedState = useLocalStore(blockedStore);
+  const paymentsState = useLocalStore(paymentsStore);
   const slots = sortSlots(slotsState.data);
   const students = sortStudents(studentsState.data);
   const blockedPeriods = sortBlockedPeriods(blockedState.data);
@@ -67,7 +75,18 @@ export const useStudio = () => {
   const removeStudent = (studentId: string) => {
     studentsStore.set(studentsState.data.filter((s) => s.id !== studentId));
     bookingsStore.set(removeBookingsOfStudent(bookingsState.data, studentId));
+    paymentsStore.set(removePaymentsOfStudent(paymentsState.data, studentId));
   };
+
+  const markPayment = (
+    studentId: string,
+    month: MonthKey,
+    paid: boolean,
+    today: DateKey,
+  ) =>
+    paymentsStore.set(
+      setPayment(paymentsState.data, studentId, month, paid, today),
+    );
 
   const markAttendance = (
     target: { slotId: string; date: DateKey; studentId: string },
@@ -123,9 +142,12 @@ export const useStudio = () => {
       slotsState.ready &&
       studentsState.ready &&
       bookingsState.ready &&
-      blockedState.ready,
+      blockedState.ready &&
+      paymentsState.ready,
     slots,
     students,
+    payments: paymentsState.data,
+    markPayment,
     bookings: bookingsState.data,
     blockedPeriods,
     addSlot,

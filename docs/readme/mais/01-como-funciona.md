@@ -7,4 +7,4 @@
 | **Reposição** | Desmarcar gera 1 crédito, sem expiração; encaixar o aluno em uma vaga livre consome 1; cancelar a reposição devolve. |
 | **Aula experimental** | Vaga livre para quem ainda não é aluno, só com o nome. |
 | **Bloqueio** | Feriados e férias bloqueiam as sessões e não geram crédito. |
-| **Mensalidade** | Cada mês fica como pago ou pendente. |
+| **Mensalidade** | Cobra-se aluno ativo com valor definido, a partir do mês em que começou. Cada mês fica pago, pendente ou atrasado (depois do vencimento); dia 31 em mês curto vence no último dia. Os totais usam o valor atual da ficha. |

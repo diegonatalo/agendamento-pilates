@@ -2,26 +2,38 @@
 
 import { useState } from "react";
 import { Field } from "@/components/field";
-import {
-  BUTTON_PRIMARY,
-  INPUT_CLASS,
-} from "@/components/form-styles";
+import { BUTTON_PRIMARY, INPUT_CLASS } from "@/components/form-styles";
+import { PaymentToolbar } from "@/components/payment-toolbar";
 import { StudentForm } from "@/components/student-form";
+import { StudentRow } from "@/components/student-row";
 import { useStudio } from "@/hooks/use-studio";
-import { toDateKey } from "@/lib/dates";
+import { useToday } from "@/hooks/use-today";
 import { creditBalance } from "@/lib/credits";
+import { toDateKey } from "@/lib/dates";
 import { newId } from "@/lib/ids";
-import { formatSlotShort } from "@/lib/slots";
+import { monthOf, paymentStatus, summarizeMonth } from "@/lib/payments";
 import { createEmptyStudent } from "@/lib/students";
 import type { Student } from "@/types/pilates";
 
 export const StudentsScreen = () => {
-  const { ready, slots, students, bookings, saveStudent, removeStudent } =
-    useStudio();
+  const {
+    ready,
+    slots,
+    students,
+    bookings,
+    payments,
+    saveStudent,
+    removeStudent,
+    markPayment,
+  } = useStudio();
+  const today = useToday();
   const [creating, setCreating] = useState<Student | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [query, setQuery] = useState("");
+  const [pickedMonth, setPickedMonth] = useState<string | null>(null);
+  const [onlyUnpaid, setOnlyUnpaid] = useState(false);
 
+  const month = pickedMonth ?? (today ? monthOf(today) : null);
   const current =
     creating ?? students.find((student) => student.id === selectedId) ?? null;
 
@@ -33,9 +45,18 @@ export const StudentsScreen = () => {
   const startCreating = () =>
     setCreating(createEmptyStudent(newId(), toDateKey(new Date())));
 
-  const visible = students.filter((student) =>
-    student.name.toLowerCase().includes(query.trim().toLowerCase()),
-  );
+  const statusOf = (student: Student) =>
+    month && today
+      ? paymentStatus(student, month, payments, today)
+      : "not-billed";
+
+  const visible = students.filter((student) => {
+    if (!student.name.toLowerCase().includes(query.trim().toLowerCase()))
+      return false;
+    if (!onlyUnpaid) return true;
+    const status = statusOf(student);
+    return status === "pending" || status === "overdue";
+  });
 
   if (current) {
     return (
@@ -67,13 +88,23 @@ export const StudentsScreen = () => {
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">Alunos</h1>
           <p className="text-sm text-zinc-600 dark:text-zinc-400">
-            Fichas e horários fixos.
+            Fichas, horários fixos e mensalidades.
           </p>
         </div>
         <button type="button" className={BUTTON_PRIMARY} onClick={startCreating}>
           Novo aluno
         </button>
       </header>
+
+      {month && today ? (
+        <PaymentToolbar
+          month={month}
+          summary={summarizeMonth(students, month, payments, today)}
+          onlyUnpaid={onlyUnpaid}
+          onMonthChange={setPickedMonth}
+          onOnlyUnpaidChange={setOnlyUnpaid}
+        />
+      ) : null}
 
       {students.length > 0 ? (
         <Field label="Buscar por nome">
@@ -92,47 +123,28 @@ export const StudentsScreen = () => {
         </p>
       ) : visible.length === 0 ? (
         <p className="text-zinc-600 dark:text-zinc-400">
-          Nenhum aluno encontrado.
+          {onlyUnpaid && !query.trim()
+            ? "Nenhuma mensalidade pendente neste mês."
+            : "Nenhum aluno encontrado."}
         </p>
       ) : (
         <ul className="flex flex-col gap-2">
           {visible.map((student) => {
-            const studentSlots = slots.filter((slot) =>
-              student.slotIds.includes(slot.id),
-            );
-            const credits = creditBalance(student.id, bookings);
+            const status = statusOf(student);
             return (
-              <li key={student.id}>
-                <button
-                  type="button"
-                  onClick={() => setSelectedId(student.id)}
-                  className="flex w-full flex-col gap-1 rounded-lg border border-zinc-200 p-3 text-left hover:bg-zinc-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600 dark:border-zinc-800 dark:hover:bg-zinc-900 dark:focus-visible:outline-teal-400"
-                >
-                  <span className="flex flex-wrap items-center gap-2">
-                    <span className="font-medium">{student.name}</span>
-                    {!student.active ? (
-                      <span className="rounded bg-zinc-200 px-1.5 py-0.5 text-xs dark:bg-zinc-800">
-                        Inativo
-                      </span>
-                    ) : null}
-                    {credits > 0 ? (
-                      <span className="rounded bg-teal-100 px-1.5 py-0.5 text-xs text-teal-950">
-                        {credits} {credits === 1 ? "reposição" : "reposições"}
-                      </span>
-                    ) : null}
-                    {student.attention.trim() ? (
-                      <span className="rounded bg-amber-200 px-1.5 py-0.5 text-xs text-amber-950">
-                        Atenção
-                      </span>
-                    ) : null}
-                  </span>
-                  <span className="text-sm text-zinc-600 dark:text-zinc-400">
-                    {studentSlots.length > 0
-                      ? studentSlots.map(formatSlotShort).join(" · ")
-                      : "Sem horário fixo"}
-                  </span>
-                </button>
-              </li>
+              <StudentRow
+                key={student.id}
+                student={student}
+                slots={slots}
+                credits={creditBalance(student.id, bookings)}
+                status={status}
+                onOpen={() => setSelectedId(student.id)}
+                onTogglePaid={() =>
+                  month &&
+                  today &&
+                  markPayment(student.id, month, status !== "paid", today)
+                }
+              />
             );
           })}
         </ul>
