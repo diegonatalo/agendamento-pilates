@@ -7,7 +7,7 @@ import {
   eligibleForMakeup,
   findBlockedPeriod,
   removeBooking,
-  removeBookingsOfSlot,
+  removeUpcomingBookingsOfSlot,
   removeBookingsOfStudent,
   sessionsForDate,
   setAttendance,
@@ -16,6 +16,7 @@ import {
   validateBlockedPeriod,
   validateGuestName,
 } from "@/lib/schedule";
+import { creditBalance } from "@/lib/credits";
 import { createEmptyStudent } from "@/lib/students";
 import type { BlockedPeriod, Booking, ClassSlot, Student } from "@/types/pilates";
 
@@ -215,8 +216,40 @@ describe("remoção de registros", () => {
     expect(removeBookingsOfStudent(all, "a").map((b) => b.id)).toEqual(["2", "3"]);
   });
 
-  it("remove os registros de um horário", () => {
-    expect(removeBookingsOfSlot(all, "s1").map((b) => b.id)).toEqual(["2"]);
+});
+
+describe("removeUpcomingBookingsOfSlot", () => {
+  const today = "2026-11-16";
+  const all = [
+    booking({ id: "past", date: "2026-11-09", status: "cancelled" }),
+    booking({ id: "today-done", date: today, status: "present" }),
+    booking({ id: "today-open", date: today, kind: "makeup", status: "scheduled" }),
+    booking({ id: "future", date: "2026-11-23", kind: "makeup", status: "scheduled" }),
+    booking({ id: "other-slot", slotId: "s2", date: "2026-11-23" }),
+  ];
+
+  it("apaga só as sessões que ainda não aconteceram no horário", () => {
+    expect(
+      removeUpcomingBookingsOfSlot(all, "s1", today).map((b) => b.id),
+    ).toEqual(["past", "today-done", "other-slot"]);
+  });
+
+  it("mantém o crédito de aula desmarcada e devolve o de reposição futura", () => {
+    const bookings = [
+      booking({ id: "earned", date: "2026-11-09", status: "cancelled" }),
+      booking({
+        id: "used",
+        slotId: "s2",
+        date: "2026-11-02",
+        kind: "makeup",
+        status: "present",
+      }),
+      booking({ id: "earned-2", slotId: "s2", date: "2026-11-03", status: "cancelled" }),
+      booking({ id: "booked", date: "2026-11-23", kind: "makeup", status: "scheduled" }),
+    ];
+    expect(creditBalance("a", bookings)).toBe(0);
+    const after = removeUpcomingBookingsOfSlot(bookings, "s1", today);
+    expect(creditBalance("a", after)).toBe(1);
   });
 });
 

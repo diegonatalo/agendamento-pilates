@@ -1,4 +1,5 @@
 import { createLocalStore, useLocalStore } from "@/hooks/use-local-store";
+import { toDateKey } from "@/lib/dates";
 import { newId } from "@/lib/ids";
 import type { StudioData } from "@/lib/backup";
 import { removePaymentsOfStudent, setPayment } from "@/lib/payments";
@@ -6,7 +7,7 @@ import {
   addMakeup,
   addTrial,
   removeBooking,
-  removeBookingsOfSlot,
+  removeUpcomingBookingsOfSlot,
   removeBookingsOfStudent,
   setAttendance,
   setBookingStatus,
@@ -66,7 +67,13 @@ export const useStudio = () => {
   const removeSlot = (slotId: string) => {
     slotsStore.set(slotsState.data.filter((slot) => slot.id !== slotId));
     studentsStore.set(removeSlotFromStudents(studentsState.data, slotId));
-    bookingsStore.set(removeBookingsOfSlot(bookingsState.data, slotId));
+    bookingsStore.set(
+      removeUpcomingBookingsOfSlot(
+        bookingsState.data,
+        slotId,
+        toDateKey(new Date()),
+      ),
+    );
   };
 
   const saveStudent = (student: Student) => {

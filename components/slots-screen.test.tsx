@@ -57,4 +57,30 @@ describe("SlotsScreen", () => {
 
     expect(screen.queryByText("18:00 às 19:00")).not.toBeInTheDocument();
   });
+
+  it("mantém o histórico do horário removido e apaga as sessões futuras", async () => {
+    const user = userEvent.setup();
+    render(<SlotsScreen />);
+    await addSlot(user, "Quinta", "18:00");
+    const [slot] = JSON.parse(window.localStorage.getItem(STORAGE_KEYS.slots) ?? "[]");
+    const entry = (id: string, date: string) => ({
+      id,
+      slotId: slot.id,
+      date,
+      kind: "regular",
+      status: "cancelled",
+      studentId: "a",
+      guestName: null,
+    });
+    window.localStorage.setItem(
+      STORAGE_KEYS.bookings,
+      JSON.stringify([entry("past", "2000-01-06"), entry("future", "2999-01-03")]),
+    );
+
+    await user.click(screen.getByRole("button", { name: /Remover/ }));
+    await user.click(screen.getByRole("button", { name: "Confirmar remoção" }));
+
+    const saved = JSON.parse(window.localStorage.getItem(STORAGE_KEYS.bookings) ?? "[]");
+    expect(saved.map((b: { id: string }) => b.id)).toEqual(["past"]);
+  });
 });

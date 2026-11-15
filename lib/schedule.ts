@@ -254,10 +254,24 @@ export const removeBookingsOfStudent = (
   studentId: string,
 ): Booking[] => bookings.filter((b) => b.studentId !== studentId);
 
-export const removeBookingsOfSlot = (
+/**
+ * Ao excluir um horário, apaga só as sessões que ainda não aconteceram. O que
+ * já passou fica como histórico e continua valendo no saldo de reposições:
+ * aula desmarcada segue gerando crédito e reposição feita segue consumindo.
+ * Uma reposição futura apagada devolve o crédito. Hoje conta como passado se
+ * já tem presença, falta ou desmarcação registrada.
+ */
+export const removeUpcomingBookingsOfSlot = (
   bookings: Booking[],
   slotId: string,
-): Booking[] => bookings.filter((b) => b.slotId !== slotId);
+  today: DateKey,
+): Booking[] =>
+  bookings.filter(
+    (b) =>
+      b.slotId !== slotId ||
+      b.date < today ||
+      (b.date === today && b.status !== "scheduled"),
+  );
 
 /** Devolve a mensagem de erro, ou `null` se o período pode ser bloqueado. */
 export const validateBlockedPeriod = (
