@@ -28,7 +28,7 @@ describe("THEME_INIT_SCRIPT", () => {
   afterEach(() => vi.restoreAllMocks());
 
   it("usa a chave padrão de storage do tema", () => {
-    expect(THEME_INIT_SCRIPT).toContain("app:theme:v1");
+    expect(THEME_INIT_SCRIPT).toContain("agendamento-pilates:theme:v1");
   });
 
   it("aplica o escuro quando é a escolha salva, mesmo com o sistema claro", () => {

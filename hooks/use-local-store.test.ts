@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { createLocalStore } from "@/hooks/use-local-store";
 
-const KEY = "app:test:v1";
+const KEY = "agendamento-pilates:test:v1";
 
 describe("createLocalStore", () => {
   beforeEach(() => window.localStorage.clear());
