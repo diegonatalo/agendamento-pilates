@@ -15,6 +15,7 @@
 ![TypeScript](https://img.shields.io/badge/TypeScript_5-3178c6?style=flat-square&logo=typescript&logoColor=white)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS_4-06b6d4?style=flat-square&logo=tailwindcss&logoColor=white)
 ![Dados](https://img.shields.io/badge/dados-s%C3%B3_no_seu_navegador-9fe02e?style=flat-square)
+![Licença](https://img.shields.io/badge/licen%C3%A7a-MIT-16a34a?style=flat-square)
 
 </div>
 
@@ -33,7 +34,43 @@ Sistema de agendamento para um estúdio de pilates, de uso exclusivo da dona e i
 
 <div align="center">
 
-<img src="docs/assets/h-func.svg" alt="02 · FUNCIONALIDADES: O que dá para fazer" width="100%" />
+<img src="docs/assets/h-demo.svg" alt="02 · DEMO: Demonstração" width="100%" />
+
+</div>
+
+<div align="center">
+
+<sub>Prints no tema claro, com dados de exemplo.</sub>
+
+<img src="docs/assets/shot-01.svg" alt="Agenda do dia com as turmas, vagas livres e presença de cada aluno" width="100%" />
+<br />
+<sub>Agenda do dia: vagas por horário, pontos de atenção e presença com um toque.</sub>
+
+<br />
+
+<img src="docs/assets/shot-02.svg" alt="Lista de alunos com horários fixos, plano e situação da mensalidade" width="100%" />
+<br />
+<sub>Alunos com horários fixos, plano e mensalidade paga ou pendente no mês.</sub>
+
+<br />
+
+<img src="docs/assets/shot-03.svg" alt="Grade semanal com a ocupação de cada horário" width="100%" />
+<br />
+<sub>Grade da semana com a ocupação de cada turma e as datas bloqueadas.</sub>
+
+<br />
+
+<img src="docs/assets/shot-04.svg" alt="Agenda e lista de alunos no celular" width="100%" />
+<br />
+<sub>No celular, com a barra de navegação embaixo.</sub>
+
+</div>
+
+<br />
+
+<div align="center">
+
+<img src="docs/assets/h-func.svg" alt="03 · FUNCIONALIDADES: O que dá para fazer" width="100%" />
 
 </div>
 
@@ -54,7 +91,7 @@ Sistema de agendamento para um estúdio de pilates, de uso exclusivo da dona e i
 
 <div align="center">
 
-<img src="docs/assets/h-stack.svg" alt="03 · STACK: Stack" width="100%" />
+<img src="docs/assets/h-stack.svg" alt="04 · STACK: Stack" width="100%" />
 
 </div>
 
@@ -68,7 +105,7 @@ Sistema de agendamento para um estúdio de pilates, de uso exclusivo da dona e i
 
 <div align="center">
 
-<img src="docs/assets/h-run.svg" alt="04 · COMO RODAR: Rodando localmente" width="100%" />
+<img src="docs/assets/h-run.svg" alt="05 · COMO RODAR: Rodando localmente" width="100%" />
 
 </div>
 
@@ -108,7 +145,7 @@ Para reexecutar ao salvar: `pnpm test:watch`.
 
 <div align="center">
 
-<img src="docs/assets/h-estrutura.svg" alt="05 · ESTRUTURA: Estrutura" width="100%" />
+<img src="docs/assets/h-estrutura.svg" alt="06 · ESTRUTURA: Estrutura" width="100%" />
 
 </div>
 
@@ -126,7 +163,7 @@ types/            Tipos compartilhados do domínio
 
 <div align="center">
 
-<img src="docs/assets/h-mais.svg" alt="06 · MAIS: Mais informações" width="100%" />
+<img src="docs/assets/h-mais.svg" alt="07 · MAIS: Mais informações" width="100%" />
 
 </div>
 
@@ -166,11 +203,15 @@ O arquivo tem dados de saúde e contato dos alunos, **sem criptografia**: guarde
 - [ ] Publicar e definir o endereço final
 - [ ] Guardar o valor da mensalidade de cada mês
 
+### 📄 Créditos e licença
+
+- Distribuído sob a licença **MIT**. Veja o arquivo [LICENSE](LICENSE).
+
 <br />
 
 <div align="center">
 
-<img src="docs/assets/h-autor.svg" alt="07 · AUTOR: Autor" width="100%" />
+<img src="docs/assets/h-autor.svg" alt="08 · AUTOR: Autor" width="100%" />
 
 </div>
 
