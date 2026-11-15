@@ -1,4 +1,4 @@
-import { BUTTON_SECONDARY } from "@/components/form-styles";
+import { BUTTON_SECONDARY, CARD } from "@/components/form-styles";
 import {
   addMonths,
   formatCurrency,
@@ -21,58 +21,75 @@ export const PaymentToolbar = ({
   onlyUnpaid,
   onMonthChange,
   onOnlyUnpaidChange,
-}: Props) => (
-  <section
-    aria-labelledby="payments-title"
-    className="flex flex-col gap-3 rounded-lg border border-zinc-200 p-4 dark:border-zinc-800"
-  >
-    <div className="flex flex-wrap items-center justify-between gap-2">
-      <h2 id="payments-title" className="text-lg font-semibold capitalize">
-        Mensalidades de {formatMonth(month)}
-      </h2>
-      <div className="flex gap-2">
-        <button
-          type="button"
-          className={BUTTON_SECONDARY}
-          onClick={() => onMonthChange(addMonths(month, -1))}
-        >
-          Mês anterior
-        </button>
-        <button
-          type="button"
-          className={BUTTON_SECONDARY}
-          onClick={() => onMonthChange(addMonths(month, 1))}
-        >
-          Próximo mês
-        </button>
+}: Props) => {
+  const percent =
+    summary.billed === 0 ? 0 : Math.round((summary.paid / summary.billed) * 100);
+
+  return (
+    <section
+      aria-labelledby="payments-title"
+      className={`${CARD} flex flex-col gap-4 p-4 sm:p-5`}
+    >
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <h2 id="payments-title" className="text-xl font-semibold first-letter:uppercase">
+          Mensalidades de {formatMonth(month)}
+        </h2>
+        <div className="flex gap-2">
+          <button
+            type="button"
+            className={BUTTON_SECONDARY}
+            onClick={() => onMonthChange(addMonths(month, -1))}
+          >
+            Mês anterior
+          </button>
+          <button
+            type="button"
+            className={BUTTON_SECONDARY}
+            onClick={() => onMonthChange(addMonths(month, 1))}
+          >
+            Próximo mês
+          </button>
+        </div>
       </div>
-    </div>
 
-    {summary.billed === 0 ? (
-      <p className="text-sm text-zinc-600 dark:text-zinc-400">
-        Nenhum aluno com mensalidade neste mês.
-      </p>
-    ) : (
-      <p className="text-sm">
-        {summary.paid} de {summary.billed} pagas ·{" "}
-        {formatCurrency(summary.received)} de {formatCurrency(summary.expected)}
-        {summary.overdue > 0 ? (
-          <strong className="text-red-700 dark:text-red-400">
-            {" "}
-            · {summary.overdue} em atraso
-          </strong>
-        ) : null}
-      </p>
-    )}
+      {summary.billed === 0 ? (
+        <p className="text-sm text-muted">
+          Nenhum aluno com mensalidade neste mês.
+        </p>
+      ) : (
+        <div className="flex flex-col gap-2">
+          <div
+            aria-hidden="true"
+            className="h-2 overflow-hidden rounded-full bg-surface-2"
+          >
+            <div
+              className="h-full rounded-full bg-primary"
+              style={{ width: `${percent}%` }}
+            />
+          </div>
+          <p className="text-sm">
+            {summary.paid} de {summary.billed} pagas ·{" "}
+            {formatCurrency(summary.received)} de{" "}
+            {formatCurrency(summary.expected)}
+            {summary.overdue > 0 ? (
+              <strong className="text-danger">
+                {" "}
+                · {summary.overdue} em atraso
+              </strong>
+            ) : null}
+          </p>
+        </div>
+      )}
 
-    <label className="flex min-h-11 items-center gap-3 text-sm font-medium">
-      <input
-        type="checkbox"
-        className="size-5 accent-teal-700"
-        checked={onlyUnpaid}
-        onChange={(e) => onOnlyUnpaidChange(e.target.checked)}
-      />
-      Mostrar só pendentes
-    </label>
-  </section>
-);
+      <label className="flex min-h-11 items-center gap-3 text-sm font-medium">
+        <input
+          type="checkbox"
+          className="size-5 accent-primary"
+          checked={onlyUnpaid}
+          onChange={(e) => onOnlyUnpaidChange(e.target.checked)}
+        />
+        Mostrar só pendentes
+      </label>
+    </section>
+  );
+};

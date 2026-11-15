@@ -1,26 +1,115 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Paleta "eucalipto": areia quente e verde profundo no claro; verde-tinta e
+   verde-sálvia no escuro. Os componentes usam só os nomes semânticos abaixo. */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg: #f6f3ee;
+  --surface: #ffffff;
+  --surface-2: #efebe4;
+  --line: #e3ddd2;
+  --line-strong: #cbc3b4;
+  --fg: #1d2623;
+  --muted: #5d6965;
+  --primary: #2f6b57;
+  --primary-hover: #265a49;
+  --primary-fg: #ffffff;
+  --primary-soft: #dcebe4;
+  --primary-soft-fg: #1f4a3c;
+  --accent: #c4684a;
+  --danger: #b4332a;
+  --danger-hover: #982a22;
+  --danger-fg: #ffffff;
+  --danger-soft: #f8dedb;
+  --danger-soft-fg: #7a1f19;
+  --warn-soft: #fbeccb;
+  --warn-soft-fg: #5e4004;
+  --shadow-card:
+    0 1px 2px rgb(29 38 35 / 0.05), 0 10px 28px -14px rgb(29 38 35 / 0.18);
+  color-scheme: light;
+}
+
+.dark {
+  --bg: #0e1411;
+  --surface: #151d19;
+  --surface-2: #1d2823;
+  --line: #26332e;
+  --line-strong: #3a4b44;
+  --fg: #e9efec;
+  --muted: #9db0a7;
+  --primary: #7fc4a8;
+  --primary-hover: #98d3ba;
+  --primary-fg: #0a1511;
+  --primary-soft: #1d3a2f;
+  --primary-soft-fg: #a9dcc6;
+  --accent: #e08a6c;
+  --danger: #f08a80;
+  --danger-hover: #f5a39b;
+  --danger-fg: #1b0b09;
+  --danger-soft: #3a1f1d;
+  --danger-soft-fg: #f6b9b3;
+  --warn-soft: #3a2f12;
+  --warn-soft-fg: #f1d28a;
+  --shadow-card:
+    0 1px 2px rgb(0 0 0 / 0.4), 0 10px 28px -14px rgb(0 0 0 / 0.6);
+  color-scheme: dark;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-fg: var(--fg);
+  --color-muted: var(--muted);
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-fg: var(--primary-fg);
+  --color-primary-soft: var(--primary-soft);
+  --color-primary-soft-fg: var(--primary-soft-fg);
+  --color-accent: var(--accent);
+  --color-danger: var(--danger);
+  --color-danger-hover: var(--danger-hover);
+  --color-danger-fg: var(--danger-fg);
+  --color-danger-soft: var(--danger-soft);
+  --color-danger-soft-fg: var(--danger-soft-fg);
+  --color-warn-soft: var(--warn-soft);
+  --color-warn-soft-fg: var(--warn-soft-fg);
+  --shadow-card: var(--shadow-card);
+  --font-sans: var(--font-jakarta);
+  --font-display: var(--font-fraunces);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-sans), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2 {
+  font-family: var(--font-display), Georgia, serif;
+  letter-spacing: -0.015em;
+}
+
+::selection {
+  background: var(--primary-soft);
+  color: var(--primary-soft-fg);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  button,
+  a,
+  input,
+  select,
+  textarea {
+    transition:
+      background-color 0.15s ease,
+      border-color 0.15s ease,
+      color 0.15s ease,
+      box-shadow 0.15s ease;
+  }
 }

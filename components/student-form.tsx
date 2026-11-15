@@ -6,6 +6,7 @@ import {
   BUTTON_DANGER,
   BUTTON_PRIMARY,
   BUTTON_SECONDARY,
+  CARD,
   INPUT_CLASS,
   LINK_BUTTON,
 } from "@/components/form-styles";
@@ -33,8 +34,8 @@ type Props = {
   onDelete: (studentId: string) => void;
 };
 
-const SECTION = "flex flex-col gap-4 rounded-lg border border-zinc-200 p-4 dark:border-zinc-800";
-const LEGEND = "px-1 text-base font-semibold";
+const SECTION = `${CARD} flex flex-col gap-4 p-4 sm:p-5`;
+const LEGEND = "px-1 font-display text-lg font-semibold";
 const TEXTAREA = `${INPUT_CLASS} min-h-20`;
 
 export const StudentForm = ({
@@ -105,7 +106,7 @@ export const StudentForm = ({
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-5" noValidate>
       <div className="flex items-center justify-between gap-3">
-        <h2 className="text-xl font-semibold">
+        <h2 className="text-2xl font-semibold">
           {isNew ? "Novo aluno" : draft.name || "Aluno"}
         </h2>
         <button type="button" className={BUTTON_SECONDARY} onClick={onCancel}>
@@ -162,7 +163,7 @@ export const StudentForm = ({
         <label className="flex items-center gap-3 text-sm font-medium">
           <input
             type="checkbox"
-            className="size-5 accent-teal-700"
+            className="size-5 accent-primary"
             checked={draft.active}
             onChange={(e) => setField("active", e.target.checked)}
           />
@@ -176,7 +177,7 @@ export const StudentForm = ({
           Créditos de reposição: <strong>{credits}</strong>
         </p>
         {slots.length === 0 ? (
-          <p className="text-sm text-zinc-600 dark:text-zinc-400">
+          <p className="text-sm text-muted">
             Cadastre horários na aba Horários para matricular o aluno.
           </p>
         ) : (
@@ -190,14 +191,14 @@ export const StudentForm = ({
                   <label className="flex min-h-11 items-center gap-3 text-sm">
                     <input
                       type="checkbox"
-                      className="size-5 accent-teal-700"
+                      className="size-5 accent-primary"
                       checked={checked}
                       disabled={full && !checked}
                       onChange={() => toggleSlot(slot.id)}
                     />
                     <span>
                       {formatSlot(slot)}{" "}
-                      <span className="text-zinc-600 dark:text-zinc-400">
+                      <span className="text-muted">
                         ({full ? "lotado" : `${taken}/${CLASS_CAPACITY}`})
                       </span>
                     </span>
@@ -235,7 +236,7 @@ export const StudentForm = ({
         <label className="flex items-center gap-3 text-sm font-medium">
           <input
             type="checkbox"
-            className="size-5 accent-teal-700"
+            className="size-5 accent-primary"
             checked={draft.health.medicalClearance}
             onChange={(e) => setHealth("medicalClearance", e.target.checked)}
           />
@@ -276,7 +277,7 @@ export const StudentForm = ({
         <label className="flex items-center gap-3 text-sm font-medium">
           <input
             type="checkbox"
-            className="size-5 accent-teal-700"
+            className="size-5 accent-primary"
             checked={draft.monthlyFee !== null}
             onChange={(e) =>
               setField(
@@ -344,10 +345,10 @@ export const StudentForm = ({
             {[...draft.evolution].reverse().map((note) => (
               <li
                 key={note.id}
-                className="flex items-start justify-between gap-3 border-t border-zinc-200 pt-3 text-sm dark:border-zinc-800"
+                className="flex items-start justify-between gap-3 border-t border-line pt-3 text-sm"
               >
                 <div>
-                  <p className="text-xs text-zinc-600 dark:text-zinc-400">
+                  <p className="text-xs text-muted">
                     {note.date.split("-").reverse().join("/")}
                   </p>
                   <p className="whitespace-pre-wrap">{note.text}</p>
@@ -366,7 +367,7 @@ export const StudentForm = ({
       </fieldset>
 
       {error ? (
-        <p role="alert" className="text-sm font-medium text-red-700 dark:text-red-400">
+        <p role="alert" className="text-sm font-medium text-danger">
           {error}
         </p>
       ) : null}

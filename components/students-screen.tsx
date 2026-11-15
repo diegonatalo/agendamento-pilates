@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { EmptyState } from "@/components/empty-state";
 import { Field } from "@/components/field";
 import { BUTTON_PRIMARY, INPUT_CLASS } from "@/components/form-styles";
 import { PaymentToolbar } from "@/components/payment-toolbar";
@@ -83,13 +84,11 @@ export const StudentsScreen = () => {
   }
 
   return (
-    <main className="flex flex-col gap-5">
-      <header className="flex items-start justify-between gap-3">
+    <main className="flex flex-col gap-6">
+      <header className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Alunos</h1>
-          <p className="text-sm text-zinc-600 dark:text-zinc-400">
-            Fichas, horários fixos e mensalidades.
-          </p>
+          <h1 className="text-3xl font-semibold">Alunos</h1>
+          <p className="text-muted">Fichas, horários fixos e mensalidades.</p>
         </div>
         <button type="button" className={BUTTON_PRIMARY} onClick={startCreating}>
           Novo aluno
@@ -118,17 +117,19 @@ export const StudentsScreen = () => {
       ) : null}
 
       {!ready ? null : students.length === 0 ? (
-        <p className="text-zinc-600 dark:text-zinc-400">
-          Nenhum aluno cadastrado ainda.
-        </p>
+        <EmptyState title="Nenhum aluno cadastrado ainda.">
+          Toque em “Novo aluno” para criar a primeira ficha.
+        </EmptyState>
       ) : visible.length === 0 ? (
-        <p className="text-zinc-600 dark:text-zinc-400">
-          {onlyUnpaid && !query.trim()
-            ? "Nenhuma mensalidade pendente neste mês."
-            : "Nenhum aluno encontrado."}
-        </p>
+        <EmptyState
+          title={
+            onlyUnpaid && !query.trim()
+              ? "Nenhuma mensalidade pendente neste mês."
+              : "Nenhum aluno encontrado."
+          }
+        />
       ) : (
-        <ul className="flex flex-col gap-2">
+        <ul className="flex flex-col gap-3">
           {visible.map((student) => {
             const status = statusOf(student);
             return (

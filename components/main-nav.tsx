@@ -11,16 +11,16 @@ const ITEMS = [
   { href: "/backup", label: "Backup", icon: "M12 3v12M7 10l5 5 5-5M5 21h14" },
 ] as const;
 
-/** Bottom Tab Bar no celular; barra no topo a partir de `md`. */
+/** Barra flutuante embaixo no celular; abas no cabeçalho a partir de `md`. */
 export const MainNav = () => {
   const pathname = usePathname();
 
   return (
     <nav
       aria-label="Principal"
-      className="fixed inset-x-0 bottom-0 z-10 border-t border-zinc-200 bg-white md:static md:border-b md:border-t-0 dark:border-zinc-800 dark:bg-zinc-950"
+      className="fixed inset-x-3 bottom-3 z-20 rounded-2xl border border-line bg-surface/90 p-1.5 shadow-card backdrop-blur-md md:static md:mr-auto md:inset-auto md:rounded-full md:border-0 md:bg-transparent md:p-0 md:shadow-none md:backdrop-blur-none"
     >
-      <ul className="mx-auto flex max-w-3xl md:gap-2 md:px-4">
+      <ul className="flex gap-1 md:gap-1">
         {ITEMS.map((item) => {
           const active =
             item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
@@ -30,10 +30,10 @@ export const MainNav = () => {
                 href={item.href}
                 aria-current={active ? "page" : undefined}
                 className={cn(
-                  "flex min-h-14 flex-col items-center justify-center gap-0.5 px-3 text-xs font-medium focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-teal-600 md:min-h-12 md:flex-row md:gap-2 md:text-sm dark:focus-visible:outline-teal-400",
+                  "flex min-h-12 flex-col items-center justify-center gap-0.5 rounded-xl px-3 text-xs font-medium focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary md:min-h-11 md:flex-row md:gap-2 md:rounded-full md:px-4 md:text-sm",
                   active
-                    ? "text-teal-700 dark:text-teal-400"
-                    : "text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100",
+                    ? "bg-primary-soft text-primary-soft-fg"
+                    : "text-muted hover:bg-surface-2 hover:text-fg",
                 )}
               >
                 <svg

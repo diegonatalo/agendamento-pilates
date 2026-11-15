@@ -44,7 +44,16 @@ export const studentsInSlot = (
 export const slotHasVacancy = (slotId: string, students: Student[]): boolean =>
   studentsInSlot(slotId, students).length < CLASS_CAPACITY;
 
-export const sortStudents = (students: Student[]): Student[] =>
+/** Iniciais para o avatar: primeira e última palavra do nome. */
+export const initialsOf = (name: string): string => {
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return "?";
+  const first = parts[0][0];
+  const last = parts.length > 1 ? parts[parts.length - 1][0] : "";
+  return (first + last).toUpperCase();
+};
+
+export const sortStudents =(students: Student[]): Student[] =>
   [...students].sort((a, b) => a.name.localeCompare(b.name, "pt-BR"));
 
 /** Remove um horário da ficha de todos os alunos (ao excluir o horário). */

@@ -278,6 +278,6 @@ describe("AgendaScreen", () => {
     render(<AgendaScreen />);
 
     await user.click(screen.getByRole("button", { name: /Terça, 10\/11, 0 aulas/ }));
-    expect(screen.getByText("Sem aulas neste dia.")).toBeInTheDocument();
+    expect(screen.getByText("Sem aulas neste dia")).toBeInTheDocument();
   });
 });

@@ -46,6 +46,7 @@ Sistema de agendamento para um estúdio de pilates, de uso exclusivo da dona e i
 <img src="docs/assets/f-04.svg" alt="Mensalidade: Indicador de pago ou pendente por mês." width="49%" />
 <br />
 <img src="docs/assets/f-05.svg" alt="Backup: Exporta e restaura todos os dados em um arquivo JSON." width="49%" />
+<img src="docs/assets/f-06.svg" alt="Tema claro e escuro: Segue o sistema ou a sua escolha, sem piscar ao abrir." width="49%" />
 
 </div>
 

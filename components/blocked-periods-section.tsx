@@ -5,6 +5,7 @@ import { Field } from "@/components/field";
 import {
   BUTTON_PRIMARY,
   BUTTON_SECONDARY,
+  CARD,
   INPUT_CLASS,
 } from "@/components/form-styles";
 import { useStudio } from "@/hooks/use-studio";
@@ -32,10 +33,10 @@ export const BlockedPeriodsSection = () => {
   return (
     <section aria-labelledby="blocked-title" className="flex flex-col gap-4">
       <div>
-        <h2 id="blocked-title" className="text-lg font-semibold">
+        <h2 id="blocked-title" className="text-2xl font-semibold">
           Datas bloqueadas
         </h2>
-        <p className="text-sm text-zinc-600 dark:text-zinc-400">
+        <p className="text-muted">
           Feriados e férias. As aulas desses dias não acontecem e não geram
           crédito de reposição.
         </p>
@@ -43,7 +44,7 @@ export const BlockedPeriodsSection = () => {
 
       <form
         onSubmit={handleSubmit}
-        className="flex flex-col gap-4 rounded-lg border border-zinc-200 p-4 dark:border-zinc-800"
+        className={`${CARD} flex flex-col gap-4 p-4 sm:p-5`}
       >
         <div className="grid gap-4 sm:grid-cols-2">
           <Field label="De">
@@ -79,31 +80,27 @@ export const BlockedPeriodsSection = () => {
       </form>
 
       {error ? (
-        <p role="alert" className="text-sm font-medium text-red-700 dark:text-red-400">
+        <p role="alert" className="text-sm font-medium text-danger">
           {error}
         </p>
       ) : null}
 
       {!ready ? null : blockedPeriods.length === 0 ? (
-        <p className="text-zinc-600 dark:text-zinc-400">
-          Nenhuma data bloqueada.
-        </p>
+        <p className="text-muted">Nenhuma data bloqueada.</p>
       ) : (
-        <ul className="flex flex-col gap-2">
+        <ul className="flex flex-col gap-3">
           {blockedPeriods.map((period) => (
             <li
               key={period.id}
-              className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-zinc-200 p-3 dark:border-zinc-800"
+              className={`${CARD} flex flex-wrap items-center justify-between gap-3 p-4`}
             >
               <div>
-                <p className="font-medium">
+                <p className="font-semibold">
                   {period.startDate === period.endDate
                     ? formatDateBr(period.startDate)
                     : `${formatDateBr(period.startDate)} a ${formatDateBr(period.endDate)}`}
                 </p>
-                <p className="text-sm text-zinc-600 dark:text-zinc-400">
-                  {period.reason}
-                </p>
+                <p className="text-sm text-muted">{period.reason}</p>
               </div>
               <button
                 type="button"

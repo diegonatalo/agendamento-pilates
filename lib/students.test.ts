@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   createEmptyStudent,
+  initialsOf,
   removeSlotFromStudents,
   slotHasVacancy,
   sortStudents,
@@ -102,5 +103,21 @@ describe("whatsappLink", () => {
   it("devolve null para telefone curto ou vazio", () => {
     expect(whatsappLink("")).toBeNull();
     expect(whatsappLink("1234")).toBeNull();
+  });
+});
+
+describe("initialsOf", () => {
+  it("usa a primeira e a última palavra do nome", () => {
+    expect(initialsOf("Ana Beatriz de Albuquerque Montenegro")).toBe("AM");
+    expect(initialsOf("maria silva")).toBe("MS");
+  });
+
+  it("nome de uma palavra tem uma inicial", () => {
+    expect(initialsOf("Ana")).toBe("A");
+  });
+
+  it("ignora espaços sobrando e cobre nome vazio", () => {
+    expect(initialsOf("  Ana   Lima ")).toBe("AL");
+    expect(initialsOf("   ")).toBe("?");
   });
 });

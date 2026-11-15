@@ -78,6 +78,17 @@ export const AddToSession = ({
           className={BUTTON_SECONDARY}
           onClick={() => setOpen(true)}
         >
+          <svg
+            aria-hidden="true"
+            viewBox="0 0 24 24"
+            className="size-4"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+          >
+            <path d="M12 5v14M5 12h14" />
+          </svg>
           Encaixar aluno{" "}
           <span className="sr-only">às {session.slot.startTime}</span>
         </button>
@@ -88,10 +99,10 @@ export const AddToSession = ({
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex flex-col gap-4 rounded-md border border-zinc-200 p-3 dark:border-zinc-800"
+      className="flex flex-col gap-4 rounded-xl bg-surface-2 p-4"
     >
-      <fieldset className="flex flex-wrap gap-4">
-        <legend className="mb-1 text-sm font-medium">Tipo de aula</legend>
+      <fieldset className="flex flex-wrap gap-x-5 gap-y-1">
+        <legend className="mb-1 text-sm font-semibold">Tipo de aula</legend>
         {(
           [
             ["makeup", "Reposição"],
@@ -102,7 +113,7 @@ export const AddToSession = ({
             <input
               type="radio"
               name={`${idBase}-mode`}
-              className="size-5 accent-teal-700"
+              className="size-5 accent-primary"
               checked={mode === value}
               onChange={() => {
                 setMode(value);
@@ -116,7 +127,7 @@ export const AddToSession = ({
 
       {mode === "makeup" ? (
         eligible.length === 0 ? (
-          <p className="text-sm text-zinc-600 dark:text-zinc-400">
+          <p className="text-sm text-muted">
             Nenhum aluno com crédito de reposição.
           </p>
         ) : (
@@ -147,7 +158,7 @@ export const AddToSession = ({
       )}
 
       {error ? (
-        <p role="alert" className="text-sm font-medium text-red-700 dark:text-red-400">
+        <p role="alert" className="text-sm font-medium text-danger">
           {error}
         </p>
       ) : null}

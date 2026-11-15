@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { BUTTON_SECONDARY, LINK_BUTTON } from "@/components/form-styles";
+import { EmptyState } from "@/components/empty-state";
 import { SessionCard } from "@/components/session-card";
 import { WeekStrip } from "@/components/week-strip";
 import { useStudio } from "@/hooks/use-studio";
@@ -31,7 +32,7 @@ export const AgendaScreen = () => {
   if (!ready || !selected || !today) {
     return (
       <main>
-        <h1 className="text-2xl font-semibold tracking-tight">Agenda</h1>
+        <h1 className="text-3xl font-semibold">Agenda</h1>
       </main>
     );
   }
@@ -41,13 +42,11 @@ export const AgendaScreen = () => {
   const sessions = sessionsOf(selected);
 
   return (
-    <main className="flex flex-col gap-5">
-      <header className="flex flex-wrap items-start justify-between gap-3">
+    <main className="flex flex-col gap-6">
+      <header className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Agenda</h1>
-          <p className="text-sm text-zinc-600 dark:text-zinc-400">
-            Presença e vagas por horário.
-          </p>
+          <h1 className="text-3xl font-semibold">Agenda</h1>
+          <p className="text-muted">Presença e vagas por horário.</p>
         </div>
         <div className="flex gap-2">
           <button
@@ -75,7 +74,7 @@ export const AgendaScreen = () => {
       />
 
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <h2 className="text-lg font-semibold">
+        <h2 className="text-2xl font-semibold">
           {WEEKDAY_LABELS[weekdayOf(selected)]}, {formatDateBr(selected)}
           {selected === today ? " (hoje)" : ""}
         </h2>
@@ -91,19 +90,19 @@ export const AgendaScreen = () => {
       </div>
 
       {slots.length === 0 ? (
-        <p className="text-zinc-600 dark:text-zinc-400">
+        <EmptyState title="Sua agenda está vazia">
           Cadastre os horários na aba{" "}
           <Link href="/horarios" className={LINK_BUTTON}>
             Horários
           </Link>{" "}
           para ver a agenda.
-        </p>
+        </EmptyState>
       ) : sessions.length === 0 ? (
-        <p className="text-zinc-600 dark:text-zinc-400">
-          Sem aulas neste dia.
-        </p>
+        <EmptyState title="Sem aulas neste dia">
+          Aproveite para descansar.
+        </EmptyState>
       ) : (
-        <div className="flex flex-col gap-3">
+        <div className="grid gap-4 md:grid-cols-2">
           {sessions.map((session) => (
             <SessionCard
               key={session.slot.id}

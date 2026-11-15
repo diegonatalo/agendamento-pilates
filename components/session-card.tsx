@@ -1,5 +1,12 @@
 import { AddToSession } from "@/components/add-to-session";
-import { LINK_BUTTON } from "@/components/form-styles";
+import { Avatar } from "@/components/avatar";
+import {
+  BADGE_NEUTRAL,
+  BADGE_PRIMARY,
+  CARD,
+  FOCUS_RING,
+  LINK_BUTTON,
+} from "@/components/form-styles";
 import { cn } from "@/lib/cn";
 import { CLASS_CAPACITY } from "@/lib/constants";
 import type { Attendee, Session } from "@/lib/schedule";
@@ -22,28 +29,31 @@ type Action = "present" | "absent" | "cancelled";
 const KIND_LABEL = { regular: null, makeup: "Reposição", trial: "Experimental" };
 
 const ACTIONS: Record<Action, { label: string; tone: string }> = {
-  present: {
-    label: "Presente",
-    tone: "border-teal-700 bg-teal-700 text-white dark:border-teal-500 dark:bg-teal-500 dark:text-zinc-950",
-  },
-  absent: {
-    label: "Faltou",
-    tone: "border-red-700 bg-red-700 text-white dark:border-red-500 dark:bg-red-500 dark:text-zinc-950",
-  },
-  cancelled: {
-    label: "Desmarcou",
-    tone: "border-zinc-700 bg-zinc-700 text-white dark:border-zinc-300 dark:bg-zinc-300 dark:text-zinc-950",
-  },
+  present: { label: "Presente", tone: "border-primary bg-primary text-primary-fg" },
+  absent: { label: "Faltou", tone: "border-danger bg-danger text-danger-fg" },
+  cancelled: { label: "Desmarcou", tone: "border-fg bg-fg text-bg" },
 };
-
-const BUTTON_BASE =
-  "inline-flex min-h-11 flex-1 items-center justify-center rounded-md border px-3 text-sm font-medium focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600 dark:focus-visible:outline-teal-400";
 
 /** Aluno fixo pode desmarcar; reposição e experimental são removidas. */
 const actionsFor = (attendee: Attendee): Action[] =>
   attendee.kind === "regular"
     ? ["present", "absent", "cancelled"]
     : ["present", "absent"];
+
+/** Uma bolinha por vaga: cheia se ocupada. Decorativo; o texto diz o mesmo. */
+const Pips = ({ occupied }: { occupied: number }) => (
+  <span aria-hidden="true" className="flex gap-1">
+    {Array.from({ length: CLASS_CAPACITY }, (_, i) => (
+      <span
+        key={i}
+        className={cn(
+          "size-2.5 rounded-full border border-primary",
+          i < occupied ? "bg-primary" : "bg-transparent",
+        )}
+      />
+    ))}
+  </span>
+);
 
 export const SessionCard = ({
   session,
@@ -60,34 +70,35 @@ export const SessionCard = ({
   return (
     <section
       aria-labelledby={titleId}
-      className="flex flex-col gap-3 rounded-lg border border-zinc-200 p-4 dark:border-zinc-800"
+      className={cn(CARD, "flex flex-col gap-4 p-4 sm:p-5", blockedBy && "bg-surface-2 shadow-none")}
     >
-      <header className="flex flex-wrap items-baseline justify-between gap-2">
-        <h3 id={titleId} className="text-lg font-semibold">
+      <header className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1">
+        <h3 id={titleId} className="font-display text-xl font-semibold">
           {slot.startTime} às {endTime(slot.startTime)}
         </h3>
         {blockedBy ? null : (
-          <p className="text-sm text-zinc-600 dark:text-zinc-400">
-            {occupied}/{CLASS_CAPACITY} ocupadas ·{" "}
-            {vacancies === 0
-              ? "lotada"
-              : `${vacancies} ${vacancies === 1 ? "vaga livre" : "vagas livres"}`}
-          </p>
+          <div className="flex items-center gap-2">
+            <Pips occupied={occupied} />
+            <p className="text-sm text-muted">
+              {occupied}/{CLASS_CAPACITY} ocupadas ·{" "}
+              {vacancies === 0
+                ? "lotada"
+                : `${vacancies} ${vacancies === 1 ? "vaga livre" : "vagas livres"}`}
+            </p>
+          </div>
         )}
       </header>
 
       {blockedBy ? (
-        <p className="rounded-md bg-zinc-100 px-3 py-2 text-sm dark:bg-zinc-900">
+        <p className="text-sm font-medium text-muted">
           Sem aula: {blockedBy.reason}
         </p>
       ) : (
         <>
           {attendees.length === 0 ? (
-            <p className="text-sm text-zinc-600 dark:text-zinc-400">
-              Nenhum aluno neste horário.
-            </p>
+            <p className="text-sm text-muted">Nenhum aluno neste horário.</p>
           ) : (
-            <ul className="flex flex-col gap-3">
+            <ul className="flex flex-col gap-4">
               {attendees.map((attendee) => {
                 const name =
                   attendee.student?.name ??
@@ -99,18 +110,27 @@ export const SessionCard = ({
                 return (
                   <li
                     key={attendee.key}
-                    className="flex flex-col gap-2 border-t border-zinc-200 pt-3 first:border-t-0 first:pt-0 dark:border-zinc-800"
+                    className="flex flex-col gap-3 border-t border-line pt-4 first:border-t-0 first:pt-0"
                   >
-                    <p className="flex flex-wrap items-center gap-2 font-medium">
-                      {name}
-                      {kindLabel ? (
-                        <span className="rounded bg-zinc-200 px-1.5 py-0.5 text-xs font-normal dark:bg-zinc-800">
-                          {kindLabel}
-                        </span>
-                      ) : null}
-                    </p>
+                    <div className="flex items-center gap-3">
+                      <Avatar name={name} />
+                      <p className="flex min-w-0 flex-wrap items-center gap-2 font-semibold">
+                        <span className="break-words">{name}</span>
+                        {kindLabel ? (
+                          <span
+                            className={
+                              attendee.kind === "makeup"
+                                ? BADGE_PRIMARY
+                                : BADGE_NEUTRAL
+                            }
+                          >
+                            {kindLabel}
+                          </span>
+                        ) : null}
+                      </p>
+                    </div>
                     {attention ? (
-                      <p className="rounded-md bg-amber-100 px-3 py-2 text-sm text-amber-950">
+                      <p className="rounded-xl bg-warn-soft px-3.5 py-2.5 text-sm text-warn-soft-fg">
                         <strong>Atenção:</strong> {attention}
                       </p>
                     ) : null}
@@ -124,10 +144,11 @@ export const SessionCard = ({
                               type="button"
                               aria-pressed={pressed}
                               className={cn(
-                                BUTTON_BASE,
+                                "inline-flex min-h-11 flex-1 items-center justify-center rounded-xl border px-3 text-sm font-semibold",
+                                FOCUS_RING,
                                 pressed
                                   ? ACTIONS[action].tone
-                                  : "border-zinc-300 hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-800",
+                                  : "border-line-strong bg-surface hover:bg-surface-2",
                               )}
                               // Clicar de novo no estado ativo volta para "agendado".
                               onClick={() =>

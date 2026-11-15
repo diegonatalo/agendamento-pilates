@@ -16,34 +16,45 @@ export const WeekStrip = ({ selected, today, countFor, onSelect }: Props) => {
   const days = Array.from({ length: 7 }, (_, i) => addDays(start, i));
 
   return (
-    <ul className="grid grid-cols-7 gap-1">
+    <ul className="grid grid-cols-7 gap-1.5 sm:gap-2">
       {days.map((date) => {
         const count = countFor(date);
         const label = WEEKDAY_LABELS[weekdayOf(date)];
         const isSelected = date === selected;
+        const isToday = date === today;
         return (
           <li key={date}>
             <button
               type="button"
               aria-pressed={isSelected}
-              aria-current={date === today ? "date" : undefined}
+              aria-current={isToday ? "date" : undefined}
               aria-label={`${label}, ${formatDayMonth(date)}, ${count} ${count === 1 ? "aula" : "aulas"}`}
               onClick={() => onSelect(date)}
               className={cn(
-                "flex min-h-16 w-full flex-col items-center justify-center rounded-md border text-xs focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600 dark:focus-visible:outline-teal-400",
+                "flex min-h-[4.5rem] w-full flex-col items-center justify-center gap-0.5 rounded-2xl border text-xs focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary",
                 isSelected
-                  ? "border-teal-700 bg-teal-700 text-white dark:border-teal-500 dark:bg-teal-500 dark:text-zinc-950"
-                  : "border-zinc-300 hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-800",
-                date === today && !isSelected && "border-teal-700 dark:border-teal-400",
+                  ? "border-primary bg-primary text-primary-fg shadow-card"
+                  : "border-line bg-surface hover:bg-surface-2",
+                isToday && !isSelected && "border-primary",
               )}
             >
-              <span aria-hidden="true">{label.slice(0, 3)}</span>
-              <span aria-hidden="true" className="text-base font-semibold">
+              <span aria-hidden="true" className="font-medium uppercase tracking-wide opacity-80">
+                {label.slice(0, 3)}
+              </span>
+              <span aria-hidden="true" className="font-display text-xl font-semibold leading-none">
                 {date.slice(8)}
               </span>
-              <span aria-hidden="true" className={count === 0 ? "opacity-40" : ""}>
-                {count}
-              </span>
+              <span
+                aria-hidden="true"
+                className={cn(
+                  "mt-0.5 size-1.5 rounded-full",
+                  count === 0
+                    ? "bg-transparent"
+                    : isSelected
+                      ? "bg-primary-fg"
+                      : "bg-primary",
+                )}
+              />
             </button>
           </li>
         );

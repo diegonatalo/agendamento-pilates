@@ -1,3 +1,11 @@
+import { Avatar } from "@/components/avatar";
+import {
+  BADGE_NEUTRAL,
+  BADGE_PRIMARY,
+  BADGE_WARN,
+  CARD,
+  FOCUS_RING,
+} from "@/components/form-styles";
 import { cn } from "@/lib/cn";
 import { formatCurrency, type PaymentStatus } from "@/lib/payments";
 import { formatSlotShort } from "@/lib/slots";
@@ -15,13 +23,10 @@ type Props = {
 const STATUS_LABEL = { paid: "Pago", pending: "Pendente", overdue: "Atrasado" };
 
 const STATUS_TONE = {
-  paid: "border-teal-700 bg-teal-700 text-white dark:border-teal-500 dark:bg-teal-500 dark:text-zinc-950",
-  pending: "border-zinc-300 hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-800",
-  overdue: "border-red-700 bg-red-700 text-white dark:border-red-500 dark:bg-red-500 dark:text-zinc-950",
+  paid: "border-primary bg-primary text-primary-fg",
+  pending: "border-line-strong bg-surface hover:bg-surface-2",
+  overdue: "border-danger bg-danger text-danger-fg",
 };
-
-const FOCUS =
-  "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600 dark:focus-visible:outline-teal-400";
 
 export const StudentRow = ({
   student,
@@ -35,52 +40,50 @@ export const StudentRow = ({
   const fee = student.monthlyFee;
 
   return (
-    <li className="flex items-stretch gap-2">
+    <li className="flex items-center gap-2">
       <button
         type="button"
         onClick={onOpen}
         className={cn(
-          "flex min-w-0 flex-1 flex-col gap-1 rounded-lg border border-zinc-200 p-3 text-left hover:bg-zinc-50 dark:border-zinc-800 dark:hover:bg-zinc-900",
-          FOCUS,
+          CARD,
+          "flex min-w-0 flex-1 items-center gap-3 p-3.5 text-left hover:bg-surface-2",
+          FOCUS_RING,
         )}
       >
-        <span className="flex flex-wrap items-center gap-2">
-          <span className="font-medium">{student.name}</span>
-          {!student.active ? (
-            <span className="rounded bg-zinc-200 px-1.5 py-0.5 text-xs dark:bg-zinc-800">
-              Inativo
-            </span>
-          ) : null}
-          {credits > 0 ? (
-            <span className="rounded bg-teal-100 px-1.5 py-0.5 text-xs text-teal-950">
-              {credits} {credits === 1 ? "reposição" : "reposições"}
-            </span>
-          ) : null}
-          {student.attention.trim() ? (
-            <span className="rounded bg-amber-200 px-1.5 py-0.5 text-xs text-amber-950">
-              Atenção
-            </span>
-          ) : null}
-        </span>
-        <span className="text-sm text-zinc-600 dark:text-zinc-400">
-          {studentSlots.length > 0
-            ? studentSlots.map(formatSlotShort).join(" · ")
-            : "Sem horário fixo"}
-        </span>
-        {fee ? (
-          <span className="text-sm text-zinc-600 dark:text-zinc-400">
-            {formatCurrency(fee.amount)} · vence dia {fee.dueDay}
+        <Avatar name={student.name} />
+        <span className="flex min-w-0 flex-col gap-1">
+          <span className="flex flex-wrap items-center gap-2">
+            <span className="break-words font-semibold">{student.name}</span>
+            {!student.active ? <span className={BADGE_NEUTRAL}>Inativo</span> : null}
+            {credits > 0 ? (
+              <span className={BADGE_PRIMARY}>
+                {credits} {credits === 1 ? "reposição" : "reposições"}
+              </span>
+            ) : null}
+            {student.attention.trim() ? (
+              <span className={BADGE_WARN}>Atenção</span>
+            ) : null}
           </span>
-        ) : null}
+          <span className="text-sm text-muted">
+            {studentSlots.length > 0
+              ? studentSlots.map(formatSlotShort).join(" · ")
+              : "Sem horário fixo"}
+          </span>
+          {fee ? (
+            <span className="text-sm text-muted">
+              {formatCurrency(fee.amount)} · vence dia {fee.dueDay}
+            </span>
+          ) : null}
+        </span>
       </button>
       {status !== "not-billed" ? (
         <button
           type="button"
           onClick={onTogglePaid}
           className={cn(
-            "min-h-11 min-w-24 rounded-lg border px-3 text-sm font-medium",
+            "min-h-11 min-w-24 rounded-xl border px-3 text-sm font-semibold",
             STATUS_TONE[status],
-            FOCUS,
+            FOCUS_RING,
           )}
         >
           {STATUS_LABEL[status]}{" "}

@@ -5,6 +5,7 @@ import {
   BUTTON_DANGER,
   BUTTON_PRIMARY,
   BUTTON_SECONDARY,
+  CARD,
 } from "@/components/form-styles";
 import { useStudio } from "@/hooks/use-studio";
 import {
@@ -87,8 +88,8 @@ export const BackupScreen = () => {
   return (
     <main className="flex flex-col gap-6">
       <header>
-        <h1 className="text-2xl font-semibold tracking-tight">Backup</h1>
-        <p className="text-sm text-zinc-600 dark:text-zinc-400">
+        <h1 className="text-3xl font-semibold">Backup</h1>
+        <p className="text-muted">
           Os dados ficam só neste navegador. Limpar os dados do navegador ou
           trocar de aparelho apaga tudo, então baixe um backup com frequência.
         </p>
@@ -96,17 +97,17 @@ export const BackupScreen = () => {
 
       <section
         aria-labelledby="export-title"
-        className="flex flex-col gap-3 rounded-lg border border-zinc-200 p-4 dark:border-zinc-800"
+        className={`${CARD} flex flex-col gap-3 p-4 sm:p-5`}
       >
-        <h2 id="export-title" className="text-lg font-semibold">
+        <h2 id="export-title" className="text-2xl font-semibold">
           Baixar backup
         </h2>
-        <p className="rounded-md bg-amber-100 px-3 py-2 text-sm text-amber-950">
+        <p className="rounded-xl bg-warn-soft px-3.5 py-2.5 text-sm text-warn-soft-fg">
           <strong>Atenção:</strong> o arquivo contém dados de saúde e contato
           dos alunos, sem criptografia. Guarde em local seguro e não envie por
           canais abertos.
         </p>
-        <p className="text-sm text-zinc-600 dark:text-zinc-400">
+        <p className="text-sm text-muted">
           {!ready
             ? " "
             : lastBackup
@@ -127,12 +128,12 @@ export const BackupScreen = () => {
 
       <section
         aria-labelledby="restore-title"
-        className="flex flex-col gap-3 rounded-lg border border-zinc-200 p-4 dark:border-zinc-800"
+        className={`${CARD} flex flex-col gap-3 p-4 sm:p-5`}
       >
-        <h2 id="restore-title" className="text-lg font-semibold">
+        <h2 id="restore-title" className="text-2xl font-semibold">
           Restaurar backup
         </h2>
-        <p className="text-sm text-zinc-600 dark:text-zinc-400">
+        <p className="text-sm text-muted">
           Restaurar <strong>substitui</strong> todos os dados atuais pelos do
           arquivo.
         </p>
@@ -142,12 +143,12 @@ export const BackupScreen = () => {
             type="file"
             accept="application/json,.json"
             onChange={handleFile}
-            className="text-sm file:mr-3 file:min-h-11 file:rounded-md file:border file:border-zinc-300 file:bg-transparent file:px-4 file:text-sm file:font-medium dark:file:border-zinc-700"
+            className="text-sm file:mr-3 file:min-h-11 file:rounded-xl file:border file:border-line-strong file:bg-surface file:px-4 file:text-sm file:font-semibold file:text-fg hover:file:bg-surface-2"
           />
         </label>
 
         {counts && pending ? (
-          <div className="flex flex-col gap-3 rounded-md border border-zinc-200 p-3 dark:border-zinc-800">
+          <div className="flex flex-col gap-3 rounded-xl bg-surface-2 p-4">
             <p className="text-sm">
               Backup de {formatDateBr(pending.exportedAt.slice(0, 10))}:{" "}
               {counts.students} alunos, {counts.slots} horários,{" "}
@@ -175,12 +176,12 @@ export const BackupScreen = () => {
       </section>
 
       {error ? (
-        <p role="alert" className="text-sm font-medium text-red-700 dark:text-red-400">
+        <p role="alert" className="text-sm font-medium text-danger">
           {error}
         </p>
       ) : null}
       {message ? (
-        <p role="status" className="text-sm font-medium text-teal-800 dark:text-teal-300">
+        <p role="status" className="text-sm font-medium text-primary">
           {message}
         </p>
       ) : null}

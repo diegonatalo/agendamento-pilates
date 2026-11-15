@@ -61,6 +61,10 @@
     {
       "title": "Backup",
       "desc": "Exporta e restaura todos os dados em um arquivo JSON."
+    },
+    {
+      "title": "Tema claro e escuro",
+      "desc": "Segue o sistema ou a sua escolha, sem piscar ao abrir."
     }
   ],
   "credits": [],

@@ -1,5 +1,7 @@
 import type { ReactNode } from "react";
+import { Logo } from "@/components/logo";
 import { MainNav } from "@/components/main-nav";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 type Props = { children: ReactNode };
 
@@ -7,15 +9,21 @@ export const AppShell = ({ children }: Props) => (
   <>
     <a
       href="#conteudo"
-      className="sr-only focus:not-sr-only focus:fixed focus:left-2 focus:top-2 focus:z-20 focus:rounded-md focus:bg-white focus:px-4 focus:py-2 focus:text-zinc-900 focus:outline-2 focus:outline-teal-600"
+      className="sr-only focus:not-sr-only focus:fixed focus:left-3 focus:top-3 focus:z-30 focus:rounded-xl focus:bg-primary focus:px-4 focus:py-2 focus:text-primary-fg focus:outline-2 focus:outline-offset-2 focus:outline-primary"
     >
       Pular para o conteúdo
     </a>
-    <MainNav />
+    <header className="sticky top-0 z-20 border-b border-line bg-bg">
+      <div className="mx-auto flex w-full max-w-4xl items-center justify-between gap-4 px-4 py-3">
+        <Logo />
+        <MainNav />
+        <ThemeToggle />
+      </div>
+    </header>
     <div
       id="conteudo"
       tabIndex={-1}
-      className="focus:outline-none mx-auto w-full max-w-3xl flex-1 px-4 pb-24 pt-6 md:pb-8"
+      className="mx-auto w-full max-w-4xl flex-1 px-4 pb-28 pt-6 focus:outline-none md:pb-10 md:pt-8"
     >
       {children}
     </div>
