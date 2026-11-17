@@ -26,6 +26,34 @@ describe("createLocalStore", () => {
     expect(store.getSnapshot()).toBe(store.getSnapshot());
   });
 
+  it("sem conseguir gravar, mantém o valor na memória e avisa", () => {
+    const store = createLocalStore<string[]>(KEY, []);
+    const listener = vi.fn();
+    store.subscribe(listener);
+    const setItem = vi
+      .spyOn(Storage.prototype, "setItem")
+      .mockImplementation(() => {
+        throw new DOMException("cheio", "QuotaExceededError");
+      });
+    expect(store.set(["a"])).toBe(false);
+    expect(store.getSnapshot()).toEqual(["a"]);
+    expect(listener).toHaveBeenCalledTimes(1);
+    setItem.mockRestore();
+    expect(store.set(["b"])).toBe(true);
+    expect(window.localStorage.getItem(KEY)).toBe('["b"]');
+  });
+
+  it("volta ao vazio se não conseguir ler o armazenamento", () => {
+    const getItem = vi
+      .spyOn(Storage.prototype, "getItem")
+      .mockImplementation(() => {
+        throw new DOMException("bloqueado", "SecurityError");
+      });
+    const store = createLocalStore<string[]>(KEY, []);
+    expect(store.getSnapshot()).toEqual([]);
+    getItem.mockRestore();
+  });
+
   it("volta ao vazio se o JSON salvo estiver corrompido", () => {
     window.localStorage.setItem(KEY, "{quebrado");
     const store = createLocalStore<string[]>(KEY, []);
