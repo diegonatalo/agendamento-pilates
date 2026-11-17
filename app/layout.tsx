@@ -2,7 +2,8 @@ import type { Metadata, Viewport } from "next";
 import { Geist } from "next/font/google";
 import { AppShell } from "@/components/app-shell";
 import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/site";
-import { THEME_INIT_SCRIPT } from "@/lib/theme";
+import { STORAGE_KEYS } from "@/lib/storage-keys";
+import { themeScript } from "@/lib/theme";
 import "./globals.css";
 
 const geist = Geist({
@@ -47,7 +48,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${geist.variable} h-full antialiased`}
     >
       <head>
-        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+        <script dangerouslySetInnerHTML={{ __html: themeScript(STORAGE_KEYS.theme) }} />
       </head>
       <body className="flex min-h-full flex-col">
         <AppShell>{children}</AppShell>
