@@ -1,42 +1,11 @@
 "use client";
 
-import { useEffect } from "react";
-import { isTheme } from "@/lib/theme";
+import { useTheme } from "@/hooks/use-theme";
 import { STORAGE_KEYS } from "@/lib/storage-keys";
-
-const SYSTEM_QUERY = "(prefers-color-scheme: dark)";
-
-const readChoice = () => {
-  try {
-    const stored = window.localStorage.getItem(STORAGE_KEYS.theme);
-    return isTheme(stored) ? stored : null;
-  } catch {
-    return null;
-  }
-};
 
 /** Alterna claro/escuro; sem escolha salva, acompanha o sistema. */
 export const ThemeToggle = () => {
-  useEffect(() => {
-    const query = window.matchMedia(SYSTEM_QUERY);
-    const onChange = () => {
-      if (readChoice() === null)
-        document.documentElement.classList.toggle("dark", query.matches);
-    };
-    query.addEventListener("change", onChange);
-    return () => query.removeEventListener("change", onChange);
-  }, []);
-
-  const toggle = () => {
-    const root = document.documentElement;
-    const next = root.classList.contains("dark") ? "light" : "dark";
-    root.classList.toggle("dark", next === "dark");
-    try {
-      window.localStorage.setItem(STORAGE_KEYS.theme, next);
-    } catch {
-      // Sem armazenamento, o tema vale só até recarregar.
-    }
-  };
+  const { toggle } = useTheme(STORAGE_KEYS.theme);
 
   return (
     <button

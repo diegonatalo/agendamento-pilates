@@ -1,65 +1,57 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { STORAGE_KEYS } from "@/lib/storage-keys";
-import { isTheme, THEME_INIT_SCRIPT } from "@/lib/theme";
+import { parseTheme, themeScript } from "@/lib/theme";
 
-const runScript = () => new Function(THEME_INIT_SCRIPT)();
+const KEY = "my-app:theme:v1";
+const COLORS = { light: "#ffffff", dark: "#000000" };
 
-const mockSystemDark = (dark: boolean) => {
-  window.matchMedia = vi.fn(
-    (query: string) =>
-      ({ matches: dark, media: query }) as unknown as MediaQueryList,
-  );
-};
+const mockSystem = (dark: boolean) =>
+  vi
+    .spyOn(window, "matchMedia")
+    .mockReturnValue({ matches: dark } as MediaQueryList);
 
-describe("isTheme", () => {
-  it("aceita só claro e escuro", () => {
-    expect(isTheme("light")).toBe(true);
-    expect(isTheme("dark")).toBe(true);
-    expect(isTheme("system")).toBe(false);
-    expect(isTheme(null)).toBe(false);
+const run = (script: string) => new Function(script)();
+const isDark = () => document.documentElement.classList.contains("dark");
+
+beforeEach(() => {
+  localStorage.clear();
+  document.documentElement.classList.remove("dark");
+  document.head.innerHTML = '<meta name="theme-color" content="">';
+});
+afterEach(() => vi.restoreAllMocks());
+
+describe("parseTheme", () => {
+  it("aceita só light e dark", () => {
+    expect(parseTheme("light")).toBe("light");
+    expect(parseTheme("dark")).toBe("dark");
+    expect(parseTheme("blue")).toBeNull();
+    expect(parseTheme(null)).toBeNull();
   });
 });
 
-describe("THEME_INIT_SCRIPT", () => {
-  beforeEach(() => {
-    window.localStorage.clear();
-    document.documentElement.className = "";
-  });
-  afterEach(() => vi.restoreAllMocks());
-
-  it("usa a chave padrão de storage do tema", () => {
-    expect(THEME_INIT_SCRIPT).toContain("agendamento-pilates:theme:v1");
-  });
-
-  it("aplica o escuro quando é a escolha salva, mesmo com o sistema claro", () => {
-    mockSystemDark(false);
-    window.localStorage.setItem(STORAGE_KEYS.theme, "dark");
-    runScript();
-    expect(document.documentElement).toHaveClass("dark");
-  });
-
-  it("aplica o claro quando é a escolha salva, mesmo com o sistema escuro", () => {
-    mockSystemDark(true);
-    document.documentElement.classList.add("dark");
-    window.localStorage.setItem(STORAGE_KEYS.theme, "light");
-    runScript();
-    expect(document.documentElement).not.toHaveClass("dark");
-  });
-
+describe("themeScript", () => {
   it("sem escolha salva, segue o sistema", () => {
-    mockSystemDark(true);
-    runScript();
-    expect(document.documentElement).toHaveClass("dark");
-
-    mockSystemDark(false);
-    runScript();
-    expect(document.documentElement).not.toHaveClass("dark");
+    mockSystem(true);
+    run(themeScript(KEY));
+    expect(isDark()).toBe(true);
   });
 
-  it("ignora valor salvo inválido e segue o sistema", () => {
-    mockSystemDark(true);
-    window.localStorage.setItem(STORAGE_KEYS.theme, "azul");
-    runScript();
-    expect(document.documentElement).toHaveClass("dark");
+  it("a escolha salva vence o sistema", () => {
+    mockSystem(true);
+    localStorage.setItem(KEY, "light");
+    run(themeScript(KEY));
+    expect(isDark()).toBe(false);
+  });
+
+  it("ajusta a cor da barra quando recebe as cores", () => {
+    localStorage.setItem(KEY, "dark");
+    run(themeScript(KEY, COLORS));
+    expect(document.querySelector("meta")).toHaveAttribute("content", "#000000");
+  });
+
+  it("não quebra a página se o armazenamento estiver bloqueado", () => {
+    vi.spyOn(Storage.prototype, "getItem").mockImplementation(() => {
+      throw new DOMException("bloqueado", "SecurityError");
+    });
+    expect(() => run(themeScript(KEY))).not.toThrow();
   });
 });
