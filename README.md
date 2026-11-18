@@ -126,6 +126,7 @@ pnpm dev        # http://localhost:3000
 | `pnpm lint` | Roda o ESLint |
 | `pnpm test` | Roda os testes |
 | `pnpm test:watch` | Roda os testes e reexecuta ao salvar |
+| `pnpm test:e2e` | Roda os testes de ponta a ponta (Playwright) |
 
 ### 🔑 Variáveis de ambiente
 
@@ -141,6 +142,13 @@ Cobrem a lógica em `lib/` (capacidade das turmas, conflito de horários, geraç
 
 Para reexecutar ao salvar: `pnpm test:watch`.
 
+Os testes de ponta a ponta (Playwright, em `e2e/`) abrem o app no Chromium e percorrem os fluxos inteiros: montar a grade, cadastrar um aluno e recarregar, baixar e restaurar o backup, e abrir todas as páginas sem erros.
+
+```bash
+pnpm exec playwright install chromium   # só na primeira vez
+pnpm test:e2e                           # gera o build e testa contra ele
+```
+
 <br />
 
 <div align="center">
@@ -153,6 +161,7 @@ Para reexecutar ao salvar: `pnpm test:watch`.
 app/              Apenas arquivos de rota
 components/       Telas e componentes de interface
 docs/             Fontes do README
+e2e/              Testes de ponta a ponta (Playwright)
 hooks/            Estado e persistência no localStorage
 lib/              Lógica pura, sem React
 public/           Arquivos estáticos

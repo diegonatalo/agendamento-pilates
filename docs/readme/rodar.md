@@ -15,6 +15,7 @@ pnpm dev        # http://localhost:3000
 | `pnpm lint` | Roda o ESLint |
 | `pnpm test` | Roda os testes |
 | `pnpm test:watch` | Roda os testes e reexecuta ao salvar |
+| `pnpm test:e2e` | Roda os testes de ponta a ponta (Playwright) |
 
 ### 🔑 Variáveis de ambiente
 
