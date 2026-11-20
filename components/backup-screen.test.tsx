@@ -32,6 +32,16 @@ describe("BackupScreen", () => {
     expect(screen.getByText("Você ainda não fez nenhum backup.")).toBeInTheDocument();
   });
 
+  it("só libera o download depois de confirmar o aviso de dados de saúde", async () => {
+    const user = userEvent.setup();
+    render(<BackupScreen />);
+    const download = screen.getByRole("button", { name: "Baixar backup" });
+    await waitFor(() => expect(screen.getByText("Você ainda não fez nenhum backup.")).toBeInTheDocument());
+    expect(download).toBeDisabled();
+    await user.click(screen.getByRole("checkbox", { name: /Entendi que o arquivo tem dados de saúde/ }));
+    expect(download).toBeEnabled();
+  });
+
   it("baixa o backup com os dados atuais e registra a data", async () => {
     window.localStorage.setItem(STORAGE_KEYS.students, JSON.stringify([student]));
     let blob: Blob | undefined;
@@ -46,6 +56,7 @@ describe("BackupScreen", () => {
     const user = userEvent.setup();
     render(<BackupScreen />);
 
+    await user.click(screen.getByRole("checkbox", { name: /Entendi que o arquivo tem dados de saúde/ }));
     await user.click(screen.getByRole("button", { name: "Baixar backup" }));
 
     expect(click).toHaveBeenCalledTimes(1);

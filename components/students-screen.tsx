@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { EmptyState } from "@/components/empty-state";
 import { Field } from "@/components/field";
@@ -99,6 +100,14 @@ export const StudentsScreen = () => {
           Novo aluno
         </button>
       </header>
+      <p className="rounded-xl bg-warn-soft px-3.5 py-2.5 text-sm text-warn-soft-fg">
+        As fichas têm dados de saúde dos alunos e ficam só neste navegador. Não use em computador
+        compartilhado, e peça o{" "}
+        <Link href="/termos/consentimento" className="font-medium underline underline-offset-2">
+          termo de consentimento
+        </Link>{" "}
+        de cada aluno.
+      </p>
 
       {month && today ? (
         <PaymentToolbar

@@ -1,5 +1,8 @@
-import { AgendaScreen } from "@/components/agenda-screen";
+import type { Metadata } from "next";
+import { LandingPage } from "@/components/landing/landing-page";
 
-export default function Page() {
-  return <AgendaScreen />;
+export const metadata: Metadata = { alternates: { canonical: "/" } };
+
+export default function Home() {
+  return <LandingPage />;
 }

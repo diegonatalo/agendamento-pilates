@@ -100,7 +100,7 @@ export const AgendaScreen = () => {
       {slots.length === 0 ? (
         <EmptyState title="Sua agenda está vazia">
           Cadastre os horários na aba{" "}
-          <Link href="/horarios" className={LINK_BUTTON}>
+          <Link href="/app/horarios" className={LINK_BUTTON}>
             Horários
           </Link>{" "}
           para ver a agenda.

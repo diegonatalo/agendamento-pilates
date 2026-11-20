@@ -44,6 +44,8 @@ export const BackupScreen = () => {
   const [pending, setPending] = useState<BackupFile | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
+  // O arquivo sai com dados de saúde sem criptografia: o download pede ciência antes.
+  const [acknowledged, setAcknowledged] = useState(false);
 
   const handleExport = () => {
     const now = new Date();
@@ -116,12 +118,21 @@ export const BackupScreen = () => {
               ? `Último backup: ${formatDateBr(lastBackup)}.`
               : "Você ainda não fez nenhum backup."}
         </p>
+        <label className="flex items-start gap-2.5 text-sm">
+          <input
+            type="checkbox"
+            className="mt-0.5 size-4 accent-[var(--primary)]"
+            checked={acknowledged}
+            onChange={(event) => setAcknowledged(event.target.checked)}
+          />
+          Entendi que o arquivo tem dados de saúde dos alunos e vou guardá-lo em local seguro.
+        </label>
         <div>
           <button
             type="button"
             className={BUTTON_PRIMARY}
             onClick={handleExport}
-            disabled={!ready}
+            disabled={!ready || !acknowledged}
           >
             Baixar backup
           </button>

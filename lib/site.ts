@@ -8,4 +8,14 @@ export const SITE_DESCRIPTION =
   "Agendamento e controle de alunos para estúdio de pilates.";
 
 /** Rotas públicas, usadas pelo sitemap. */
-export const ROUTES = ["/"];
+/** Rotas públicas, usadas pelo sitemap. As telas do app têm dados dos alunos e ficam fora. */
+export const ROUTES = ["/", "/privacidade", "/termos", "/termos/consentimento"];
+
+/**
+ * Contato para pedidos sobre dados pessoais (LGPD, art. 18), mostrado em `/privacidade`.
+ * TODO: trocar pelo e-mail definitivo; o standard-kit avisa enquanto este for o provisório.
+ */
+export const PRIVACY_EMAIL = "contato@exemplo.com.br";
+
+/** Repositório público, no rodapé. */
+export const SOURCE_URL = "https://github.com/diegonatalo/agendamento-pilates";
