@@ -1,0 +1,93 @@
+/** Textos da landing (`/`). As seções ficam em `components/landing/`. */
+
+export const HERO = {
+  kicker: "Para estúdios de pilates",
+  title: "A agenda do estúdio, as fichas dos alunos e as mensalidades num lugar só.",
+  subtitle:
+    "Monte a grade de horários, encaixe cada aluno nas turmas fixas, acompanhe a ficha de saúde e a evolução de cada um e saiba quem está em dia com o plano.",
+  note: "Grátis e sem cadastro. Os dados ficam só no navegador do estúdio.",
+};
+
+export type Step = { title: string; text: string };
+
+export const STEPS: Step[] = [
+  {
+    title: "Monte a grade",
+    text: "Gere os horários da semana de uma vez, com capacidade por turma, e bloqueie feriados e férias.",
+  },
+  {
+    title: "Cadastre os alunos",
+    text: "Contato, horários fixos, ficha de saúde, pontos de atenção, objetivos e plano de cada aluno.",
+  },
+  {
+    title: "Acompanhe o dia a dia",
+    text: "Veja a agenda da semana, quem vem em cada aula e quem está com a mensalidade em aberto.",
+  },
+];
+
+export type FeatureIcon = "calendar" | "users" | "health" | "money" | "block" | "backup";
+
+export type Feature = { icon: FeatureIcon; title: string; text: string };
+
+export const FEATURES: Feature[] = [
+  {
+    icon: "calendar",
+    title: "Agenda da semana",
+    text: "As aulas de cada dia com os alunos de cada horário, e espaço para encaixar quem vai repor.",
+  },
+  {
+    icon: "users",
+    title: "Turmas fixas",
+    text: "Cada aluno tem os seus horários fixos, e a grade mostra quais turmas ainda têm vaga e quais lotaram.",
+  },
+  {
+    icon: "health",
+    title: "Ficha de saúde",
+    text: "Lesões, cirurgias, restrições, liberação médica, contato de emergência e a evolução ao longo do tempo.",
+  },
+  {
+    icon: "money",
+    title: "Planos e mensalidades",
+    text: "Cadastre os planos do estúdio e marque os pagamentos do mês de cada aluno.",
+  },
+  {
+    icon: "block",
+    title: "Feriados e férias",
+    text: "Bloqueie dias ou períodos inteiros, e a agenda já mostra o estúdio fechado.",
+  },
+  {
+    icon: "backup",
+    title: "Backup em arquivo",
+    text: "Baixe um backup para guardar ou levar para outro computador, com aviso sobre os dados de saúde.",
+  },
+];
+
+export type Screenshot = { light: string; dark: string; alt: string };
+
+/** Prints gerados por `e2e/screenshots.spec.ts` com alunos fictícios (nunca à mão). */
+export const SCREENSHOT: Screenshot = {
+  light: "/landing/agenda-claro.webp",
+  dark: "/landing/agenda-escuro.webp",
+  alt: "Agenda do estúdio com os horários da semana e os alunos de cada aula (dados fictícios).",
+};
+
+export type Faq = { question: string; answer: string };
+
+export const FAQ: Faq[] = [
+  { question: "É grátis?", answer: "É. Não tem plano pago, cadastro nem anúncio." },
+  {
+    question: "Onde ficam os dados dos alunos?",
+    answer:
+      "Só no navegador do computador ou celular do estúdio. Nada vai para um servidor, e por isso o backup é tão importante.",
+  },
+  {
+    question: "Preciso pedir autorização aos alunos?",
+    answer:
+      "As fichas têm dados de saúde, que a LGPD trata como sensíveis. Use o modelo de termo de consentimento e revise com um advogado.",
+  },
+  {
+    question: "Dá para usar em mais de um aparelho?",
+    answer:
+      "Os dados não sincronizam sozinhos. Para trocar de aparelho, baixe o backup num e restaure no outro.",
+  },
+];

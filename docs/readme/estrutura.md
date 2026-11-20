@@ -1,5 +1,5 @@
 ```text
-app/              Apenas arquivos de rota
+app/              Apenas arquivos de rota: landing (/), o app em /app, /privacidade e /termos (com o termo de consentimento)
 components/       Telas e componentes de interface
 docs/             Fontes do README
 e2e/              Testes de ponta a ponta (Playwright)

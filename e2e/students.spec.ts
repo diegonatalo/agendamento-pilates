@@ -19,7 +19,7 @@ test("cadastra um aluno num horário e mantém depois de recarregar", async ({ p
 });
 
 test("não salva aluno sem nome", async ({ page }) => {
-  await page.goto("/alunos");
+  await page.goto("/app/alunos");
   await page.getByRole("button", { name: "Novo aluno" }).click();
   await page.getByRole("button", { name: "Salvar aluno" }).click();
   await expect(page.getByText("Informe o nome do aluno.")).toBeVisible();

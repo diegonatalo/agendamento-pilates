@@ -2,7 +2,7 @@ import { expect, type Page } from "@playwright/test";
 
 /** Cria a grade com os valores padrão do gerador e devolve quantos horários surgiram. */
 export const createSlots = async (page: Page) => {
-  await page.goto("/horarios");
+  await page.goto("/app/horarios");
   const create = page.getByRole("button", { name: /^Criar \d+ horários?$/ });
   await expect(create).toBeEnabled();
   await create.click();
@@ -11,7 +11,7 @@ export const createSlots = async (page: Page) => {
 
 /** Cadastra um aluno só com o nome, matriculado no primeiro horário da grade. */
 export const createStudent = async (page: Page, name: string) => {
-  await page.goto("/alunos");
+  await page.goto("/app/alunos");
   await page.getByRole("button", { name: "Novo aluno" }).click();
   await page.getByLabel("Nome", { exact: true }).fill(name);
   await page
