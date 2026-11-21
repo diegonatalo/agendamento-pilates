@@ -1,8 +1,8 @@
 Requer [Node.js](https://nodejs.org) e [pnpm](https://pnpm.io).
 
 ```bash
-git clone https://github.com/diegonatalo/agendamento-pilates.git
-cd agendamento-pilates
+git clone https://github.com/diegonatalo/encaixe.git
+cd encaixe
 pnpm install
 cp .env.example .env.local   # preencha o banco e o segredo
 pnpm db:migrate
@@ -32,4 +32,4 @@ Veja [`.env.example`](.env.example).
 | `DATABASE_URL_UNPOOLED` | URL sem pooler, usada pelas migrações. | As migrações usam a `DATABASE_URL` |
 | `BETTER_AUTH_SECRET` | Segredo que assina os cookies de sessão. Gere com `openssl rand -base64 32`, um por ambiente. | Em produção, o login e o app dão erro |
 | `BETTER_AUTH_URL` | Endereço do site em desenvolvimento e nos testes, sem barra no final. Na Vercel não precisa: vale o `SITE_URL`. | Better Auth deduz pela requisição e avisa no log |
-| `NEXT_PUBLIC_SITE_URL` | URL pública do site, usada nas tags Open Graph, no `robots.txt` e no `sitemap.xml`. Sem barra no final. | Usa `http://localhost:3000` |
+| `NEXT_PUBLIC_SITE_URL` | URL pública do site, usada nas tags Open Graph, no `robots.txt` e no `sitemap.xml`. Sem barra no final. | Usa `https://dn-encaixe.vercel.app` |

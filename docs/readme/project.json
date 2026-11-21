@@ -1,9 +1,9 @@
 {
   "name": "Encaixe",
-  "repo": "agendamento-pilates",
+  "repo": "encaixe",
   "tagline": "A agenda de estúdios e professores com turmas fixas.",
   "urls": {
-    "demo": "https://agendamento-pilates.vercel.app"
+    "demo": "https://dn-encaixe.vercel.app"
   },
   "stack": [
     {
