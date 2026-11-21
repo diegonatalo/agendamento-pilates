@@ -1,12 +1,12 @@
 <!-- Arquivo gerado pelo readme-kit. Não edite aqui: altere docs/readme/ e rode "readme-kit build". -->
 <div align="center">
 
-<img src="docs/assets/banner.svg" alt="Agendamento Pilates: A agenda do estúdio de pilates, feita para a instrutora. github.com/diegonatalo/agendamento-pilates. Stack: Next.js 16, React 19, TypeScript 6, Tailwind CSS 4" width="100%" />
+<img src="docs/assets/banner.svg" alt="Encaixe: A agenda de estúdios e professores com turmas fixas. github.com/diegonatalo/encaixe. Stack: Next.js 16, React 19, TypeScript 6, Tailwind CSS 4" width="100%" />
 
 <br />
 
-<a href="https://agendamento-pilates.vercel.app"><img src="docs/assets/btn-demo.svg" alt="Abrir o app ↗" height="46" /></a>
-<a href="https://github.com/diegonatalo/agendamento-pilates"><img src="docs/assets/btn-code.svg" alt="Código ↗" height="46" /></a>
+<a href="https://dn-encaixe.vercel.app"><img src="docs/assets/btn-demo.svg" alt="Abrir o app ↗" height="46" /></a>
+<a href="https://github.com/diegonatalo/encaixe"><img src="docs/assets/btn-code.svg" alt="Código ↗" height="46" /></a>
 
 <br />
 
@@ -27,8 +27,8 @@
 
 </div>
 
-**A agenda do estúdio de pilates, feita para a instrutora.**<br />
-Sistema de agendamento para um estúdio de pilates, de uso exclusivo da dona e instrutora. As turmas têm até 3 alunos por horário e cada sessão dura 1h. Ela controla a agenda, a presença, as reposições, a mensalidade e a ficha de saúde de cada aluno. Os alunos não acessam o sistema. Cada estúdio tem a própria conta, e os dados ficam num banco Postgres.
+**A agenda de estúdios e professores com turmas fixas.**<br />
+Encaixe é um sistema de agendamento para estúdios e professores com turmas fixas, como pilates, yoga, funcional e aulas particulares. Quem dá as aulas define a duração da sessão e quantos alunos cabem em cada horário, e controla a agenda, a presença, as reposições, a mensalidade e a ficha de saúde de cada aluno. Os alunos não acessam o sistema. Cada estúdio tem a própria conta, e os dados ficam num banco Postgres.
 
 <br />
 
@@ -76,7 +76,7 @@ Sistema de agendamento para um estúdio de pilates, de uso exclusivo da dona e i
 
 <div align="center">
 
-<img src="docs/assets/f-01.svg" alt="Agenda por horário: Turmas de até 3 alunos, sessões de 1h, com vagas livres à vista." width="49%" />
+<img src="docs/assets/f-01.svg" alt="Agenda por horário: Turmas com vagas por horário e duração da sessão definidas pelo estúdio." width="49%" />
 <img src="docs/assets/f-02.svg" alt="Ficha do aluno: Saúde, lesões, pontos de atenção e evolução em um só lugar." width="49%" />
 <br />
 <img src="docs/assets/f-03.svg" alt="Reposição: Cada desmarcação vira crédito, sem expiração." width="49%" />
@@ -114,8 +114,8 @@ Sistema de agendamento para um estúdio de pilates, de uso exclusivo da dona e i
 Requer [Node.js](https://nodejs.org) e [pnpm](https://pnpm.io).
 
 ```bash
-git clone https://github.com/diegonatalo/agendamento-pilates.git
-cd agendamento-pilates
+git clone https://github.com/diegonatalo/encaixe.git
+cd encaixe
 pnpm install
 cp .env.example .env.local   # preencha o banco e o segredo
 pnpm db:migrate
@@ -145,7 +145,7 @@ Veja [`.env.example`](.env.example).
 | `DATABASE_URL_UNPOOLED` | URL sem pooler, usada pelas migrações. | As migrações usam a `DATABASE_URL` |
 | `BETTER_AUTH_SECRET` | Segredo que assina os cookies de sessão. Gere com `openssl rand -base64 32`, um por ambiente. | Em produção, o login e o app dão erro |
 | `BETTER_AUTH_URL` | Endereço do site em desenvolvimento e nos testes, sem barra no final. Na Vercel não precisa: vale o `SITE_URL`. | Better Auth deduz pela requisição e avisa no log |
-| `NEXT_PUBLIC_SITE_URL` | URL pública do site, usada nas tags Open Graph, no `robots.txt` e no `sitemap.xml`. Sem barra no final. | Usa `http://localhost:3000` |
+| `NEXT_PUBLIC_SITE_URL` | URL pública do site, usada nas tags Open Graph, no `robots.txt` e no `sitemap.xml`. Sem barra no final. | Usa `https://dn-encaixe.vercel.app` |
 
 ### 🧪 Testes
 
@@ -209,12 +209,12 @@ Na Vercel, com o banco Postgres do Neon ligado pela integração da Vercel (ela 
 
 - Defina `BETTER_AUTH_SECRET` em Settings > Environment Variables, com um valor só da produção.
 - O script `vercel-build` aplica as migrações pendentes (`drizzle-kit migrate`) antes do build. A Vercel só publica a `main` (`vercel.json`).
-- `NEXT_PUBLIC_SITE_URL` é opcional e define o endereço usado em metadados e no sitemap; sem ela vale `http://localhost:3000`.
+- `NEXT_PUBLIC_SITE_URL` é opcional e define o endereço usado em metadados e no sitemap; sem ela vale `https://dn-encaixe.vercel.app`.
 - O app logado (`/app`) e a API pedem `noindex` e ficam fora do `robots.txt`.
 
 ### 💾 Backup
 
-Na aba **Conta**, o backup baixa um arquivo `agenda-pilates-AAAA-MM-DD.json` com horários, alunos, presenças, datas bloqueadas e pagamentos, e restaura a partir dele (substituindo os dados atuais da conta, depois de confirmar). Serve para guardar uma cópia ou levar os dados para outra conta. Arquivos de outro app, de outra versão ou incompletos são recusados sem alterar nada.
+Na aba **Conta**, o backup baixa um arquivo `encaixe-backup-AAAA-MM-DD.json` com horários, alunos, presenças, datas bloqueadas e pagamentos, e restaura a partir dele (substituindo os dados atuais da conta, depois de confirmar). Serve para guardar uma cópia ou levar os dados para outra conta. Arquivos de outro app, de outra versão ou incompletos são recusados sem alterar nada.
 
 O arquivo tem dados de saúde e contato dos alunos, **sem criptografia**: guarde em local seguro.
 
@@ -255,6 +255,6 @@ O arquivo tem dados de saúde e contato dos alunos, **sem criptografia**: guarde
 
 <div align="center">
 
-<img src="docs/assets/footer.svg" alt="© 2026 Diego Natalo. Feito com 💚 para quem cuida do movimento dos outros" width="100%" />
+<img src="docs/assets/footer.svg" alt="© 2026 Diego Natalo. Feito com 💚 para quem cuida do horário dos outros" width="100%" />
 
 </div>

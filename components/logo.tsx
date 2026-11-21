@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { SITE_NAME } from "@/lib/site";
 
-/** Marca: arco de equilíbrio sobre um ponto, em verde com um toque de argila. */
+/** Marca do Encaixe: quatro horários na grade, um deles encaixado em destaque. */
 export const LogoMark = ({ className }: { className?: string }) => (
   <svg
     aria-hidden="true"
@@ -10,13 +10,10 @@ export const LogoMark = ({ className }: { className?: string }) => (
     fill="none"
   >
     <rect width="40" height="40" rx="12" fill="var(--primary)" />
-    <path
-      d="M9 24c3-9 9-13 11-13s8 4 11 13"
-      stroke="var(--primary-fg)"
-      strokeWidth="3"
-      strokeLinecap="round"
-    />
-    <circle cx="20" cy="29" r="3" fill="var(--accent)" />
+    <rect x="9" y="11" width="9" height="9" rx="2.5" fill="var(--primary-fg)" />
+    <rect x="22" y="11" width="9" height="9" rx="2.5" fill="var(--primary-fg)" opacity="0.55" />
+    <rect x="9" y="24" width="9" height="9" rx="2.5" fill="var(--primary-fg)" opacity="0.55" />
+    <rect x="22" y="24" width="9" height="9" rx="2.5" fill="var(--accent)" />
   </svg>
 );
 

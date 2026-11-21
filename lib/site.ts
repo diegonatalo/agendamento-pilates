@@ -1,11 +1,14 @@
-/** URL do site. Para outro domínio, defina NEXT_PUBLIC_SITE_URL no build. */
+/**
+ * URL pública do site, sem barra final. Também é o endereço do login na Vercel
+ * (lib/auth.ts). Para outro domínio, defina NEXT_PUBLIC_SITE_URL no build.
+ */
 export const SITE_URL = (
-  process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"
+  process.env.NEXT_PUBLIC_SITE_URL ?? "https://dn-encaixe.vercel.app"
 ).replace(/\/+$/, "");
 
-export const SITE_NAME = "Agenda Pilates";
+export const SITE_NAME = "Encaixe";
 export const SITE_DESCRIPTION =
-  "Agendamento e controle de alunos para estúdio de pilates.";
+  "Agenda, alunos e mensalidades para estúdios e professores com turmas fixas.";
 
 /** Rotas públicas, usadas pelo sitemap. */
 /** Rotas públicas, usadas pelo sitemap. As telas do app têm dados dos alunos e ficam fora. */
@@ -18,4 +21,4 @@ export const ROUTES = ["/", "/privacidade", "/termos", "/termos/consentimento"];
 export const PRIVACY_EMAIL = "contato@exemplo.com.br";
 
 /** Repositório público, no rodapé. */
-export const SOURCE_URL = "https://github.com/diegonatalo/agendamento-pilates";
+export const SOURCE_URL = "https://github.com/diegonatalo/encaixe";

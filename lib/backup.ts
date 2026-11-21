@@ -18,6 +18,7 @@ import type {
   StudioSettings,
 } from "@/types/pilates";
 
+/** Identificador gravado no arquivo. Fica com o nome antigo para os backups já baixados continuarem abrindo. */
 export const BACKUP_APP = "agenda-pilates";
 export const BACKUP_VERSION = 3;
 
@@ -76,7 +77,7 @@ export const parseBackup = (text: string): ParseResult => {
   if (!isRec(raw) || raw.app !== BACKUP_APP || !isRec(raw.data))
     return {
       ok: false,
-      error: "Este arquivo não é um backup do Agenda Pilates.",
+      error: "Este arquivo não é um backup do Encaixe.",
     };
   if (raw.version !== BACKUP_VERSION)
     return { ok: false, error: "Esta versão de backup não é suportada." };

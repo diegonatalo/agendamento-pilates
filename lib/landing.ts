@@ -1,10 +1,10 @@
 /** Textos da landing (`/`). As seções ficam em `components/landing/`. */
 
 export const HERO = {
-  kicker: "Para estúdios de pilates",
+  kicker: "Para estúdios e professores com turmas fixas",
   title: "A agenda do estúdio, as fichas dos alunos e as mensalidades num lugar só.",
   subtitle:
-    "Monte a grade de horários, encaixe cada aluno nas turmas fixas, acompanhe a ficha de saúde e a evolução de cada um e saiba quem está em dia com o plano.",
+    "Pilates, yoga, funcional ou aulas particulares: monte a grade de horários, encaixe cada aluno nas turmas fixas, acompanhe a ficha e a evolução de cada um e saiba quem está em dia com o plano.",
   note: "Grátis. Os dados ficam salvos na conta do estúdio, em qualquer aparelho.",
 };
 

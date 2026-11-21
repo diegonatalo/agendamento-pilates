@@ -13,7 +13,7 @@ test("baixa o backup e restaura os dados numa conta nova", async ({ page, browse
       .check()
       .then(() => page.getByRole("button", { name: "Baixar backup" }).click()),
   ]);
-  expect(download.suggestedFilename()).toMatch(/^agenda-pilates-\d{4}-\d{2}-\d{2}\.json$/);
+  expect(download.suggestedFilename()).toMatch(/^encaixe-backup-\d{4}-\d{2}-\d{2}\.json$/);
   const file = testInfo.outputPath(download.suggestedFilename());
   await download.saveAs(file);
   await expect(page.getByText(/^Último backup:/)).toBeVisible();
@@ -46,7 +46,7 @@ test("recusa um arquivo que não é backup", async ({ page }) => {
     buffer: Buffer.from('{"nada": true}'),
   });
   await expect(
-    page.getByRole("alert").filter({ hasText: "não é um backup do Agenda Pilates" }),
+    page.getByRole("alert").filter({ hasText: "não é um backup do Encaixe" }),
   ).toBeVisible();
   await expect(page.getByRole("button", { name: "Substituir dados atuais" })).toHaveCount(0);
 });

@@ -68,7 +68,7 @@ export const PublicShell = ({ children }: { children: ReactNode }) => (
   </div>
 );
 
-/** Página inicial: apresenta a Agenda Pilates e leva ao app (`/app`). */
+/** Página inicial: apresenta o Encaixe e leva ao app (`/app`). */
 export const LandingPage = () => (
   <PublicShell>
     <main id="conteudo" className="flex flex-1 flex-col">
