@@ -25,7 +25,7 @@ export const STEPS: Step[] = [
   },
 ];
 
-export type FeatureIcon = "calendar" | "users" | "health" | "money" | "block" | "backup";
+export type FeatureIcon = "calendar" | "users" | "health" | "money" | "block" | "devices";
 
 export type Feature = { icon: FeatureIcon; title: string; text: string };
 
@@ -56,9 +56,9 @@ export const FEATURES: Feature[] = [
     text: "Bloqueie dias ou períodos inteiros, e a agenda já mostra o estúdio fechado.",
   },
   {
-    icon: "backup",
-    title: "Backup em arquivo",
-    text: "Baixe um backup para guardar ou levar para outro computador, com aviso sobre os dados de saúde.",
+    icon: "devices",
+    title: "Em qualquer aparelho",
+    text: "Entre com a mesma conta no computador da recepção e no celular, e tudo aparece igual nos dois.",
   },
 ];
 
@@ -78,7 +78,7 @@ export const FAQ: Faq[] = [
   {
     question: "Onde ficam os dados dos alunos?",
     answer:
-      "Num banco de dados ligado à conta do estúdio, que só abre com o e-mail e a senha. Dá também para baixar um backup em arquivo.",
+      "Num banco de dados ligado à conta do estúdio, que só abre com o e-mail e a senha.",
   },
   {
     question: "Preciso pedir autorização aos alunos?",

@@ -1,9 +1,7 @@
-import type { StudioData } from "@/lib/backup";
 import {
   LIMITS,
   isBlocked,
   isBooking,
-  isDateValue,
   isIdValue,
   isPayment,
   isPaymentKey,
@@ -17,7 +15,6 @@ import type {
   BlockedPeriod,
   Booking,
   ClassSlot,
-  DateKey,
   MonthKey,
   MonthlyPayment,
   Plan,
@@ -26,15 +23,21 @@ import type {
 } from "@/types/pilates";
 
 /** Everything the app keeps for one account. */
-export type StudioState = StudioData & { lastBackup: DateKey | null };
+export type StudioState = {
+  settings: StudioSettings;
+  plans: Plan[];
+  slots: ClassSlot[];
+  students: Student[];
+  bookings: Booking[];
+  blockedPeriods: BlockedPeriod[];
+  payments: MonthlyPayment[];
+};
 
 export type PaymentKey = { studentId: string; month: MonthKey };
 
-/** Rows to write and to delete, per table. Lists keep the shape of `StudioData`. */
+/** Rows to write and to delete, per table. Lists keep the shape of `StudioState`. */
 export type StudioChanges = {
   settings?: StudioSettings;
-  /** `undefined` means unchanged; `null` clears it. */
-  lastBackup?: DateKey | null;
   upsert: {
     plans: Plan[];
     slots: ClassSlot[];
@@ -73,7 +76,6 @@ export const emptyChanges = (): StudioChanges => ({
 export const diffStudio = (prev: StudioState, next: StudioState): StudioChanges => {
   const changes = emptyChanges();
   if (!same(prev.settings, next.settings)) changes.settings = next.settings;
-  if (prev.lastBackup !== next.lastBackup) changes.lastBackup = next.lastBackup;
   for (const list of LIST_KEYS) {
     if (prev[list] === next[list]) continue;
     const before = new Map<string, unknown>(prev[list].map((item) => [keyOf(list, item), item]));
@@ -97,7 +99,6 @@ export const diffStudio = (prev: StudioState, next: StudioState): StudioChanges 
 
 export const countChanges = (changes: StudioChanges): number =>
   (changes.settings ? 1 : 0) +
-  (changes.lastBackup !== undefined ? 1 : 0) +
   LIST_KEYS.reduce((sum, list) => sum + changes.upsert[list].length + changes.remove[list].length, 0);
 
 const UPSERT_GUARDS: Record<ListKey, (value: unknown) => boolean> = {
@@ -117,8 +118,6 @@ export const parseChanges = (input: unknown): StudioChanges | null => {
   if (!isRec(input) || !isRec(input.upsert) || !isRec(input.remove)) return null;
   const { upsert, remove } = input;
   if (input.settings !== undefined && !isSettings(input.settings)) return null;
-  if (input.lastBackup !== undefined && input.lastBackup !== null && !isDateValue(input.lastBackup))
-    return null;
   let total = 0;
   for (const list of LIST_KEYS) {
     const added = upsert[list];

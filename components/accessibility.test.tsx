@@ -5,7 +5,6 @@ import axe from "axe-core";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { AgendaScreen } from "@/components/agenda-screen";
 import { AppShell } from "@/components/app-shell";
-import { BackupScreen } from "@/components/backup-screen";
 import { NotFoundScreen } from "@/components/not-found-screen";
 import { SlotsScreen } from "@/components/slots-screen";
 import { StudentsScreen } from "@/components/students-screen";
@@ -98,8 +97,4 @@ describe("acessibilidade (axe)", () => {
     expect(await violationsIn(container)).toEqual([]);
   });
 
-  it("backup", async () => {
-    const { container } = renderStudio(<BackupScreen />);
-    expect(await violationsIn(container)).toEqual([]);
-  });
 });

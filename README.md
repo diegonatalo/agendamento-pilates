@@ -83,9 +83,7 @@ Encaixe é um sistema de agendamento para estúdios e professores com turmas fix
 <img src="docs/assets/f-04.svg" alt="Mensalidade: Indicador de pago ou pendente por mês." width="49%" />
 <br />
 <img src="docs/assets/f-05.svg" alt="Conta: Login com e-mail e senha e os dados no Postgres, iguais no computador e no celular." width="49%" />
-<img src="docs/assets/f-06.svg" alt="Backup: Exporta e restaura todos os dados em um arquivo JSON." width="49%" />
-<br />
-<img src="docs/assets/f-07.svg" alt="Tema claro e escuro: Segue o sistema ou a sua escolha, sem piscar ao abrir." width="49%" />
+<img src="docs/assets/f-06.svg" alt="Tema claro e escuro: Segue o sistema ou a sua escolha, sem piscar ao abrir." width="49%" />
 
 </div>
 
@@ -157,7 +155,7 @@ Cobrem a lógica em `lib/` (capacidade das turmas, conflito de horários, geraç
 
 Para reexecutar ao salvar: `pnpm test:watch`.
 
-Os testes de ponta a ponta (Playwright, em `e2e/`) abrem o app no Chromium e percorrem os fluxos inteiros com uma conta nova por teste: criar a conta, entrar e sair, senha errada, e-mail repetido, isolamento entre contas e excluir a conta; montar a grade, cadastrar um aluno e recarregar; baixar o backup e restaurar numa conta nova; e abrir todas as páginas sem erros. Usam o banco do `.env.local` (no CI, um Postgres descartável).
+Os testes de ponta a ponta (Playwright, em `e2e/`) abrem o app no Chromium e percorrem os fluxos inteiros com uma conta nova por teste: criar a conta, entrar e sair, senha errada, e-mail repetido, isolamento entre contas e excluir a conta; montar a grade, cadastrar um aluno e recarregar; e abrir todas as páginas sem erros. Usam o banco do `.env.local` (no CI, um Postgres descartável).
 
 ```bash
 pnpm exec playwright install chromium   # só na primeira vez
@@ -211,12 +209,6 @@ Na Vercel, com o banco Postgres do Neon ligado pela integração da Vercel (ela 
 - O script `vercel-build` aplica as migrações pendentes (`drizzle-kit migrate`) antes do build. A Vercel só publica a `main` (`vercel.json`).
 - `NEXT_PUBLIC_SITE_URL` é opcional e define o endereço usado em metadados e no sitemap; sem ela vale `https://dn-encaixe.vercel.app`.
 - O app logado (`/app`) e a API pedem `noindex` e ficam fora do `robots.txt`.
-
-### 💾 Backup
-
-Na aba **Conta**, o backup baixa um arquivo `encaixe-backup-AAAA-MM-DD.json` com horários, alunos, presenças, datas bloqueadas e pagamentos, e restaura a partir dele (substituindo os dados atuais da conta, depois de confirmar). Serve para guardar uma cópia ou levar os dados para outra conta. Arquivos de outro app, de outra versão ou incompletos são recusados sem alterar nada.
-
-O arquivo tem dados de saúde e contato dos alunos, **sem criptografia**: guarde em local seguro.
 
 ### 🧭 Próximos passos
 

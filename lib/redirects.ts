@@ -12,7 +12,7 @@ export const REDIRECTS: Redirect[] = [
     destination: `/app${source}`,
     permanent: true,
   })),
-  // O backup virou parte da tela de conta quando o app ganhou login.
+  // A antiga tela de backup virou a tela de conta quando o app ganhou login.
   { source: "/backup", destination: "/app/conta", permanent: true },
   { source: "/app/backup", destination: "/app/conta", permanent: true },
 ];

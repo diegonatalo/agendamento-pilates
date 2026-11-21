@@ -16,7 +16,7 @@ const ICON_PATHS: Record<FeatureIcon, string> = {
   health: "M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10ZM9 11h6M12 8v6",
   money: "M20.6 13.4 13.4 20.6a2 2 0 0 1-2.8 0L3 13V3h10l7.6 7.6a2 2 0 0 1 0 2.8ZM7.5 7.5h.01",
   block: "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18ZM5.6 5.6l12.8 12.8",
-  backup: "M12 3v12M7 10l5 5 5-5M5 21h14",
+  devices: "M4 5h12a1 1 0 0 1 1 1v8H3V6a1 1 0 0 1 1-1ZM1 17h17M19 9h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1h-3a1 1 0 0 1-1-1v-9a1 1 0 0 1 1-1Z",
 };
 
 const FeatureGlyph = ({ icon }: { icon: FeatureIcon }) => (
@@ -203,8 +203,8 @@ export const LandingPage = () => (
             </h2>
             <p className="text-pretty">
               As fichas ficam na conta do estúdio, protegidas por senha, e cada conta vê só os próprios alunos. Sem
-              cookies de rastreamento nem propaganda. Como são dados de saúde, use uma senha forte, guarde o backup
-              com cuidado e peça o termo de consentimento de cada aluno.
+              cookies de rastreamento nem propaganda. Como são dados de saúde, use uma senha forte e peça o termo
+              de consentimento de cada aluno.
             </p>
             <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm font-semibold">
               <Link href="/termos/consentimento" className="underline underline-offset-4">
