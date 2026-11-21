@@ -1,7 +1,8 @@
 ### 🌐 Deploy
 
-O app é estático e não tem servidor próprio nem banco: os dados ficam no `localStorage` do navegador de quem usa. Qualquer hospedagem de Next.js serve (por exemplo a Vercel: importe o repositório e publique, sem configurar nada).
+Na Vercel, com o banco Postgres do Neon ligado pela integração da Vercel (ela cria a `DATABASE_URL` e a `DATABASE_URL_UNPOOLED`).
 
+- Defina `BETTER_AUTH_SECRET` em Settings > Environment Variables, com um valor só da produção.
+- O script `vercel-build` aplica as migrações pendentes (`drizzle-kit migrate`) antes do build. A Vercel só publica a `main` (`vercel.json`).
 - `NEXT_PUBLIC_SITE_URL` é opcional e define o endereço usado em metadados e no sitemap; sem ela vale `http://localhost:3000`.
-- O site pede `noindex`, porque é de uso pessoal da instrutora.
-- Como os dados não saem do navegador, **trocar de aparelho ou limpar os dados do navegador apaga tudo**: use a aba Backup para exportar e restaurar o JSON.
+- O app logado (`/app`) e a API pedem `noindex` e ficam fora do `robots.txt`.

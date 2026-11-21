@@ -1,13 +1,13 @@
-import { render, screen } from "@testing-library/react";
+import { screen } from "@testing-library/react";
+import { renderStudio, resetStudio, seed, stored } from "@/components/studio-test-utils";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it } from "vitest";
 import { PlansScreen } from "@/components/plans-screen";
 import { createEmptyStudent } from "@/lib/students";
-import { STORAGE_KEYS } from "@/lib/storage-keys";
 import type { Plan } from "@/types/pilates";
 
 const savedPlans = (): Plan[] =>
-  JSON.parse(window.localStorage.getItem(STORAGE_KEYS.plans) ?? "[]");
+  stored("plans");
 
 const fillPlan = async (
   user: ReturnType<typeof userEvent.setup>,
@@ -25,16 +25,16 @@ const fillPlan = async (
 };
 
 describe("PlansScreen", () => {
-  beforeEach(() => window.localStorage.clear());
+  beforeEach(() => resetStudio());
 
   it("mostra o estado vazio", () => {
-    render(<PlansScreen />);
+    renderStudio(<PlansScreen />);
     expect(screen.getByText("Nenhum plano cadastrado ainda.")).toBeInTheDocument();
   });
 
   it("adiciona um plano e persiste", async () => {
     const user = userEvent.setup();
-    render(<PlansScreen />);
+    renderStudio(<PlansScreen />);
     await fillPlan(user, "2x por semana", "2", "280");
     await user.click(screen.getByRole("button", { name: "Adicionar plano" }));
 
@@ -46,7 +46,7 @@ describe("PlansScreen", () => {
 
   it("mostra o erro e não salva um plano sem valor", async () => {
     const user = userEvent.setup();
-    render(<PlansScreen />);
+    renderStudio(<PlansScreen />);
     await user.type(screen.getByLabelText("Nome"), "1x por semana");
     await user.click(screen.getByRole("button", { name: "Adicionar plano" }));
 
@@ -55,12 +55,9 @@ describe("PlansScreen", () => {
   });
 
   it("edita o valor de um plano", async () => {
-    window.localStorage.setItem(
-      STORAGE_KEYS.plans,
-      JSON.stringify([{ id: "p1", name: "1x por semana", weeklyClasses: 1, amount: 180 }]),
-    );
+    seed("plans", [{ id: "p1", name: "1x por semana", weeklyClasses: 1, amount: 180 }]);
     const user = userEvent.setup();
-    render(<PlansScreen />);
+    renderStudio(<PlansScreen />);
 
     await user.click(screen.getByRole("button", { name: "Editar plano 1x por semana" }));
     expect(screen.getByLabelText("Nome")).toHaveValue("1x por semana");
@@ -74,25 +71,19 @@ describe("PlansScreen", () => {
   });
 
   it("não exclui plano que está na ficha de algum aluno", async () => {
-    window.localStorage.setItem(
-      STORAGE_KEYS.plans,
-      JSON.stringify([
+    seed("plans", [
         { id: "p1", name: "1x por semana", weeklyClasses: 1, amount: 180 },
         { id: "p2", name: "2x por semana", weeklyClasses: 2, amount: 280 },
-      ]),
-    );
-    window.localStorage.setItem(
-      STORAGE_KEYS.students,
-      JSON.stringify([
+      ]);
+    seed("students", [
         {
           ...createEmptyStudent("a", "2026-01-01"),
           name: "Ana",
           monthlyFee: { planId: "p1", customAmount: null, dueDay: 5 },
         },
-      ]),
-    );
+      ]);
     const user = userEvent.setup();
-    render(<PlansScreen />);
+    renderStudio(<PlansScreen />);
 
     await user.click(screen.getByRole("button", { name: "Excluir plano 1x por semana" }));
     await user.click(screen.getByRole("button", { name: "Confirmar exclusão" }));

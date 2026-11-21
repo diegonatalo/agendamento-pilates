@@ -5,7 +5,7 @@ export const HERO = {
   title: "A agenda do estúdio, as fichas dos alunos e as mensalidades num lugar só.",
   subtitle:
     "Monte a grade de horários, encaixe cada aluno nas turmas fixas, acompanhe a ficha de saúde e a evolução de cada um e saiba quem está em dia com o plano.",
-  note: "Grátis e sem cadastro. Os dados ficam só no navegador do estúdio.",
+  note: "Grátis. Os dados ficam salvos na conta do estúdio, em qualquer aparelho.",
 };
 
 export type Step = { title: string; text: string };
@@ -74,11 +74,11 @@ export const SCREENSHOT: Screenshot = {
 export type Faq = { question: string; answer: string };
 
 export const FAQ: Faq[] = [
-  { question: "É grátis?", answer: "É. Não tem plano pago, cadastro nem anúncio." },
+  { question: "É grátis?", answer: "É. Não tem plano pago nem anúncio: basta criar uma conta com e-mail e senha." },
   {
     question: "Onde ficam os dados dos alunos?",
     answer:
-      "Só no navegador do computador ou celular do estúdio. Nada vai para um servidor, e por isso o backup é tão importante.",
+      "Num banco de dados ligado à conta do estúdio, que só abre com o e-mail e a senha. Dá também para baixar um backup em arquivo.",
   },
   {
     question: "Preciso pedir autorização aos alunos?",
@@ -88,7 +88,7 @@ export const FAQ: Faq[] = [
   {
     question: "Dá para usar em mais de um aparelho?",
     answer:
-      "Os dados não sincronizam sozinhos. Para trocar de aparelho, baixe o backup num e restaure no outro.",
+      "Dá. Entre com a mesma conta no computador da recepção e no celular, e tudo aparece igual nos dois.",
   },
 ];
 

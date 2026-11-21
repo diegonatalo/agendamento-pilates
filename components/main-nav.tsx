@@ -9,7 +9,7 @@ const ITEMS = [
   { href: "/app/alunos", label: "Alunos", icon: "M16 20v-1a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v1M10 11a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7ZM20 20v-1a4 4 0 0 0-3-3.9M15 4.2a3.5 3.5 0 0 1 0 6.6" },
   { href: "/app/planos", label: "Planos", icon: "M20.6 13.4 13.4 20.6a2 2 0 0 1-2.8 0L3 13V3h10l7.6 7.6a2 2 0 0 1 0 2.8ZM7.5 7.5h.01" },
   { href: "/app/horarios", label: "Horários", icon: "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18ZM12 7v5l3 2" },
-  { href: "/app/backup", label: "Backup", icon: "M12 3v12M7 10l5 5 5-5M5 21h14" },
+  { href: "/app/conta", label: "Conta", icon: "M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM4 21a8 8 0 0 1 16 0" },
 ] as const;
 
 /** Barra flutuante embaixo no celular; abas no cabeçalho a partir de `md`. */

@@ -1,9 +1,9 @@
-import { render, screen, within } from "@testing-library/react";
+import { screen, within } from "@testing-library/react";
+import { renderStudio, resetStudio, seed, stored, type StudioKey } from "@/components/studio-test-utils";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { AgendaScreen } from "@/components/agenda-screen";
 import { createEmptyStudent } from "@/lib/students";
-import { STORAGE_KEYS } from "@/lib/storage-keys";
 import type { BlockedPeriod, Booking, ClassSlot, Student } from "@/types/pilates";
 
 // Segunda-feira, 9 de novembro de 2026.
@@ -18,36 +18,36 @@ const person = (id: string, name: string, overrides: Partial<Student> = {}): Stu
   ...overrides,
 });
 
-const seed = (data: {
+const seedStudio = (data: {
   slots?: ClassSlot[];
   students?: Student[];
   bookings?: Booking[];
   blocked?: BlockedPeriod[];
 }) => {
-  const set = (key: string, value: unknown) =>
-    window.localStorage.setItem(key, JSON.stringify(value));
-  set(STORAGE_KEYS.slots, data.slots ?? []);
-  set(STORAGE_KEYS.students, data.students ?? []);
-  set(STORAGE_KEYS.bookings, data.bookings ?? []);
-  set(STORAGE_KEYS.blockedPeriods, data.blocked ?? []);
+  const set = (key: StudioKey, value: unknown) =>
+    seed(key, value);
+  set("slots", data.slots ?? []);
+  set("students", data.students ?? []);
+  set("bookings", data.bookings ?? []);
+  set("blockedPeriods", data.blocked ?? []);
 };
 
 describe("AgendaScreen", () => {
   beforeEach(() => {
-    window.localStorage.clear();
+    resetStudio();
     vi.useFakeTimers({ toFake: ["Date"] });
     vi.setSystemTime(new Date(2026, 10, 9, 10, 0));
   });
   afterEach(() => vi.useRealTimers());
 
   it("orienta a cadastrar horários quando não há nenhum", () => {
-    render(<AgendaScreen />);
+    renderStudio(<AgendaScreen />);
     expect(screen.getByRole("link", { name: "Horários" })).toBeInTheDocument();
   });
 
   it("mostra as sessões de hoje com alunos e vagas livres", () => {
-    seed({ slots: [slot], students: [person("a", "Ana"), person("b", "Bia")] });
-    render(<AgendaScreen />);
+    seedStudio({ slots: [slot], students: [person("a", "Ana"), person("b", "Bia")] });
+    renderStudio(<AgendaScreen />);
 
     expect(screen.getByRole("heading", { name: /Segunda, 09\/11\/2026 \(hoje\)/ })).toBeInTheDocument();
     expect(screen.getByText("08:00 às 09:00")).toBeInTheDocument();
@@ -57,18 +57,18 @@ describe("AgendaScreen", () => {
   });
 
   it("destaca o ponto de atenção do aluno", () => {
-    seed({
+    seedStudio({
       slots: [slot],
       students: [person("a", "Ana", { attention: "Evitar rotação de coluna" })],
     });
-    render(<AgendaScreen />);
+    renderStudio(<AgendaScreen />);
     expect(screen.getByText(/Evitar rotação de coluna/)).toBeInTheDocument();
   });
 
   it("marca presença, alterna para falta e volta ao padrão, persistindo", async () => {
-    seed({ slots: [slot], students: [person("a", "Ana")] });
+    seedStudio({ slots: [slot], students: [person("a", "Ana")] });
     const user = userEvent.setup();
-    render(<AgendaScreen />);
+    renderStudio(<AgendaScreen />);
 
     const present = screen.getByRole("button", { name: /Presente/ });
     const absent = screen.getByRole("button", { name: /Faltou/ });
@@ -76,7 +76,7 @@ describe("AgendaScreen", () => {
 
     await user.click(present);
     expect(present).toHaveAttribute("aria-pressed", "true");
-    let saved: Booking[] = JSON.parse(window.localStorage.getItem(STORAGE_KEYS.bookings) ?? "[]");
+    let saved: Booking[] = stored("bookings");
     expect(saved).toHaveLength(1);
     expect(saved[0]).toMatchObject({ date: TODAY, slotId: "s1", studentId: "a", status: "present" });
 
@@ -86,12 +86,12 @@ describe("AgendaScreen", () => {
 
     await user.click(absent);
     expect(absent).toHaveAttribute("aria-pressed", "false");
-    saved = JSON.parse(window.localStorage.getItem(STORAGE_KEYS.bookings) ?? "[]");
+    saved = stored("bookings");
     expect(saved).toEqual([]);
   });
 
   it("mostra a presença já registrada naquela data", () => {
-    seed({
+    seedStudio({
       slots: [slot],
       students: [person("a", "Ana")],
       bookings: [
@@ -106,17 +106,17 @@ describe("AgendaScreen", () => {
         },
       ],
     });
-    render(<AgendaScreen />);
+    renderStudio(<AgendaScreen />);
     expect(screen.getByRole("button", { name: /Faltou/ })).toHaveAttribute("aria-pressed", "true");
   });
 
   it("mostra dia bloqueado sem alunos nem botões de presença", () => {
-    seed({
+    seedStudio({
       slots: [slot],
       students: [person("a", "Ana")],
       blocked: [{ id: "p1", startDate: TODAY, endDate: TODAY, reason: "Feriado" }],
     });
-    render(<AgendaScreen />);
+    renderStudio(<AgendaScreen />);
 
     expect(screen.getByText("Sem aula: Feriado")).toBeInTheDocument();
     expect(screen.queryByText("Ana")).not.toBeInTheDocument();
@@ -124,12 +124,12 @@ describe("AgendaScreen", () => {
   });
 
   it("navega entre os dias da semana e volta para hoje", async () => {
-    seed({
+    seedStudio({
       slots: [slot, { id: "s2", weekday: 3, startTime: "18:00" }],
       students: [person("a", "Ana")],
     });
     const user = userEvent.setup();
-    render(<AgendaScreen />);
+    renderStudio(<AgendaScreen />);
 
     await user.click(screen.getByRole("button", { name: /Quarta, 11\/11, 1 aula/ }));
     expect(screen.getByText("18:00 às 19:00")).toBeInTheDocument();
@@ -140,9 +140,9 @@ describe("AgendaScreen", () => {
   });
 
   it("avança para a próxima semana", async () => {
-    seed({ slots: [slot], students: [person("a", "Ana")] });
+    seedStudio({ slots: [slot], students: [person("a", "Ana")] });
     const user = userEvent.setup();
-    render(<AgendaScreen />);
+    renderStudio(<AgendaScreen />);
 
     await user.click(screen.getByRole("button", { name: "Próxima semana" }));
     expect(screen.getByRole("heading", { name: /Segunda, 16\/11\/2026/ })).toBeInTheDocument();
@@ -151,12 +151,12 @@ describe("AgendaScreen", () => {
   });
 
   it("desmarcar libera a vaga da sessão", async () => {
-    seed({
+    seedStudio({
       slots: [slot],
       students: [person("a", "Ana"), person("b", "Bia"), person("c", "Carla")],
     });
     const user = userEvent.setup();
-    render(<AgendaScreen />);
+    renderStudio(<AgendaScreen />);
     expect(screen.getByText(/3\/3 ocupadas · lotada/)).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: /Encaixar aluno/ })).not.toBeInTheDocument();
 
@@ -164,7 +164,7 @@ describe("AgendaScreen", () => {
 
     expect(screen.getByText(/2\/3 ocupadas · 1 vaga livre/)).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /Encaixar aluno/ })).toBeInTheDocument();
-    const saved: Booking[] = JSON.parse(window.localStorage.getItem(STORAGE_KEYS.bookings) ?? "[]");
+    const saved: Booking[] = stored("bookings");
     expect(saved[0]).toMatchObject({ studentId: "a", status: "cancelled", kind: "regular" });
   });
 
@@ -179,7 +179,7 @@ describe("AgendaScreen", () => {
       guestName: null,
     };
     const setup = () =>
-      seed({
+      seedStudio({
         slots: [slot],
         students: [person("a", "Ana"), person("b", "Bia", { slotIds: [] })],
         bookings: [earlier],
@@ -188,7 +188,7 @@ describe("AgendaScreen", () => {
     it("encaixa um aluno com crédito e consome o saldo", async () => {
       setup();
       const user = userEvent.setup();
-      render(<AgendaScreen />);
+      renderStudio(<AgendaScreen />);
 
       await user.click(screen.getByRole("button", { name: /Encaixar aluno/ }));
       expect(screen.getByRole("option", { name: "Bia (1 crédito)" })).toBeInTheDocument();
@@ -197,7 +197,7 @@ describe("AgendaScreen", () => {
       expect(screen.getByText("Bia")).toBeInTheDocument();
       expect(screen.getByText("Reposição")).toBeInTheDocument();
       expect(screen.getByText(/2\/3 ocupadas/)).toBeInTheDocument();
-      const saved: Booking[] = JSON.parse(window.localStorage.getItem(STORAGE_KEYS.bookings) ?? "[]");
+      const saved: Booking[] = stored("bookings");
       expect(saved.find((b) => b.kind === "makeup")).toMatchObject({
         studentId: "b",
         date: TODAY,
@@ -211,7 +211,7 @@ describe("AgendaScreen", () => {
     it("cancelar a reposição devolve o crédito", async () => {
       setup();
       const user = userEvent.setup();
-      render(<AgendaScreen />);
+      renderStudio(<AgendaScreen />);
       await user.click(screen.getByRole("button", { name: /Encaixar aluno/ }));
       await user.click(screen.getByRole("button", { name: "Encaixar" }));
 
@@ -223,9 +223,9 @@ describe("AgendaScreen", () => {
     });
 
     it("avisa quando ninguém tem crédito", async () => {
-      seed({ slots: [slot], students: [person("a", "Ana")] });
+      seedStudio({ slots: [slot], students: [person("a", "Ana")] });
       const user = userEvent.setup();
-      render(<AgendaScreen />);
+      renderStudio(<AgendaScreen />);
       await user.click(screen.getByRole("button", { name: /Encaixar aluno/ }));
 
       expect(screen.getByText("Nenhum aluno com crédito de reposição.")).toBeInTheDocument();
@@ -235,9 +235,9 @@ describe("AgendaScreen", () => {
 
   describe("aula experimental", () => {
     it("encaixa quem não tem cadastro e permite marcar presença", async () => {
-      seed({ slots: [slot], students: [person("a", "Ana")] });
+      seedStudio({ slots: [slot], students: [person("a", "Ana")] });
       const user = userEvent.setup();
-      render(<AgendaScreen />);
+      renderStudio(<AgendaScreen />);
 
       await user.click(screen.getByRole("button", { name: /Encaixar aluno/ }));
       await user.click(screen.getByRole("radio", { name: "Aula experimental" }));
@@ -251,14 +251,14 @@ describe("AgendaScreen", () => {
       const present = screen.getByRole("button", { name: /Presente — Visitante/ });
       await user.click(present);
       expect(present).toHaveAttribute("aria-pressed", "true");
-      const saved: Booking[] = JSON.parse(window.localStorage.getItem(STORAGE_KEYS.bookings) ?? "[]");
+      const saved: Booking[] = stored("bookings");
       expect(saved[0]).toMatchObject({ kind: "trial", guestName: "Visitante", status: "present" });
     });
 
     it("exige o nome e permite remover", async () => {
-      seed({ slots: [slot], students: [] });
+      seedStudio({ slots: [slot], students: [] });
       const user = userEvent.setup();
-      render(<AgendaScreen />);
+      renderStudio(<AgendaScreen />);
 
       await user.click(screen.getByRole("button", { name: /Encaixar aluno/ }));
       await user.click(screen.getByRole("radio", { name: "Aula experimental" }));
@@ -273,9 +273,9 @@ describe("AgendaScreen", () => {
   });
 
   it("diz que não há aulas em um dia sem horário", async () => {
-    seed({ slots: [slot], students: [] });
+    seedStudio({ slots: [slot], students: [] });
     const user = userEvent.setup();
-    render(<AgendaScreen />);
+    renderStudio(<AgendaScreen />);
 
     await user.click(screen.getByRole("button", { name: /Terça, 10\/11, 0 aulas/ }));
     expect(screen.getByText("Sem aulas neste dia")).toBeInTheDocument();

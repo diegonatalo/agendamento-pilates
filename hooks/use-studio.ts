@@ -1,5 +1,4 @@
-import { createLocalStore, useLocalStore } from "@/hooks/use-local-store";
-import { DEFAULT_SETTINGS } from "@/lib/constants";
+import { createContext, useContext, useSyncExternalStore } from "react";
 import { toDateKey } from "@/lib/dates";
 import { newId } from "@/lib/ids";
 import type { StudioData } from "@/lib/backup";
@@ -24,7 +23,8 @@ import {
 } from "@/lib/schedule";
 import { validateSettings } from "@/lib/settings";
 import { slotsOverlap, sortSlots, validateNewSlot } from "@/lib/slots";
-import { STORAGE_KEYS } from "@/lib/storage-keys";
+import type { StudioState } from "@/lib/studio-changes";
+import type { StudioStore } from "@/lib/studio-store";
 import { removeSlotFromStudents, sortStudents } from "@/lib/students";
 import type {
   BlockedPeriod,
@@ -33,210 +33,160 @@ import type {
   ClassSlot,
   DateKey,
   MonthKey,
-  MonthlyPayment,
-  Plan,
   Student,
   StudioSettings,
 } from "@/types/pilates";
 
-const settingsStore = createLocalStore<StudioSettings>(
-  STORAGE_KEYS.settings,
-  DEFAULT_SETTINGS,
-);
-const plansStore = createLocalStore<Plan[]>(STORAGE_KEYS.plans, []);
-const slotsStore = createLocalStore<ClassSlot[]>(STORAGE_KEYS.slots, []);
-const studentsStore = createLocalStore<Student[]>(STORAGE_KEYS.students, []);
-const bookingsStore = createLocalStore<Booking[]>(STORAGE_KEYS.bookings, []);
-const lastBackupStore = createLocalStore<DateKey | null>(
-  STORAGE_KEYS.lastBackup,
-  null,
-);
-const paymentsStore = createLocalStore<MonthlyPayment[]>(
-  STORAGE_KEYS.payments,
-  [],
-);
-const blockedStore = createLocalStore<BlockedPeriod[]>(
-  STORAGE_KEYS.blockedPeriods,
-  [],
-);
+export const StudioContext = createContext<StudioStore | null>(null);
+
+const useStudioStore = () => {
+  const store = useContext(StudioContext);
+  if (!store) throw new Error("useStudio must be used inside <StudioProvider>");
+  return store;
+};
+
+/** Se o salvamento em segundo plano está em andamento ou falhou. */
+export const useSyncStatus = () => {
+  const store = useStudioStore();
+  return useSyncExternalStore(store.subscribe, store.getStatus, store.getStatus);
+};
 
 /** Dados do estúdio e as operações que mantêm tudo coerente. */
 export const useStudio = () => {
-  const settingsState = useLocalStore(settingsStore);
-  const plansState = useLocalStore(plansStore);
-  const slotsState = useLocalStore(slotsStore);
-  const studentsState = useLocalStore(studentsStore);
-  const bookingsState = useLocalStore(bookingsStore);
-  const blockedState = useLocalStore(blockedStore);
-  const paymentsState = useLocalStore(paymentsStore);
-  const lastBackupState = useLocalStore(lastBackupStore);
-  const slots = sortSlots(slotsState.data);
-  const students = sortStudents(studentsState.data);
-  const blockedPeriods = sortBlockedPeriods(blockedState.data);
-  const plans = sortPlans(plansState.data);
-  const settings = settingsState.data;
+  const store = useStudioStore();
+  const state = useSyncExternalStore(store.subscribe, store.getState, store.getState);
+  const slots = sortSlots(state.slots);
+  const students = sortStudents(state.students);
+  const blockedPeriods = sortBlockedPeriods(state.blockedPeriods);
+  const plans = sortPlans(state.plans);
+  const settings = state.settings;
+
+  /** Lê o estado mais recente (não o do último render) e grava o resultado. */
+  const update = (change: (current: StudioState) => StudioState) => store.update(change);
+  const current = () => store.getState();
 
   /** Devolve a mensagem de erro, ou `null` quando salvou. */
   const saveSettings = (next: StudioSettings) => {
-    const error = validateSettings(next, slotsState.data);
+    const error = validateSettings(next, current().slots);
     if (error) return error;
-    settingsStore.set(next);
+    update((s) => ({ ...s, settings: next }));
     return null;
   };
 
   /** Cria ou atualiza um plano. Devolve a mensagem de erro, ou `null`. */
   const savePlan = (draft: PlanDraft, editingId: string | null) => {
     const clean = { ...draft, name: draft.name.trim() };
-    const error = validatePlan(clean, plansState.data, editingId);
+    const error = validatePlan(clean, current().plans, editingId);
     if (error) return error;
-    plansStore.set(
-      editingId
-        ? plansState.data.map((p) => (p.id === editingId ? { ...p, ...clean } : p))
-        : [...plansState.data, { id: newId(), ...clean }],
-    );
+    update((s) => ({
+      ...s,
+      plans: editingId
+        ? s.plans.map((p) => (p.id === editingId ? { ...p, ...clean } : p))
+        : [...s.plans, { id: newId(), ...clean }],
+    }));
     return null;
   };
 
   /** Só exclui plano sem alunos. Devolve a mensagem de erro, ou `null`. */
   const removePlan = (planId: string) => {
-    const using = studentsOnPlan(planId, studentsState.data).length;
+    const using = studentsOnPlan(planId, current().students).length;
     if (using > 0)
       return `Este plano está na ficha de ${using} ${using === 1 ? "aluno" : "alunos"}. Troque o plano deles antes de excluir.`;
-    plansStore.set(plansState.data.filter((p) => p.id !== planId));
+    update((s) => ({ ...s, plans: s.plans.filter((p) => p.id !== planId) }));
     return null;
   };
 
   /** Devolve a mensagem de erro, ou `null` quando adicionou. */
   const addSlot = (candidate: Pick<ClassSlot, "weekday" | "startTime">) => {
-    const error = validateNewSlot(candidate, slotsState.data, settings);
+    const error = validateNewSlot(candidate, current().slots, current().settings);
     if (error) return error;
-    slotsStore.set([...slotsState.data, { id: newId(), ...candidate }]);
+    update((s) => ({ ...s, slots: [...s.slots, { id: newId(), ...candidate }] }));
     return null;
   };
 
   /** Cria vários horários de uma vez, pulando os que conflitam. Devolve quantos criou. */
   const addSlots = (candidates: Pick<ClassSlot, "weekday" | "startTime">[]) => {
-    const next = [...slotsState.data];
+    const before = current().slots;
+    const next = [...before];
     for (const candidate of candidates) {
-      if (next.some((slot) => slotsOverlap(slot, candidate, settings))) continue;
+      if (next.some((slot) => slotsOverlap(slot, candidate, current().settings))) continue;
       next.push({ id: newId(), ...candidate });
     }
-    slotsStore.set(next);
-    return next.length - slotsState.data.length;
+    update((s) => ({ ...s, slots: next }));
+    return next.length - before.length;
   };
 
-  const removeSlot = (slotId: string) => {
-    slotsStore.set(slotsState.data.filter((slot) => slot.id !== slotId));
-    studentsStore.set(removeSlotFromStudents(studentsState.data, slotId));
-    bookingsStore.set(
-      removeUpcomingBookingsOfSlot(
-        bookingsState.data,
-        slotId,
-        toDateKey(new Date()),
-      ),
-    );
-  };
+  const removeSlot = (slotId: string) =>
+    update((s) => ({
+      ...s,
+      slots: s.slots.filter((slot) => slot.id !== slotId),
+      students: removeSlotFromStudents(s.students, slotId),
+      bookings: removeUpcomingBookingsOfSlot(s.bookings, slotId, toDateKey(new Date())),
+    }));
 
-  const saveStudent = (student: Student) => {
-    const exists = studentsState.data.some((s) => s.id === student.id);
-    studentsStore.set(
-      exists
-        ? studentsState.data.map((s) => (s.id === student.id ? student : s))
-        : [...studentsState.data, student],
-    );
-  };
+  const saveStudent = (student: Student) =>
+    update((s) => ({
+      ...s,
+      students: s.students.some((x) => x.id === student.id)
+        ? s.students.map((x) => (x.id === student.id ? student : x))
+        : [...s.students, student],
+    }));
 
-  const removeStudent = (studentId: string) => {
-    studentsStore.set(studentsState.data.filter((s) => s.id !== studentId));
-    bookingsStore.set(removeBookingsOfStudent(bookingsState.data, studentId));
-    paymentsStore.set(removePaymentsOfStudent(paymentsState.data, studentId));
-  };
+  const removeStudent = (studentId: string) =>
+    update((s) => ({
+      ...s,
+      students: s.students.filter((x) => x.id !== studentId),
+      bookings: removeBookingsOfStudent(s.bookings, studentId),
+      payments: removePaymentsOfStudent(s.payments, studentId),
+    }));
 
   /** Substitui todos os dados pelos do backup. */
-  const restoreData = (data: StudioData) => {
-    settingsStore.set(data.settings);
-    plansStore.set(data.plans);
-    slotsStore.set(data.slots);
-    studentsStore.set(data.students);
-    bookingsStore.set(data.bookings);
-    blockedStore.set(data.blockedPeriods);
-    paymentsStore.set(data.payments);
-  };
+  const restoreData = (data: StudioData) => update((s) => ({ ...s, ...data }));
 
-  const recordBackup = (date: DateKey) => lastBackupStore.set(date);
+  const recordBackup = (date: DateKey) => update((s) => ({ ...s, lastBackup: date }));
 
   /** Ao marcar como pago, grava o valor atual da mensalidade do aluno. */
-  const markPayment = (
-    studentId: string,
-    month: MonthKey,
-    paid: boolean,
-    today: DateKey,
-  ) => {
-    const fee = studentsState.data.find((s) => s.id === studentId)?.monthlyFee;
-    const amount = fee ? (feeAmount(fee, plansState.data) ?? 0) : 0;
-    paymentsStore.set(
-      setPayment(paymentsState.data, studentId, month, paid, today, amount),
-    );
-  };
+  const markPayment = (studentId: string, month: MonthKey, paid: boolean, today: DateKey) =>
+    update((s) => {
+      const fee = s.students.find((x) => x.id === studentId)?.monthlyFee;
+      const amount = fee ? (feeAmount(fee, s.plans) ?? 0) : 0;
+      return { ...s, payments: setPayment(s.payments, studentId, month, paid, today, amount) };
+    });
+
+  const setBookings = (change: (bookings: Booking[]) => Booking[]) =>
+    update((s) => ({ ...s, bookings: change(s.bookings) }));
 
   const markAttendance = (
     target: { slotId: string; date: DateKey; studentId: string },
     status: BookingStatus,
-  ) =>
-    bookingsStore.set(
-      setAttendance(bookingsState.data, target, status, newId()),
-    );
+  ) => setBookings((b) => setAttendance(b, target, status, newId()));
 
-  const bookMakeup = (target: {
-    slotId: string;
-    date: DateKey;
-    studentId: string;
-  }) => bookingsStore.set(addMakeup(bookingsState.data, target, newId()));
+  const bookMakeup = (target: { slotId: string; date: DateKey; studentId: string }) =>
+    setBookings((b) => addMakeup(b, target, newId()));
 
-  const bookTrial = (target: {
-    slotId: string;
-    date: DateKey;
-    guestName: string;
-  }) => bookingsStore.set(addTrial(bookingsState.data, target, newId()));
+  const bookTrial = (target: { slotId: string; date: DateKey; guestName: string }) =>
+    setBookings((b) => addTrial(b, target, newId()));
 
   const markBooking = (bookingId: string, status: BookingStatus) =>
-    bookingsStore.set(setBookingStatus(bookingsState.data, bookingId, status));
+    setBookings((b) => setBookingStatus(b, bookingId, status));
 
-  const cancelBooking = (bookingId: string) =>
-    bookingsStore.set(removeBooking(bookingsState.data, bookingId));
+  const cancelBooking = (bookingId: string) => setBookings((b) => removeBooking(b, bookingId));
 
   /** Devolve a mensagem de erro, ou `null` quando bloqueou. */
-  const addBlockedPeriod = (
-    startDate: DateKey,
-    endDate: DateKey,
-    reason: string,
-  ) => {
+  const addBlockedPeriod = (startDate: DateKey, endDate: DateKey, reason: string) => {
     const error = validateBlockedPeriod(startDate, endDate);
     if (error) return error;
-    blockedStore.set([
-      ...blockedState.data,
-      {
-        id: newId(),
-        startDate,
-        endDate,
-        reason: reason.trim() || "Sem aula",
-      },
-    ]);
+    const period: BlockedPeriod = { id: newId(), startDate, endDate, reason: reason.trim() || "Sem aula" };
+    update((s) => ({ ...s, blockedPeriods: [...s.blockedPeriods, period] }));
     return null;
   };
 
   const removeBlockedPeriod = (periodId: string) =>
-    blockedStore.set(blockedState.data.filter((p) => p.id !== periodId));
+    update((s) => ({ ...s, blockedPeriods: s.blockedPeriods.filter((p) => p.id !== periodId) }));
 
   return {
-    ready:
-      settingsState.ready &&
-      plansState.ready &&
-      slotsState.ready &&
-      studentsState.ready &&
-      bookingsState.ready &&
-      blockedState.ready &&
-      paymentsState.ready,
+    /** Os dados já chegam do servidor; fica para as telas que esperavam o navegador. */
+    ready: true,
     settings,
     saveSettings,
     addSlots,
@@ -245,12 +195,12 @@ export const useStudio = () => {
     removePlan,
     slots,
     students,
-    payments: paymentsState.data,
-    lastBackup: lastBackupState.data,
+    payments: state.payments,
+    lastBackup: state.lastBackup,
     markPayment,
     restoreData,
     recordBackup,
-    bookings: bookingsState.data,
+    bookings: state.bookings,
     blockedPeriods,
     addSlot,
     removeSlot,

@@ -90,12 +90,12 @@ export const BackupScreen = () => {
   const counts = pending ? countBackup(pending.data) : null;
 
   return (
-    <main className="flex flex-col gap-6">
+    <section aria-labelledby="backup-title" className="flex flex-col gap-6">
       <header>
-        <h1 className="text-3xl font-semibold">Backup</h1>
+        <h2 id="backup-title" className="text-2xl font-semibold">Backup</h2>
         <p className="text-muted">
-          Os dados ficam só neste navegador. Limpar os dados do navegador ou
-          trocar de aparelho apaga tudo, então baixe um backup com frequência.
+          Os dados ficam salvos na sua conta. O backup é uma cópia em arquivo,
+          para guardar por conta própria ou levar para outra conta.
         </p>
       </header>
 
@@ -103,9 +103,9 @@ export const BackupScreen = () => {
         aria-labelledby="export-title"
         className={`${CARD} flex flex-col gap-3 p-4 sm:p-5`}
       >
-        <h2 id="export-title" className="text-2xl font-semibold">
+        <h3 id="export-title" className="text-xl font-semibold">
           Baixar backup
-        </h2>
+        </h3>
         <p className="rounded-xl bg-warn-soft px-3.5 py-2.5 text-sm text-warn-soft-fg">
           <strong>Atenção:</strong> o arquivo contém dados de saúde e contato
           dos alunos, sem criptografia. Guarde em local seguro e não envie por
@@ -143,9 +143,9 @@ export const BackupScreen = () => {
         aria-labelledby="restore-title"
         className={`${CARD} flex flex-col gap-3 p-4 sm:p-5`}
       >
-        <h2 id="restore-title" className="text-2xl font-semibold">
+        <h3 id="restore-title" className="text-xl font-semibold">
           Restaurar backup
-        </h2>
+        </h3>
         <p className="text-sm text-muted">
           Restaurar <strong>substitui</strong> todos os dados atuais pelos do
           arquivo.
@@ -199,6 +199,6 @@ export const BackupScreen = () => {
           {message}
         </p>
       ) : null}
-    </main>
+    </section>
   );
 };

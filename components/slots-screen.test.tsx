@@ -1,9 +1,9 @@
-import { render, screen } from "@testing-library/react";
+import { screen } from "@testing-library/react";
+import { renderStudio, resetStudio, savedChanges, seed, stored } from "@/components/studio-test-utils";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { SlotsScreen } from "@/components/slots-screen";
 import { createEmptyStudent } from "@/lib/students";
-import { STORAGE_KEYS } from "@/lib/storage-keys";
 
 const addSlot = async (
   user: ReturnType<typeof userEvent.setup>,
@@ -21,16 +21,16 @@ const addSlot = async (
 };
 
 describe("SlotsScreen", () => {
-  beforeEach(() => window.localStorage.clear());
+  beforeEach(() => resetStudio());
 
   it("mostra o estado vazio", () => {
-    render(<SlotsScreen />);
+    renderStudio(<SlotsScreen />);
     expect(screen.getByText("Nenhum horário cadastrado ainda.")).toBeInTheDocument();
   });
 
   it("o horário avulso fica recolhido até ser aberto", async () => {
     const user = userEvent.setup();
-    render(<SlotsScreen />);
+    renderStudio(<SlotsScreen />);
     const toggle = screen.getByRole("button", { name: "Adicionar horário avulso" });
     expect(toggle).toHaveAttribute("aria-expanded", "false");
     expect(screen.queryByLabelText("Dia da semana")).not.toBeInTheDocument();
@@ -48,19 +48,19 @@ describe("SlotsScreen", () => {
 
   it("adiciona um horário e persiste", async () => {
     const user = userEvent.setup();
-    render(<SlotsScreen />);
+    renderStudio(<SlotsScreen />);
     await addSlot(user, "Terça", "09:00");
 
     expect(screen.getByText("09:00 às 10:00")).toBeInTheDocument();
     expect(screen.getByText("0/3 alunos fixos")).toBeInTheDocument();
-    const saved = JSON.parse(window.localStorage.getItem(STORAGE_KEYS.slots) ?? "[]");
+    const saved = stored("slots");
     expect(saved).toHaveLength(1);
     expect(saved[0]).toMatchObject({ weekday: 2, startTime: "09:00" });
   });
 
   it("recusa um horário que conflita com outro", async () => {
     const user = userEvent.setup();
-    render(<SlotsScreen />);
+    renderStudio(<SlotsScreen />);
     await addSlot(user, "Terça", "09:00");
     await addSlot(user, "Terça", "09:30");
 
@@ -70,7 +70,7 @@ describe("SlotsScreen", () => {
 
   it("remove um horário só depois de confirmar", async () => {
     const user = userEvent.setup();
-    render(<SlotsScreen />);
+    renderStudio(<SlotsScreen />);
     await addSlot(user, "Quinta", "18:00");
 
     await user.click(screen.getByRole("button", { name: /Remover/ }));
@@ -83,7 +83,7 @@ describe("SlotsScreen", () => {
   describe("configurações do estúdio", () => {
     it("salva duração, intervalo e capacidade e atualiza a tela", async () => {
       const user = userEvent.setup();
-      render(<SlotsScreen />);
+      renderStudio(<SlotsScreen />);
       const duration = screen.getByLabelText("Duração da sessão (min)");
       await user.clear(duration);
       await user.type(duration, "50");
@@ -96,13 +96,13 @@ describe("SlotsScreen", () => {
       expect(screen.getByRole("status")).toHaveTextContent("Configurações salvas.");
       expect(screen.getByText(/Cada sessão dura 50 min e comporta até 4 alunos/)).toBeInTheDocument();
       expect(
-        JSON.parse(window.localStorage.getItem(STORAGE_KEYS.settings) ?? "null"),
+        stored("settings"),
       ).toEqual({ sessionMinutes: 50, breakMinutes: 10, capacity: 4 });
     });
 
     it("não salva duração que sobrepõe horários existentes", async () => {
       const user = userEvent.setup();
-      render(<SlotsScreen />);
+      renderStudio(<SlotsScreen />);
       await addSlot(user, "Segunda", "08:00");
       await addSlot(user, "Segunda", "09:00");
       const duration = screen.getByLabelText("Duração da sessão (min)");
@@ -111,7 +111,7 @@ describe("SlotsScreen", () => {
       await user.click(screen.getByRole("button", { name: "Salvar configurações" }));
 
       expect(screen.getAllByRole("alert").at(-1)).toHaveTextContent(/sobrepostos/);
-      expect(window.localStorage.getItem(STORAGE_KEYS.settings)).toBeNull();
+      expect(savedChanges().some((changes) => changes.settings)).toBe(false);
     });
   });
 
@@ -128,7 +128,7 @@ describe("SlotsScreen", () => {
 
     it("mostra a prévia e cria os horários dos dias escolhidos", async () => {
       const user = userEvent.setup();
-      render(<SlotsScreen />);
+      renderStudio(<SlotsScreen />);
       // Só segunda e quarta: desmarca terça, quinta e sexta.
       for (const day of ["Terça", "Quinta", "Sexta"])
         await user.click(screen.getByRole("button", { name: day, pressed: true }));
@@ -139,7 +139,7 @@ describe("SlotsScreen", () => {
       await user.click(screen.getByRole("button", { name: "Criar 6 horários" }));
 
       expect(screen.getByRole("status")).toHaveTextContent("6 horários criados.");
-      const saved = JSON.parse(window.localStorage.getItem(STORAGE_KEYS.slots) ?? "[]");
+      const saved = stored("slots");
       expect(saved.map((s: { weekday: number; startTime: string }) => `${s.weekday} ${s.startTime}`)).toEqual([
         "1 07:00",
         "1 08:00",
@@ -154,7 +154,7 @@ describe("SlotsScreen", () => {
 
     it("respeita a pausa e mantém horários já cadastrados", async () => {
       const user = userEvent.setup();
-      render(<SlotsScreen />);
+      renderStudio(<SlotsScreen />);
       await addSlot(user, "Segunda", "11:00");
       for (const day of ["Terça", "Quarta", "Quinta", "Sexta"])
         await user.click(screen.getByRole("button", { name: day, pressed: true }));
@@ -168,13 +168,13 @@ describe("SlotsScreen", () => {
       expect(screen.getByText(/1 horário cai sobre horários já cadastrados/)).toBeInTheDocument();
       await user.click(screen.getByRole("button", { name: "Criar 3 horários" }));
 
-      const saved = JSON.parse(window.localStorage.getItem(STORAGE_KEYS.slots) ?? "[]");
+      const saved = stored("slots");
       expect(saved).toHaveLength(4);
     });
 
     it("avisa quando o expediente é inválido", async () => {
       const user = userEvent.setup();
-      render(<SlotsScreen />);
+      renderStudio(<SlotsScreen />);
       await setTime(user, "Abre às", "18:00");
       await setTime(user, "Fecha às", "08:00");
 
@@ -185,25 +185,19 @@ describe("SlotsScreen", () => {
 
   describe("grade já montada", () => {
     const seedGrid = () => {
-      window.localStorage.setItem(
-        STORAGE_KEYS.slots,
-        JSON.stringify([
+      seed("slots", [
           { id: "mon7", weekday: 1, startTime: "07:00" },
           { id: "fri8", weekday: 5, startTime: "08:00" },
-        ]),
-      );
-      window.localStorage.setItem(
-        STORAGE_KEYS.students,
-        JSON.stringify([
+        ]);
+      seed("students", [
           { ...createEmptyStudent("a", "2026-01-01"), name: "Ana", slotIds: ["fri8"] },
-        ]),
-      );
+        ]);
     };
 
     it("mostra a grade primeiro e recolhe a configuração", async () => {
       seedGrid();
       const user = userEvent.setup();
-      render(<SlotsScreen />);
+      renderStudio(<SlotsScreen />);
 
       const toggle = screen.getByRole("button", { name: "Configurar grade" });
       expect(toggle).toHaveAttribute("aria-expanded", "false");
@@ -220,7 +214,7 @@ describe("SlotsScreen", () => {
     it("mostra um dia por vez nas abas", async () => {
       seedGrid();
       const user = userEvent.setup();
-      render(<SlotsScreen />);
+      renderStudio(<SlotsScreen />);
 
       expect(screen.getByRole("tab", { name: /Segunda/ })).toHaveAttribute("aria-selected", "true");
       expect(screen.getByText("07:00 às 08:00")).toBeInTheDocument();
@@ -237,7 +231,7 @@ describe("SlotsScreen", () => {
     it("navega entre as abas pelo teclado", async () => {
       seedGrid();
       const user = userEvent.setup();
-      render(<SlotsScreen />);
+      renderStudio(<SlotsScreen />);
 
       await user.click(screen.getByRole("tab", { name: /Segunda/ }));
       await user.keyboard("{ArrowRight}");
@@ -265,7 +259,7 @@ describe("SlotsScreen", () => {
       it("mostra a semana numa tabela e detalha o horário escolhido", async () => {
         seedGrid();
         const user = userEvent.setup();
-        render(<SlotsScreen />);
+        renderStudio(<SlotsScreen />);
 
         expect(screen.getByRole("table")).toBeInTheDocument();
         expect(screen.getByRole("columnheader", { name: "Segunda" })).toBeInTheDocument();
@@ -280,7 +274,7 @@ describe("SlotsScreen", () => {
 
         await user.click(screen.getByRole("button", { name: /Remover horário de Sexta/ }));
         await user.click(screen.getByRole("button", { name: "Confirmar remoção" }));
-        const saved = JSON.parse(window.localStorage.getItem(STORAGE_KEYS.slots) ?? "[]");
+        const saved = stored("slots");
         expect(saved.map((s: { id: string }) => s.id)).toEqual(["mon7"]);
         expect(screen.queryByRole("region", { name: "Horário selecionado" })).not.toBeInTheDocument();
       });
@@ -298,18 +292,15 @@ describe("SlotsScreen", () => {
       studentId: "a",
       guestName: null,
     });
-    window.localStorage.setItem(STORAGE_KEYS.slots, JSON.stringify([slot]));
-    window.localStorage.setItem(
-      STORAGE_KEYS.bookings,
-      JSON.stringify([entry("past", "2000-01-06"), entry("future", "2999-01-03")]),
-    );
+    seed("slots", [slot]);
+    seed("bookings", [entry("past", "2000-01-06"), entry("future", "2999-01-03")]);
     const user = userEvent.setup();
-    render(<SlotsScreen />);
+    renderStudio(<SlotsScreen />);
 
     await user.click(screen.getByRole("button", { name: /Remover/ }));
     await user.click(screen.getByRole("button", { name: "Confirmar remoção" }));
 
-    const saved = JSON.parse(window.localStorage.getItem(STORAGE_KEYS.bookings) ?? "[]");
+    const saved = stored("bookings");
     expect(saved.map((b: { id: string }) => b.id)).toEqual(["past"]);
   });
 });

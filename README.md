@@ -14,7 +14,7 @@
 ![React](https://img.shields.io/badge/React_19-20232a?style=flat-square&logo=react&logoColor=61dafb)
 ![TypeScript](https://img.shields.io/badge/TypeScript_6-3178c6?style=flat-square&logo=typescript&logoColor=white)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS_4-06b6d4?style=flat-square&logo=tailwindcss&logoColor=white)
-![Dados](https://img.shields.io/badge/dados-s%C3%B3_no_seu_navegador-9fe02e?style=flat-square)
+![Dados](https://img.shields.io/badge/dados-na_conta_do_est%C3%BAdio-9fe02e?style=flat-square)
 ![Licença](https://img.shields.io/badge/licen%C3%A7a-MIT-16a34a?style=flat-square)
 
 </div>
@@ -28,7 +28,7 @@
 </div>
 
 **A agenda do estúdio de pilates, feita para a instrutora.**<br />
-Sistema de agendamento para um estúdio de pilates, de uso exclusivo da dona e instrutora. As turmas têm até 3 alunos por horário e cada sessão dura 1h. Ela controla a agenda, a presença, as reposições, a mensalidade e a ficha de saúde de cada aluno. Os alunos não acessam o sistema.
+Sistema de agendamento para um estúdio de pilates, de uso exclusivo da dona e instrutora. As turmas têm até 3 alunos por horário e cada sessão dura 1h. Ela controla a agenda, a presença, as reposições, a mensalidade e a ficha de saúde de cada aluno. Os alunos não acessam o sistema. Cada estúdio tem a própria conta, e os dados ficam num banco Postgres.
 
 <br />
 
@@ -82,8 +82,10 @@ Sistema de agendamento para um estúdio de pilates, de uso exclusivo da dona e i
 <img src="docs/assets/f-03.svg" alt="Reposição: Cada desmarcação vira crédito, sem expiração." width="49%" />
 <img src="docs/assets/f-04.svg" alt="Mensalidade: Indicador de pago ou pendente por mês." width="49%" />
 <br />
-<img src="docs/assets/f-05.svg" alt="Backup: Exporta e restaura todos os dados em um arquivo JSON." width="49%" />
-<img src="docs/assets/f-06.svg" alt="Tema claro e escuro: Segue o sistema ou a sua escolha, sem piscar ao abrir." width="49%" />
+<img src="docs/assets/f-05.svg" alt="Conta: Login com e-mail e senha e os dados no Postgres, iguais no computador e no celular." width="49%" />
+<img src="docs/assets/f-06.svg" alt="Backup: Exporta e restaura todos os dados em um arquivo JSON." width="49%" />
+<br />
+<img src="docs/assets/f-07.svg" alt="Tema claro e escuro: Segue o sistema ou a sua escolha, sem piscar ao abrir." width="49%" />
 
 </div>
 
@@ -97,7 +99,7 @@ Sistema de agendamento para um estúdio de pilates, de uso exclusivo da dona e i
 
 <div align="center">
 
-<img src="docs/assets/stack.svg" alt="Stack: Next.js 16, React 19, TypeScript 6, Tailwind CSS 4, ESLint 9, Vitest 5" width="100%" />
+<img src="docs/assets/stack.svg" alt="Stack: Next.js 16, React 19, TypeScript 6, Tailwind CSS 4, Better Auth, Drizzle ORM, Neon Postgres, ESLint 9, Vitest 5" width="100%" />
 
 </div>
 
@@ -115,6 +117,8 @@ Requer [Node.js](https://nodejs.org) e [pnpm](https://pnpm.io).
 git clone https://github.com/diegonatalo/agendamento-pilates.git
 cd agendamento-pilates
 pnpm install
+cp .env.example .env.local   # preencha o banco e o segredo
+pnpm db:migrate
 pnpm dev        # http://localhost:3000
 ```
 
@@ -127,10 +131,21 @@ pnpm dev        # http://localhost:3000
 | `pnpm test` | Roda os testes |
 | `pnpm test:watch` | Roda os testes e reexecuta ao salvar |
 | `pnpm test:e2e` | Roda os testes de ponta a ponta (Playwright) |
+| `pnpm db:generate` | Gera uma migração a partir do `lib/db/schema.ts` |
+| `pnpm db:migrate` | Aplica as migrações no banco do `.env.local` |
+| `pnpm vercel-build` | Migrações e build, usado pela Vercel |
 
 ### 🔑 Variáveis de ambiente
 
-Nenhuma é necessária.
+Veja [`.env.example`](.env.example).
+
+| Variável | Descrição | Se não definir |
+|---|---|---|
+| `DATABASE_URL` | URL do Postgres (Neon), com pooler. Em desenvolvimento, use uma branch `dev`, nunca a de produção. | O app não abre |
+| `DATABASE_URL_UNPOOLED` | URL sem pooler, usada pelas migrações. | As migrações usam a `DATABASE_URL` |
+| `BETTER_AUTH_SECRET` | Segredo que assina os cookies de sessão. Gere com `openssl rand -base64 32`, um por ambiente. | Em produção, o login e o app dão erro |
+| `BETTER_AUTH_URL` | Endereço do site em desenvolvimento e nos testes, sem barra no final. Na Vercel não precisa: vale o `SITE_URL`. | Better Auth deduz pela requisição e avisa no log |
+| `NEXT_PUBLIC_SITE_URL` | URL pública do site, usada nas tags Open Graph, no `robots.txt` e no `sitemap.xml`. Sem barra no final. | Usa `http://localhost:3000` |
 
 ### 🧪 Testes
 
@@ -142,7 +157,7 @@ Cobrem a lógica em `lib/` (capacidade das turmas, conflito de horários, geraç
 
 Para reexecutar ao salvar: `pnpm test:watch`.
 
-Os testes de ponta a ponta (Playwright, em `e2e/`) abrem o app no Chromium e percorrem os fluxos inteiros: montar a grade, cadastrar um aluno e recarregar, baixar e restaurar o backup, e abrir todas as páginas sem erros.
+Os testes de ponta a ponta (Playwright, em `e2e/`) abrem o app no Chromium e percorrem os fluxos inteiros com uma conta nova por teste: criar a conta, entrar e sair, senha errada, e-mail repetido, isolamento entre contas e excluir a conta; montar a grade, cadastrar um aluno e recarregar; baixar o backup e restaurar numa conta nova; e abrir todas as páginas sem erros. Usam o banco do `.env.local` (no CI, um Postgres descartável).
 
 ```bash
 pnpm exec playwright install chromium   # só na primeira vez
@@ -158,12 +173,13 @@ pnpm test:e2e                           # gera o build e testa contra ele
 </div>
 
 ```text
-app/              Apenas arquivos de rota: landing (/), o app em /app, /privacidade e /termos (com o termo de consentimento)
+app/              Apenas arquivos de rota: landing (/), o app em /app, /entrar, /cadastro, /privacidade, /termos e a API de login
 components/       Telas e componentes de interface
 docs/             Fontes do README
 e2e/              Testes de ponta a ponta (Playwright)
-hooks/            Estado e persistência no localStorage
-lib/              Lógica pura, sem React
+drizzle/          Migrações do banco (geradas pelo Drizzle)
+hooks/            Estado do estúdio e tema
+lib/              Lógica pura, sem React; lib/db (schema e conexão) e lib/data (leitura e Server Actions)
 public/           Arquivos estáticos
 types/            Tipos compartilhados do domínio
 ```
@@ -189,15 +205,16 @@ types/            Tipos compartilhados do domínio
 
 ### 🌐 Deploy
 
-O app é estático e não tem servidor próprio nem banco: os dados ficam no `localStorage` do navegador de quem usa. Qualquer hospedagem de Next.js serve (por exemplo a Vercel: importe o repositório e publique, sem configurar nada).
+Na Vercel, com o banco Postgres do Neon ligado pela integração da Vercel (ela cria a `DATABASE_URL` e a `DATABASE_URL_UNPOOLED`).
 
+- Defina `BETTER_AUTH_SECRET` em Settings > Environment Variables, com um valor só da produção.
+- O script `vercel-build` aplica as migrações pendentes (`drizzle-kit migrate`) antes do build. A Vercel só publica a `main` (`vercel.json`).
 - `NEXT_PUBLIC_SITE_URL` é opcional e define o endereço usado em metadados e no sitemap; sem ela vale `http://localhost:3000`.
-- O site pede `noindex`, porque é de uso pessoal da instrutora.
-- Como os dados não saem do navegador, **trocar de aparelho ou limpar os dados do navegador apaga tudo**: use a aba Backup para exportar e restaurar o JSON.
+- O app logado (`/app`) e a API pedem `noindex` e ficam fora do `robots.txt`.
 
 ### 💾 Backup
 
-A aba **Backup** baixa um arquivo `agenda-pilates-AAAA-MM-DD.json` com horários, alunos, presenças, datas bloqueadas e pagamentos, e restaura a partir dele (substituindo os dados atuais, depois de confirmar). Arquivos de outro app, de outra versão ou incompletos são recusados sem alterar nada.
+Na aba **Conta**, o backup baixa um arquivo `agenda-pilates-AAAA-MM-DD.json` com horários, alunos, presenças, datas bloqueadas e pagamentos, e restaura a partir dele (substituindo os dados atuais da conta, depois de confirmar). Serve para guardar uma cópia ou levar os dados para outra conta. Arquivos de outro app, de outra versão ou incompletos são recusados sem alterar nada.
 
 O arquivo tem dados de saúde e contato dos alunos, **sem criptografia**: guarde em local seguro.
 
@@ -209,7 +226,9 @@ O arquivo tem dados de saúde e contato dos alunos, **sem criptografia**: guarde
 - [x] Desmarcar, reposição e aula experimental
 - [x] Mensalidade
 - [x] Backup e acessibilidade
+- [x] Conta com login e dados no banco
 - [ ] Publicar e definir o endereço final
+- [ ] Serviço de e-mail para recuperar a senha
 - [ ] Guardar o valor da mensalidade de cada mês
 
 ### 📄 Créditos e licença

@@ -5,7 +5,7 @@ import { PrintButton } from "@/components/print-button";
 import { PRIVACY_EMAIL, SITE_NAME, SOURCE_URL } from "@/lib/site";
 
 /** Data da última mudança nos textos (`AAAA-MM-DD`). */
-const UPDATED_AT = "2026-11-20";
+const UPDATED_AT = "2026-11-21";
 
 const linkClass = "font-semibold text-primary underline underline-offset-2";
 
@@ -19,7 +19,7 @@ export const PrivacyPage = () => (
   <PublicShell>
     <LegalPage
       title="Privacidade"
-      summary={`A ${SITE_NAME} guarda os dados do estúdio e dos alunos só no navegador de quem usa. Nada vai para um servidor nosso.`}
+      summary={`A ${SITE_NAME} guarda os dados do estúdio e dos alunos num banco de dados ligado à conta do estúdio. Esta página diz o que é guardado, onde e como apagar.`}
       updatedAt={UPDATED_AT}
       sections={[
         {
@@ -34,8 +34,12 @@ export const PrivacyPage = () => (
                 (lesões e condições, cirurgias, restrições de movimento, liberação médica e contato de emergência).
               </p>
               <p>
-                Tudo fica no armazenamento do navegador (localStorage), no aparelho do estúdio. Nós não temos acesso a
-                nada disso.
+                Da conta do estúdio: nome, e-mail e a senha, guardada só como hash (não dá para ler a senha de volta).
+              </p>
+              <p>
+                Tudo fica num banco de dados Postgres no <strong>Neon</strong>, ligado à conta, e só abre com o e-mail e
+                a senha do estúdio. Cada conta vê apenas os próprios dados. No navegador fica só a preferência de tema
+                claro ou escuro.
               </p>
             </>
           ),
@@ -58,8 +62,8 @@ export const PrivacyPage = () => (
                 para imprimir. Ele é um ponto de partida e deve ser revisado por um advogado.
               </p>
               <p>
-                Recomendações: use um computador ou celular só do estúdio, com senha; cadastre só o necessário para dar
-                as aulas com segurança; e apague a ficha de quem deixou de ser aluno.
+                Recomendações: use uma senha forte e só sua; saia da conta em aparelhos de outras pessoas; cadastre só
+                o necessário para dar as aulas com segurança; e apague a ficha de quem deixou de ser aluno.
               </p>
             </>
           ),
@@ -68,11 +72,20 @@ export const PrivacyPage = () => (
           id: "terceiros",
           title: "Quem mais recebe dados",
           content: (
-            <p>
-              Só a <strong>Vercel</strong>, a hospedagem do site, que registra dados técnicos de acesso (como IP e
-              navegador) para entregar as páginas. O botão de WhatsApp na ficha só abre o WhatsApp com o número do
-              aluno; nada é enviado sem você mandar. Não usamos cookies, estatísticas de visita nem propaganda.
-            </p>
+            <>
+              <p>
+                O <strong>Neon</strong>, onde fica o banco de dados, e a <strong>Vercel</strong>, a hospedagem do site,
+                que registra dados técnicos de acesso (como IP e navegador) para entregar as páginas e limitar tentativas
+                de login. Os dois só guardam e processam os dados para o app funcionar.
+              </p>
+              <p>
+                O botão de WhatsApp na ficha só abre o WhatsApp com o número do aluno; nada é enviado sem você mandar.
+              </p>
+              <p>
+                O único cookie é o de <strong>sessão</strong>, necessário para manter o estúdio logado. Não usamos
+                estatísticas de visita nem propaganda.
+              </p>
+            </>
           ),
         },
         {
@@ -90,8 +103,9 @@ export const PrivacyPage = () => (
           title: "Como apagar",
           content: (
             <p>
-              Apague a ficha do aluno na própria tela de alunos. Para apagar tudo, limpe os dados deste site nas
-              configurações do navegador. Depois disso, não há como recuperar, a não ser por um backup.
+              Apague a ficha do aluno na própria tela de alunos. Para apagar tudo, use <strong>Excluir conta</strong>{" "}
+              na aba Conta: a conta e todos os dados do estúdio são apagados do banco na hora. Depois disso, não há como
+              recuperar, a não ser por um backup.
             </p>
           ),
         },
@@ -141,7 +155,7 @@ export const TermsPage = () => (
               <Link href="/termos/consentimento" className={linkClass}>
                 modelo de termo
               </Link>
-              ), proteger o aparelho onde o app é usado e atender os pedidos dos alunos sobre os próprios dados.
+              ), manter a senha da conta em segredo e atender os pedidos dos alunos sobre os próprios dados.
             </p>
           ),
         },
@@ -160,8 +174,8 @@ export const TermsPage = () => (
           title: "Backup e perda de dados",
           content: (
             <p>
-              Os dados ficam só no navegador, e fazer backup é responsabilidade do estúdio: limpar o navegador, trocar
-              de aparelho ou usar uma aba anônima pode apagar tudo. Detalhes em{" "}
+              Os dados ficam na conta do estúdio. Mesmo assim, guardar um backup de vez em quando é responsabilidade
+              do estúdio, e excluir a conta apaga tudo para sempre. Detalhes em{" "}
               <Link href="/privacidade" className={linkClass}>
                 Privacidade
               </Link>
@@ -233,8 +247,8 @@ export const ConsentPage = () => (
         <p>Fui informado(a) de que:</p>
         <ol className="list-decimal pl-6">
           <li>
-            os dados ficam no computador ou celular do estúdio, no sistema {SITE_NAME}, e não são compartilhados com
-            terceiros;
+            os dados ficam no sistema {SITE_NAME}, na conta do estúdio, protegida por senha, e não são compartilhados
+            com terceiros além dos serviços que hospedam o sistema;
           </li>
           <li>só os instrutores do estúdio têm acesso a eles;</li>
           <li>

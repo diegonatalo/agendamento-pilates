@@ -1,10 +1,23 @@
 import type { Metadata } from "next";
-import { AppShell } from "@/components/app-shell";
+import { Suspense } from "react";
+import { AppLoading } from "@/components/app-loading";
+import { SignedInApp } from "@/components/signed-in-app";
 
 // As telas do app mostram dados dos alunos de cada estúdio: fora da busca.
 export const metadata: Metadata = { robots: { index: false, follow: false } };
 
-/** O app (agenda, alunos, planos, horários e backup) mora em `/app`; a landing fica em `/`. */
+/**
+ * O app mora em `/app` e pede login; a landing e as páginas legais ficam fora dele.
+ * A sessão é lida dentro do <Suspense>, então a tela de carregamento sai na hora.
+ */
+// Todo o app depende da sessão, que só existe na requisição: não há casca
+// estática para validar como navegação instantânea.
+export const instant = false;
+
 export default function AppLayout({ children }: LayoutProps<"/app">) {
-  return <AppShell>{children}</AppShell>;
+  return (
+    <Suspense fallback={<AppLoading />}>
+      <SignedInApp>{children}</SignedInApp>
+    </Suspense>
+  );
 }

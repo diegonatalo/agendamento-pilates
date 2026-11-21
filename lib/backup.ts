@@ -1,4 +1,13 @@
-import { isValidTime } from "@/lib/slots";
+import {
+  isBlocked,
+  isBooking,
+  isPayment,
+  isPlan,
+  isRec,
+  isSettings,
+  isSlot,
+  isStudent,
+} from "@/lib/studio-validation";
 import type {
   BlockedPeriod,
   Booking,
@@ -43,98 +52,6 @@ export const buildBackup = (
   data,
 });
 
-type Rec = Record<string, unknown>;
-
-const isRec = (value: unknown): value is Rec =>
-  typeof value === "object" && value !== null && !Array.isArray(value);
-const isStr = (value: unknown): value is string => typeof value === "string";
-const isNullableStr = (value: unknown): boolean =>
-  value === null || isStr(value);
-const isStrArray = (value: unknown): boolean =>
-  Array.isArray(value) && value.every(isStr);
-const isOneOf = (value: unknown, options: readonly string[]): boolean =>
-  isStr(value) && options.includes(value);
-
-const isSettings = (v: unknown): boolean =>
-  isRec(v) &&
-  Number.isInteger(v.sessionMinutes) &&
-  Number.isInteger(v.breakMinutes) &&
-  Number.isInteger(v.capacity);
-
-const isPlan = (v: unknown): boolean =>
-  isRec(v) &&
-  isStr(v.id) &&
-  isStr(v.name) &&
-  Number.isInteger(v.weeklyClasses) &&
-  typeof v.amount === "number";
-
-const isSlot = (v: unknown): boolean =>
-  isRec(v) &&
-  isStr(v.id) &&
-  Number.isInteger(v.weekday) &&
-  (v.weekday as number) >= 0 &&
-  (v.weekday as number) <= 6 &&
-  isStr(v.startTime) &&
-  isValidTime(v.startTime);
-
-const isStudent = (v: unknown): boolean => {
-  if (!isRec(v)) return false;
-  const health = v.health;
-  const fee = v.monthlyFee;
-  return (
-    isStr(v.id) &&
-    isStr(v.name) &&
-    isStr(v.phone) &&
-    isNullableStr(v.birthDate) &&
-    isStr(v.startedAt) &&
-    typeof v.active === "boolean" &&
-    isStrArray(v.slotIds) &&
-    isRec(health) &&
-    isStr(health.injuries) &&
-    isStr(health.surgeries) &&
-    isStr(health.restrictions) &&
-    typeof health.medicalClearance === "boolean" &&
-    isStr(health.emergencyContact) &&
-    isStr(v.attention) &&
-    isStr(v.goals) &&
-    Array.isArray(v.evolution) &&
-    v.evolution.every(
-      (n) => isRec(n) && isStr(n.id) && isStr(n.date) && isStr(n.text),
-    ) &&
-    (fee === null ||
-      (isRec(fee) &&
-        isNullableStr(fee.planId) &&
-        (fee.customAmount === null || typeof fee.customAmount === "number") &&
-        (fee.planId !== null || fee.customAmount !== null) &&
-        typeof fee.dueDay === "number"))
-  );
-};
-
-const isBooking = (v: unknown): boolean =>
-  isRec(v) &&
-  isStr(v.id) &&
-  isStr(v.slotId) &&
-  isStr(v.date) &&
-  isOneOf(v.kind, ["regular", "makeup", "trial"]) &&
-  isOneOf(v.status, ["scheduled", "present", "absent", "cancelled"]) &&
-  isNullableStr(v.studentId) &&
-  isNullableStr(v.guestName);
-
-const isBlocked = (v: unknown): boolean =>
-  isRec(v) &&
-  isStr(v.id) &&
-  isStr(v.startDate) &&
-  isStr(v.endDate) &&
-  isStr(v.reason);
-
-const isPayment = (v: unknown): boolean =>
-  isRec(v) &&
-  isStr(v.studentId) &&
-  isStr(v.month) &&
-  typeof v.paid === "boolean" &&
-  isNullableStr(v.paidAt) &&
-  typeof v.amount === "number";
-
 const SECTIONS: {
   key: Exclude<keyof StudioData, "settings">;
   label: string;
@@ -163,7 +80,7 @@ export const parseBackup = (text: string): ParseResult => {
     };
   if (raw.version !== BACKUP_VERSION)
     return { ok: false, error: "Esta versão de backup não é suportada." };
-  if (!isStr(raw.exportedAt))
+  if (typeof raw.exportedAt !== "string")
     return { ok: false, error: "O backup está incompleto ou corrompido." };
 
   const source = raw.data;

@@ -9,7 +9,7 @@ describe("MainNav", () => {
   it("lista as cinco seções", () => {
     render(<MainNav />);
     const names = screen.getAllByRole("link").map((l) => l.textContent);
-    expect(names).toEqual(["Agenda", "Alunos", "Planos", "Horários", "Backup"]);
+    expect(names).toEqual(["Agenda", "Alunos", "Planos", "Horários", "Conta"]);
   });
 
   it("marca só a seção atual", () => {
@@ -23,6 +23,6 @@ describe("MainNav", () => {
     pathname.current = "/app";
     render(<MainNav />);
     expect(screen.getByRole("link", { name: "Agenda" })).toHaveAttribute("aria-current", "page");
-    expect(screen.getByRole("link", { name: "Backup" })).not.toHaveAttribute("aria-current");
+    expect(screen.getByRole("link", { name: "Conta" })).not.toHaveAttribute("aria-current");
   });
 });
