@@ -8,12 +8,18 @@ export type MonthKey = string;
 export type Weekday = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 
 /** Como o estúdio funciona; vale para todos os horários. */
+/** Ramo de quem usa o app; muda o vocabulário e a ficha (veja `lib/business.ts`). */
+export type BusinessType = "pilates" | "personal" | "tutor" | "psychology" | "barber";
+
+/** Como o negócio funciona; vale para todos os horários. */
 export type StudioSettings = {
+  /** `null` até a conta escolher o ramo, na primeira visita. */
+  businessType: BusinessType | null;
   /** Duração de cada sessão, em minutos. */
   sessionMinutes: number;
   /** Intervalo mínimo entre o fim de uma sessão e o início da próxima. */
   breakMinutes: number;
-  /** Alunos por turma. */
+  /** Clientes por horário. */
   capacity: number;
 };
 

@@ -1,7 +1,9 @@
+import { countOf } from "@/lib/business";
 import { cn } from "@/lib/cn";
 import { addDays, formatDayMonth, startOfWeek, weekdayOf } from "@/lib/dates";
 import { WEEKDAY_LABELS } from "@/lib/slots";
 import type { DateKey } from "@/types/pilates";
+import { useBusiness } from "@/hooks/use-studio";
 
 type Props = {
   selected: DateKey;
@@ -12,6 +14,7 @@ type Props = {
 };
 
 export const WeekStrip = ({ selected, today, countFor, onSelect }: Props) => {
+  const business = useBusiness();
   const start = startOfWeek(selected);
   const days = Array.from({ length: 7 }, (_, i) => addDays(start, i));
 
@@ -28,7 +31,7 @@ export const WeekStrip = ({ selected, today, countFor, onSelect }: Props) => {
               type="button"
               aria-pressed={isSelected}
               aria-current={isToday ? "date" : undefined}
-              aria-label={`${label}, ${formatDayMonth(date)}, ${count} ${count === 1 ? "aula" : "aulas"}`}
+              aria-label={`${label}, ${formatDayMonth(date)}, ${countOf(count, business.session)}`}
               onClick={() => onSelect(date)}
               className={cn(
                 "flex min-h-[4.5rem] w-full flex-col items-center justify-center gap-0.5 rounded-xl border text-xs focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary",

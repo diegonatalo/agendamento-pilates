@@ -25,6 +25,7 @@ export const AgendaScreen = () => {
     bookMakeup,
     bookTrial,
     settings,
+    business,
   } = useStudio();
   const today = useToday();
   const [picked, setPicked] = useState<string | null>(null);
@@ -106,7 +107,7 @@ export const AgendaScreen = () => {
           para ver a agenda.
         </EmptyState>
       ) : sessions.length === 0 ? (
-        <EmptyState title="Sem aulas neste dia">
+        <EmptyState title={`Sem ${business.session.many} neste dia`}>
           Aproveite para descansar.
         </EmptyState>
       ) : (

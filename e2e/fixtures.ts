@@ -19,13 +19,23 @@ export const signUpByApi = async (request: APIRequestContext, baseURL: string, e
   return email;
 };
 
+/** Na primeira visita, a conta escolhe o ramo do negócio. */
+export const chooseBusiness = async (page: Page, label: RegExp | string = "Estúdio de pilates") => {
+  await page.goto("/app");
+  await page.getByRole("radio", { name: label }).check();
+  await page.getByRole("button", { name: "Começar" }).click();
+  await expect(page.getByRole("heading", { name: "Agenda", level: 1 })).toBeVisible();
+  await saved(page);
+};
+
 /**
- * Testes do app: cada um roda com uma conta nova, já logada. Para testar sem
- * login, use o `test` do próprio Playwright.
+ * Testes do app: cada um roda com uma conta nova de estúdio de pilates, já
+ * logada. Para testar sem login, use o `test` do próprio Playwright.
  */
 export const test = base.extend({
   page: async ({ page, baseURL }, provide) => {
     await signUpByApi(page.request, baseURL!);
+    await chooseBusiness(page);
     await provide(page);
   },
 });

@@ -5,7 +5,8 @@ import { CARD, BUTTON_PRIMARY, BUTTON_SECONDARY } from "@/components/form-styles
 import { Logo, LogoMark } from "@/components/logo";
 import { SiteFooter } from "@/components/site-footer";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { FAQ, FEATURES, HERO, PHOTOS, SCREENSHOT, STEPS, type FeatureIcon } from "@/lib/landing";
+import { BUSINESSES } from "@/lib/business";
+import { AUDIENCES, FAQ, FEATURES, HERO, SCREENSHOT, STEPS, type FeatureIcon } from "@/lib/landing";
 import { SOURCE_URL } from "@/lib/site";
 
 /** Traços de 24x24 (mesmo estilo dos ícones do menu). */
@@ -68,50 +69,65 @@ export const PublicShell = ({ children }: { children: ReactNode }) => (
   </div>
 );
 
+/** Print da agenda, claro ou escuro conforme o tema. */
+const AgendaShot = ({ sizes, priority = false }: { sizes: string; priority?: boolean }) => (
+  <>
+    <Image
+      src={SCREENSHOT.light}
+      alt={SCREENSHOT.alt}
+      width={1280}
+      height={800}
+      priority={priority}
+      sizes={sizes}
+      className="block h-auto w-full dark:hidden"
+    />
+    <Image
+      src={SCREENSHOT.dark}
+      alt={SCREENSHOT.alt}
+      width={1280}
+      height={800}
+      priority={priority}
+      sizes={sizes}
+      className="hidden h-auto w-full dark:block"
+    />
+  </>
+);
+
 /** Página inicial: apresenta o Encaixe e leva ao app (`/app`). */
 export const LandingPage = () => (
   <PublicShell>
     <main id="conteudo" className="flex flex-1 flex-col">
       <section className="relative overflow-hidden" aria-labelledby="titulo">
-        {/* Círculo suave atrás da foto, como o ponto do logo. */}
+        {/* Círculo suave atrás do print, como o bloco de destaque do logo. */}
         <div
-          className="pointer-events-none absolute -right-32 top-10 size-[34rem] rounded-full bg-primary-soft opacity-70"
+          className="pointer-events-none absolute -right-40 -top-10 size-[36rem] rounded-full bg-primary-soft opacity-70"
           aria-hidden="true"
         />
-        <div className={`${SECTION} relative grid items-center gap-12 py-14 sm:py-20 md:grid-cols-[1.1fr_1fr]`}>
+        <div className={`${SECTION} relative grid items-center gap-12 py-14 sm:py-20 md:grid-cols-[1fr_1.15fr]`}>
           <div className="flex flex-col gap-6">
             <p className="text-sm font-medium tracking-[0.18em] text-primary uppercase">{HERO.kicker}</p>
             <h1
               id="titulo"
               className="font-display text-4xl font-light leading-[1.1] tracking-tight text-balance sm:text-5xl"
             >
-              A agenda do estúdio, <span className="font-semibold text-primary">no seu ritmo.</span>
+              A sua agenda, <span className="font-semibold text-primary">no seu ritmo.</span>
             </h1>
             <p className="text-lg text-pretty text-muted">{HERO.subtitle}</p>
             <div className="flex flex-wrap gap-3">
               <Link href="/cadastro" className={`${BUTTON_PRIMARY} rounded-full px-6`}>
                 Criar conta grátis
               </Link>
-              <a href="#como-funciona" className={`${BUTTON_SECONDARY} rounded-full px-6`}>
-                Ver como funciona
+              <a href="#para-quem" className={`${BUTTON_SECONDARY} rounded-full px-6`}>
+                Ver para quem é
               </a>
             </div>
             <p className="text-sm text-muted">{HERO.note}</p>
           </div>
-          {/* Foto em arco, como o arco do logo e os do próprio estúdio. */}
-          <div className="relative mx-auto w-full max-w-sm">
-            <div className="overflow-hidden rounded-t-full rounded-b-[2rem] border-8 border-surface shadow-card">
-              <Image
-                src={PHOTOS.studio.src}
-                alt={PHOTOS.studio.alt}
-                width={1600}
-                height={1067}
-                priority
-                sizes="(min-width: 768px) 384px, 100vw"
-                className="aspect-[3/4] w-full object-cover"
-              />
+          <div className="relative">
+            <div className={`${CARD} overflow-hidden`}>
+              <AgendaShot sizes="(min-width: 768px) 560px, 100vw" priority />
             </div>
-            <div className={`${CARD} absolute -bottom-6 -left-6 flex items-center gap-3 px-4 py-3 max-sm:left-2`}>
+            <div className={`${CARD} absolute -bottom-6 -left-4 flex items-center gap-3 px-4 py-3 max-sm:left-2`}>
               <LogoMark className="size-8" />
               <div className="text-sm leading-tight">
                 <p className="font-semibold">Segunda, 07:00</p>
@@ -123,97 +139,95 @@ export const LandingPage = () => (
       </section>
 
       <section
-        id="como-funciona"
+        id="para-quem"
         className="scroll-mt-20 border-y border-line bg-surface py-20"
-        aria-labelledby="titulo-como"
+        aria-labelledby="titulo-para-quem"
       >
         <div className={SECTION}>
-          <h2 id="titulo-como" className={`${H2} text-center`}>
-            Como funciona
+          <h2 id="titulo-para-quem" className={H2}>
+            Um app, cinco jeitos de atender
           </h2>
-          <ol className="relative mt-12 grid gap-10 md:grid-cols-3">
-            {/* Linha que liga os passos, no desktop. */}
-            <span
-              className="absolute left-[16.6%] right-[16.6%] top-5 hidden h-px bg-line-strong md:block"
-              aria-hidden="true"
-            />
-            {STEPS.map((step, index) => (
-              <li key={step.title} className="relative flex flex-col items-center gap-3 text-center">
-                <span className="grid size-10 place-items-center rounded-full bg-primary font-semibold text-primary-fg ring-8 ring-surface">
-                  {index + 1}
-                </span>
-                <h3 className="text-lg font-semibold">{step.title}</h3>
-                <p className="max-w-xs text-muted">{step.text}</p>
-              </li>
-            ))}
-          </ol>
+          <p className="mt-3 max-w-2xl text-pretty text-muted">
+            Você escolhe o seu ramo ao criar a conta. O Encaixe passa a usar os nomes do seu dia a dia e mostra na ficha
+            só o que faz sentido para você.
+          </p>
+          <ul className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {AUDIENCES.map((audience) => {
+              const business = BUSINESSES[audience.type];
+              return (
+                <li key={audience.type} className="flex flex-col gap-2 rounded-2xl border border-line bg-bg p-5">
+                  <h3 className="text-lg font-semibold">{business.label}</h3>
+                  <p className="text-sm font-medium text-primary">
+                    {business.client.Many} · {business.session.many}
+                  </p>
+                  <p className="text-sm text-pretty text-muted">{audience.text}</p>
+                </li>
+              );
+            })}
+          </ul>
         </div>
       </section>
 
-      <section className={`${SECTION} py-20`} aria-labelledby="titulo-recursos">
-        <h2 id="titulo-recursos" className={H2}>
-          Feito para a rotina do estúdio
+      <section id="como-funciona" className={`${SECTION} scroll-mt-20 py-20`} aria-labelledby="titulo-como">
+        <h2 id="titulo-como" className={`${H2} text-center`}>
+          Como funciona
         </h2>
-        <div className={`${CARD} mt-8 overflow-hidden`}>
-          <Image
-            src={SCREENSHOT.light}
-            alt={SCREENSHOT.alt}
-            width={1280}
-            height={800}
-            sizes="(min-width: 1024px) 992px, 100vw"
-            className="block h-auto w-full dark:hidden"
+        <ol className="relative mt-12 grid gap-10 md:grid-cols-3">
+          {/* Linha que liga os passos, no desktop. */}
+          <span
+            className="absolute left-[16.6%] right-[16.6%] top-5 hidden h-px bg-line-strong md:block"
+            aria-hidden="true"
           />
-          <Image
-            src={SCREENSHOT.dark}
-            alt={SCREENSHOT.alt}
-            width={1280}
-            height={800}
-            sizes="(min-width: 1024px) 992px, 100vw"
-            className="hidden h-auto w-full dark:block"
-          />
-        </div>
-        <ul className="mt-12 grid gap-x-10 gap-y-8 sm:grid-cols-2 lg:grid-cols-3">
-          {FEATURES.map((feature) => (
-            <li key={feature.title} className="flex gap-4">
-              <span className="grid size-11 shrink-0 place-items-center rounded-full bg-primary-soft">
-                <FeatureGlyph icon={feature.icon} />
+          {STEPS.map((step, index) => (
+            <li key={step.title} className="relative flex flex-col items-center gap-3 text-center">
+              <span className="grid size-10 place-items-center rounded-full bg-primary font-semibold text-primary-fg ring-8 ring-bg">
+                {index + 1}
               </span>
-              <div>
-                <h3 className="font-semibold">{feature.title}</h3>
-                <p className="mt-1 text-sm text-muted">{feature.text}</p>
-              </div>
+              <h3 className="text-lg font-semibold">{step.title}</h3>
+              <p className="max-w-xs text-muted">{step.text}</p>
             </li>
           ))}
-        </ul>
+        </ol>
+      </section>
+
+      <section className="border-y border-line bg-surface py-20" aria-labelledby="titulo-recursos">
+        <div className={SECTION}>
+          <h2 id="titulo-recursos" className={H2}>
+            Feito para a rotina de quem atende
+          </h2>
+          <ul className="mt-12 grid gap-x-10 gap-y-8 sm:grid-cols-2 lg:grid-cols-3">
+            {FEATURES.map((feature) => (
+              <li key={feature.title} className="flex gap-4">
+                <span className="grid size-11 shrink-0 place-items-center rounded-full bg-primary-soft">
+                  <FeatureGlyph icon={feature.icon} />
+                </span>
+                <div>
+                  <h3 className="font-semibold">{feature.title}</h3>
+                  <p className="mt-1 text-sm text-muted">{feature.text}</p>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
       </section>
 
       <section className="bg-primary-soft text-primary-soft-fg" aria-labelledby="titulo-privacidade">
-        <div className={`${SECTION} grid items-center gap-10 py-16 md:grid-cols-[1fr_1.3fr]`}>
-          <Image
-            src={PHOTOS.student.src}
-            alt={PHOTOS.student.alt}
-            width={1600}
-            height={1067}
-            sizes="(min-width: 768px) 420px, 100vw"
-            className="aspect-[4/3] w-full rounded-[2rem] object-cover"
-          />
-          <div className="flex flex-col gap-4">
-            <h2 id="titulo-privacidade" className={H2}>
-              Dados de saúde pedem cuidado
-            </h2>
-            <p className="text-pretty">
-              As fichas ficam na conta do estúdio, protegidas por senha, e cada conta vê só os próprios alunos. Sem
-              cookies de rastreamento nem propaganda. Como são dados de saúde, use uma senha forte e peça o termo
-              de consentimento de cada aluno.
-            </p>
-            <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm font-semibold">
-              <Link href="/termos/consentimento" className="underline underline-offset-4">
-                Modelo de termo de consentimento
-              </Link>
-              <Link href="/privacidade" className="underline underline-offset-4">
-                Política de privacidade
-              </Link>
-            </div>
+        <div className="mx-auto flex w-full max-w-3xl flex-col gap-4 px-4 py-16 text-center">
+          <h2 id="titulo-privacidade" className={H2}>
+            Os dados dos seus clientes são seus
+          </h2>
+          <p className="text-pretty">
+            Ficam na sua conta, protegidos por senha, e cada conta vê só os próprios clientes. Sem cookies de
+            rastreamento nem propaganda. Se a ficha tem dados de saúde, use uma senha forte e peça o termo de
+            consentimento de cada cliente.
+          </p>
+          <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm font-semibold">
+            <Link href="/termos/consentimento" className="underline underline-offset-4">
+              Modelo de termo de consentimento
+            </Link>
+            <Link href="/privacidade" className="underline underline-offset-4">
+              Política de privacidade
+            </Link>
           </div>
         </div>
       </section>
@@ -233,16 +247,16 @@ export const LandingPage = () => (
       </section>
 
       <section className={`${SECTION} pb-20`} aria-labelledby="titulo-final">
-        <div className="relative overflow-hidden rounded-t-[999px] rounded-b-[2rem] bg-primary px-6 pb-14 pt-20 text-center text-primary-fg">
+        <div className="relative overflow-hidden rounded-[2rem] bg-primary px-6 py-16 text-center text-primary-fg">
           <h2 id="titulo-final" className="font-display text-3xl font-light tracking-tight sm:text-4xl">
-            Comece pela <span className="font-semibold">grade de horários</span>
+            A sua semana <span className="font-semibold">encaixada</span>
           </h2>
-          <p className="mx-auto mt-3 max-w-md opacity-85">Em poucos minutos a semana do estúdio está montada.</p>
+          <p className="mx-auto mt-3 max-w-md opacity-85">Crie a conta, escolha o seu ramo e monte a grade em poucos minutos.</p>
           <Link
-            href="/app/horarios"
+            href="/cadastro"
             className="mt-8 inline-flex min-h-11 items-center rounded-full bg-primary-fg px-6 font-semibold text-primary hover:opacity-90"
           >
-            Montar a grade
+            Criar conta grátis
           </Link>
         </div>
       </section>

@@ -14,6 +14,7 @@ import {
 } from "drizzle-orm/pg-core";
 import type {
   BookingKind,
+  BusinessType,
   BookingStatus,
   EvolutionNote,
   MonthlyFee,
@@ -121,6 +122,8 @@ const money = (name: string) => numeric(name, { precision: 12, scale: 2, mode: "
 /** One row per account, created on the first visit. */
 export const studioSettings = pgTable("studio_settings", {
   userId: owner().primaryKey(),
+  /** null until the account picks its business on the first visit */
+  businessType: text("business_type").$type<BusinessType>(),
   sessionMinutes: integer("session_minutes").notNull(),
   breakMinutes: integer("break_minutes").notNull(),
   capacity: integer("capacity").notNull(),

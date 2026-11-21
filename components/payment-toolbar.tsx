@@ -6,6 +6,7 @@ import {
   type MonthSummary,
 } from "@/lib/payments";
 import type { MonthKey } from "@/types/pilates";
+import { useBusiness } from "@/hooks/use-studio";
 
 type Props = {
   month: MonthKey;
@@ -22,6 +23,7 @@ export const PaymentToolbar = ({
   onMonthChange,
   onOnlyUnpaidChange,
 }: Props) => {
+  const business = useBusiness();
   const percent =
     summary.billed === 0 ? 0 : Math.round((summary.paid / summary.billed) * 100);
 
@@ -54,7 +56,7 @@ export const PaymentToolbar = ({
 
       {summary.billed === 0 ? (
         <p className="text-sm text-muted">
-          Nenhum aluno com mensalidade neste mês.
+          Nenhum {business.client.one} com mensalidade neste mês.
         </p>
       ) : (
         <div className="flex flex-col gap-2">

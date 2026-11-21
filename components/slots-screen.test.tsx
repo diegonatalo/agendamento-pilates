@@ -84,20 +84,20 @@ describe("SlotsScreen", () => {
     it("salva duração, intervalo e capacidade e atualiza a tela", async () => {
       const user = userEvent.setup();
       renderStudio(<SlotsScreen />);
-      const duration = screen.getByLabelText("Duração da sessão (min)");
+      const duration = screen.getByLabelText("Duração de cada aula (min)");
       await user.clear(duration);
       await user.type(duration, "50");
-      await user.selectOptions(screen.getByLabelText("Intervalo entre sessões"), "10");
-      const capacity = screen.getByLabelText("Alunos por turma");
+      await user.selectOptions(screen.getByLabelText("Intervalo entre aulas"), "10");
+      const capacity = screen.getByLabelText("Alunos por horário");
       await user.clear(capacity);
       await user.type(capacity, "4");
       await user.click(screen.getByRole("button", { name: "Salvar configurações" }));
 
       expect(screen.getByRole("status")).toHaveTextContent("Configurações salvas.");
-      expect(screen.getByText(/Cada sessão dura 50 min e comporta até 4 alunos/)).toBeInTheDocument();
+      expect(screen.getByText(/Cada aula dura 50 min, com até 4 alunos por horário/)).toBeInTheDocument();
       expect(
         stored("settings"),
-      ).toEqual({ sessionMinutes: 50, breakMinutes: 10, capacity: 4 });
+      ).toEqual({ businessType: "pilates", sessionMinutes: 50, breakMinutes: 10, capacity: 4 });
     });
 
     it("não salva duração que sobrepõe horários existentes", async () => {
@@ -105,7 +105,7 @@ describe("SlotsScreen", () => {
       renderStudio(<SlotsScreen />);
       await addSlot(user, "Segunda", "08:00");
       await addSlot(user, "Segunda", "09:00");
-      const duration = screen.getByLabelText("Duração da sessão (min)");
+      const duration = screen.getByLabelText("Duração de cada aula (min)");
       await user.clear(duration);
       await user.type(duration, "90");
       await user.click(screen.getByRole("button", { name: "Salvar configurações" }));
@@ -135,7 +135,7 @@ describe("SlotsScreen", () => {
       await setTime(user, "Abre às", "07:00");
       await setTime(user, "Fecha às", "10:00");
 
-      expect(screen.getByText(/3 sessões por dia:/).parentElement).toHaveTextContent("07:00, 08:00, 09:00");
+      expect(screen.getByText(/3 horários por dia:/).parentElement).toHaveTextContent("07:00, 08:00, 09:00");
       await user.click(screen.getByRole("button", { name: "Criar 6 horários" }));
 
       expect(screen.getByRole("status")).toHaveTextContent("6 horários criados.");
@@ -160,11 +160,11 @@ describe("SlotsScreen", () => {
         await user.click(screen.getByRole("button", { name: day, pressed: true }));
       await setTime(user, "Abre às", "10:00");
       await setTime(user, "Fecha às", "15:00");
-      await user.click(screen.getByRole("checkbox", { name: "Pausa sem aulas (almoço)" }));
+      await user.click(screen.getByRole("checkbox", { name: "Pausa (almoço)" }));
       await setTime(user, "Pausa das", "12:00");
       await setTime(user, "Até", "13:00");
 
-      expect(screen.getByText(/4 sessões por dia:/).parentElement).toHaveTextContent("10:00, 11:00, 13:00, 14:00");
+      expect(screen.getByText(/4 horários por dia:/).parentElement).toHaveTextContent("10:00, 11:00, 13:00, 14:00");
       expect(screen.getByText(/1 horário cai sobre horários já cadastrados/)).toBeInTheDocument();
       await user.click(screen.getByRole("button", { name: "Criar 3 horários" }));
 
@@ -201,10 +201,10 @@ describe("SlotsScreen", () => {
 
       const toggle = screen.getByRole("button", { name: "Configurar grade" });
       expect(toggle).toHaveAttribute("aria-expanded", "false");
-      expect(screen.queryByLabelText("Duração da sessão (min)")).not.toBeInTheDocument();
+      expect(screen.queryByLabelText("Duração de cada aula (min)")).not.toBeInTheDocument();
 
       await user.click(toggle);
-      expect(screen.getByLabelText("Duração da sessão (min)")).toBeInTheDocument();
+      expect(screen.getByLabelText("Duração de cada aula (min)")).toBeInTheDocument();
       expect(screen.getByRole("button", { name: "Fechar configuração" })).toHaveAttribute(
         "aria-expanded",
         "true",

@@ -3,7 +3,7 @@ import { ConsentPage } from "@/components/legal-pages";
 
 export const metadata: Metadata = {
   title: "Termo de consentimento",
-  description: "Modelo de termo de consentimento do aluno para tratamento de dados de saúde, para o estúdio imprimir.",
+  description: "Modelo de termo de consentimento do cliente para tratamento de dados de saúde, para imprimir.",
   alternates: { canonical: "/termos/consentimento" },
 };
 

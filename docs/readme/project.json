@@ -1,7 +1,7 @@
 {
   "name": "Encaixe",
   "repo": "encaixe",
-  "tagline": "A agenda de estúdios e professores com turmas fixas.",
+  "tagline": "A agenda de quem atende com hora marcada: estúdios, personal, professores, psicólogos e barbearias.",
   "urls": {
     "demo": "https://dn-encaixe.vercel.app"
   },
@@ -79,11 +79,11 @@
   "features": [
     {
       "title": "Agenda por horário",
-      "desc": "Turmas com vagas por horário e duração da sessão definidas pelo estúdio."
+      "desc": "Grade semanal com vagas e duração definidas por você, e encaixe de reposição ou avulso."
     },
     {
-      "title": "Ficha do aluno",
-      "desc": "Saúde, lesões, pontos de atenção e evolução em um só lugar."
+      "title": "Ficha por ramo",
+      "desc": "Aluno, paciente ou cliente: nomes e campos da ficha mudam conforme o seu negócio."
     },
     {
       "title": "Reposição",

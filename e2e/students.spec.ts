@@ -22,5 +22,5 @@ test("não salva aluno sem nome", async ({ page }) => {
   await page.goto("/app/alunos");
   await page.getByRole("button", { name: "Novo aluno" }).click();
   await page.getByRole("button", { name: "Salvar aluno" }).click();
-  await expect(page.getByText("Informe o nome do aluno.")).toBeVisible();
+  await expect(page.getByText("Informe o nome.", { exact: true })).toBeVisible();
 });

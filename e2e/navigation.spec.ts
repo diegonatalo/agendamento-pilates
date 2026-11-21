@@ -38,8 +38,8 @@ test("endereço desconhecido mostra a página 404", async ({ page }) => {
 publicTest("a página inicial apresenta o app e leva a criar a conta", async ({ page }) => {
   const errors = collectErrors(page);
   await page.goto("/");
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText(/agenda do estúdio/);
-  await page.getByRole("main").getByRole("link", { name: "Criar conta grátis" }).click();
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText(/sua agenda/);
+  await page.getByRole("main").getByRole("link", { name: "Criar conta grátis" }).first().click();
   await expect(page).toHaveURL("/cadastro");
   await expect(page.getByRole("heading", { name: "Criar conta", level: 1 })).toBeVisible();
   expect(errors).toEqual([]);

@@ -12,6 +12,7 @@ import {
 } from "@/components/form-styles";
 import { useStudio } from "@/hooks/use-studio";
 import { formatCurrency } from "@/lib/payments";
+import { countOf } from "@/lib/business";
 import { formatWeeklyClasses, studentsOnPlan } from "@/lib/plans";
 import type { Plan } from "@/types/pilates";
 
@@ -26,7 +27,7 @@ const toDraft = (plan: Plan): Draft => ({
 });
 
 export const PlansScreen = () => {
-  const { ready, plans, students, savePlan, removePlan } = useStudio();
+  const { ready, plans, students, savePlan, removePlan, business } = useStudio();
   const [draft, setDraft] = useState<Draft>(EMPTY);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -73,7 +74,7 @@ export const PlansScreen = () => {
       <header>
         <h1 className="text-3xl font-semibold">Planos</h1>
         <p className="text-muted">
-          Os planos do estúdio. Na ficha de cada aluno você escolhe o plano, e
+          Os seus planos mensais. Na ficha de cada {business.client.one} você escolhe o plano, e
           o valor pago fica registrado em cada mês.
         </p>
       </header>
@@ -96,7 +97,7 @@ export const PlansScreen = () => {
               autoComplete="off"
             />
           </Field>
-          <Field label="Aulas por semana">
+          <Field label={`${business.session.Many} por semana`}>
             <select
               className={INPUT_CLASS}
               value={draft.weeklyClasses}
@@ -125,7 +126,7 @@ export const PlansScreen = () => {
         </div>
         {editingId ? (
           <p className="text-sm text-muted">
-            Mudar o valor reajusta todos os alunos do plano a partir de agora.
+            Mudar o valor reajusta todos os {business.client.many} do plano a partir de agora.
             Meses já pagos mantêm o valor que foi pago.
           </p>
         ) : null}
@@ -149,7 +150,7 @@ export const PlansScreen = () => {
 
       {!ready ? null : plans.length === 0 ? (
         <EmptyState title="Nenhum plano cadastrado ainda.">
-          Cadastre os planos que o estúdio oferece, como 1x, 2x ou 3x por
+          Cadastre os planos que você oferece, como 1x, 2x ou 3x por
           semana.
         </EmptyState>
       ) : (
@@ -171,7 +172,7 @@ export const PlansScreen = () => {
                         ? null
                         : formatWeeklyClasses(plan.weeklyClasses),
                       formatCurrency(plan.amount),
-                      `${enrolled} ${enrolled === 1 ? "aluno" : "alunos"}`,
+                      countOf(enrolled, business.client),
                     ]
                       .filter(Boolean)
                       .join(" · ")}

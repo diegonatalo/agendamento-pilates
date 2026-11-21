@@ -1,4 +1,5 @@
 import { createContext, useContext, useSyncExternalStore } from "react";
+import { businessOf, pickBusiness } from "@/lib/business";
 import { toDateKey } from "@/lib/dates";
 import { newId } from "@/lib/ids";
 import { removePaymentsOfStudent, setPayment } from "@/lib/payments";
@@ -29,6 +30,7 @@ import type {
   BlockedPeriod,
   Booking,
   BookingStatus,
+  BusinessType,
   ClassSlot,
   DateKey,
   MonthKey,
@@ -50,6 +52,13 @@ export const useSyncStatus = () => {
   return useSyncExternalStore(store.subscribe, store.getStatus, store.getStatus);
 };
 
+/** Vocabulário e ficha do ramo da conta, para componentes que só exibem dados. */
+export const useBusiness = () => {
+  const store = useStudioStore();
+  const state = useSyncExternalStore(store.subscribe, store.getState, store.getState);
+  return businessOf(state.settings);
+};
+
 /** Dados do estúdio e as operações que mantêm tudo coerente. */
 export const useStudio = () => {
   const store = useStudioStore();
@@ -63,6 +72,10 @@ export const useStudio = () => {
   /** Lê o estado mais recente (não o do último render) e grava o resultado. */
   const update = (change: (current: StudioState) => StudioState) => store.update(change);
   const current = () => store.getState();
+
+  /** Escolhe o ramo; com a grade vazia, aplica também a duração e as vagas sugeridas. */
+  const chooseBusiness = (type: BusinessType) =>
+    update((s) => ({ ...s, settings: pickBusiness(s.settings, type, s.slots.length > 0) }));
 
   /** Devolve a mensagem de erro, ou `null` quando salvou. */
   const saveSettings = (next: StudioSettings) => {
@@ -182,6 +195,8 @@ export const useStudio = () => {
     /** Os dados já chegam do servidor; fica para as telas que esperavam o navegador. */
     ready: true,
     settings,
+    business: businessOf(settings),
+    chooseBusiness,
     saveSettings,
     addSlots,
     plans,

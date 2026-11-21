@@ -109,7 +109,7 @@ describe("StudentForm: evolução, validação e exclusão", () => {
   it("exige o nome e tira espaços antes de salvar", async () => {
     const { onSave } = setup();
     await save();
-    expect(screen.getByRole("alert")).toHaveTextContent("Informe o nome do aluno.");
+    expect(screen.getByRole("alert")).toHaveTextContent("Informe o nome.");
     await userEvent.type(screen.getByLabelText("Nome"), "  Bia  ");
     await save();
     expect(saved(onSave).name).toBe("Bia");
@@ -132,5 +132,48 @@ describe("StudentForm: evolução, validação e exclusão", () => {
     expect(screen.queryByRole("button", { name: "Excluir aluno" })).toBeNull();
     await userEvent.click(screen.getByRole("button", { name: "Voltar" }));
     expect(onCancel).toHaveBeenCalled();
+  });
+});
+
+describe("StudentForm: cada ramo com a sua ficha", () => {
+  const renderFor = (businessType: "psychology" | "barber" | "tutor") =>
+    render(
+      <StudentForm
+        initial={createEmptyStudent("a1", "2026-03-01")}
+        isNew
+        slots={slots}
+        plans={plans}
+        settings={{ ...DEFAULT_SETTINGS, businessType }}
+        students={[]}
+        credits={0}
+        onSave={vi.fn()}
+        onCancel={vi.fn()}
+        onDelete={vi.fn()}
+      />,
+    );
+
+  it("psicólogo: paciente, acompanhamento e anotações, sem liberação médica", () => {
+    renderFor("psychology");
+    expect(screen.getByRole("heading", { name: "Novo paciente" })).toBeInTheDocument();
+    expect(screen.getByRole("group", { name: "Acompanhamento" })).toBeInTheDocument();
+    expect(screen.getByLabelText("Demanda inicial")).toBeInTheDocument();
+    expect(screen.queryByLabelText("Tem liberação médica")).not.toBeInTheDocument();
+    expect(screen.getByRole("group", { name: "Anotações" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Salvar paciente" })).toBeInTheDocument();
+  });
+
+  it("barbearia: cliente com preferências, sem ficha de saúde nem contato de emergência", () => {
+    renderFor("barber");
+    expect(screen.getByRole("heading", { name: "Novo cliente" })).toBeInTheDocument();
+    expect(screen.queryByRole("group", { name: "Saúde" })).not.toBeInTheDocument();
+    expect(screen.queryByLabelText(/Contato de emergência/)).not.toBeInTheDocument();
+    expect(screen.getByLabelText(/Corte, barba e produtos que prefere/)).toBeInTheDocument();
+    expect(screen.queryByLabelText("Objetivos")).not.toBeInTheDocument();
+  });
+
+  it("professor particular: sem saúde, com responsável para alunos menores", () => {
+    renderFor("tutor");
+    expect(screen.queryByRole("group", { name: "Saúde" })).not.toBeInTheDocument();
+    expect(screen.getByLabelText("Responsável ou contato de emergência")).toBeInTheDocument();
   });
 });

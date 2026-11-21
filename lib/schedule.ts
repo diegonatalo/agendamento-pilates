@@ -252,7 +252,7 @@ export const removeBooking = (
 ): Booking[] => bookings.filter((b) => b.id !== bookingId);
 
 export const validateGuestName = (name: string): string | null =>
-  name.trim() ? null : "Informe o nome de quem vai fazer a aula experimental.";
+  name.trim() ? null : "Informe o nome de quem vem.";
 
 export const removeBookingsOfStudent = (
   bookings: Booking[],

@@ -10,6 +10,7 @@ import {
   INPUT_CLASS,
   LINK_BUTTON,
 } from "@/components/form-styles";
+import { businessOf } from "@/lib/business";
 import { toDateKey } from "@/lib/dates";
 import { newId } from "@/lib/ids";
 import { formatCurrency } from "@/lib/payments";
@@ -63,6 +64,8 @@ export const StudentForm = ({
   const [error, setError] = useState<string | null>(null);
   const [confirmingDelete, setConfirmingDelete] = useState(false);
   const [noteText, setNoteText] = useState("");
+  const business = businessOf(settings);
+  const { client, record } = business;
 
   const setField = <K extends keyof Student>(key: K, value: Student[K]) =>
     setDraft((current) => ({ ...current, [key]: value }));
@@ -129,7 +132,7 @@ export const StudentForm = ({
     <form onSubmit={handleSubmit} className="flex flex-col gap-5" noValidate>
       <div className="flex items-center justify-between gap-3">
         <h2 className="text-2xl font-semibold">
-          {isNew ? "Novo aluno" : draft.name || "Aluno"}
+          {isNew ? `Novo ${client.one}` : draft.name || client.One}
         </h2>
         <button type="button" className={BUTTON_SECONDARY} onClick={onCancel}>
           Voltar
@@ -173,7 +176,7 @@ export const StudentForm = ({
               onChange={(e) => setField("birthDate", e.target.value || null)}
             />
           </Field>
-          <Field label="Início no estúdio">
+          <Field label={`${client.One} desde`}>
             <input
               type="date"
               className={INPUT_CLASS}
@@ -189,8 +192,17 @@ export const StudentForm = ({
             checked={draft.active}
             onChange={(e) => setField("active", e.target.checked)}
           />
-          Aluno ativo
+          {client.One} ativo
         </label>
+        {business.emergencyContact ? (
+          <Field label={business.emergencyContact.label}>
+            <input
+              className={INPUT_CLASS}
+              value={draft.health.emergencyContact}
+              onChange={(e) => setHealth("emergencyContact", e.target.value)}
+            />
+          </Field>
+        ) : null}
       </fieldset>
 
       <fieldset className={SECTION}>
@@ -200,7 +212,7 @@ export const StudentForm = ({
         </p>
         {slots.length === 0 ? (
           <p className="text-sm text-muted">
-            Cadastre horários na aba Horários para matricular o aluno.
+            Cadastre horários na aba Horários para marcar os horários fixos do {client.one}.
           </p>
         ) : (
           <ul className="flex flex-col gap-2">
@@ -232,66 +244,53 @@ export const StudentForm = ({
         )}
       </fieldset>
 
-      <fieldset className={SECTION}>
-        <legend className={LEGEND}>Saúde</legend>
-        <Field label="Lesões e condições">
-          <textarea
-            className={TEXTAREA}
-            value={draft.health.injuries}
-            onChange={(e) => setHealth("injuries", e.target.value)}
-          />
-        </Field>
-        <Field label="Cirurgias">
-          <textarea
-            className={TEXTAREA}
-            value={draft.health.surgeries}
-            onChange={(e) => setHealth("surgeries", e.target.value)}
-          />
-        </Field>
-        <Field label="Restrições de movimento">
-          <textarea
-            className={TEXTAREA}
-            value={draft.health.restrictions}
-            onChange={(e) => setHealth("restrictions", e.target.value)}
-          />
-        </Field>
-        <label className="flex items-center gap-3 text-sm font-medium">
-          <input
-            type="checkbox"
-            className="size-5 accent-primary"
-            checked={draft.health.medicalClearance}
-            onChange={(e) => setHealth("medicalClearance", e.target.checked)}
-          />
-          Tem liberação médica
-        </label>
-        <Field label="Contato de emergência">
-          <input
-            className={INPUT_CLASS}
-            value={draft.health.emergencyContact}
-            onChange={(e) => setHealth("emergencyContact", e.target.value)}
-          />
-        </Field>
-      </fieldset>
+      {record ? (
+        <fieldset className={SECTION}>
+          <legend className={LEGEND}>{record.legend}</legend>
+          {(["injuries", "surgeries", "restrictions"] as const).map((key) => {
+            const field = record[key];
+            return field ? (
+              <Field key={key} label={field.label}>
+                <textarea
+                  className={TEXTAREA}
+                  value={draft.health[key]}
+                  onChange={(e) => setHealth(key, e.target.value)}
+                />
+              </Field>
+            ) : null;
+          })}
+          {record.clearance ? (
+            <label className="flex items-center gap-3 text-sm font-medium">
+              <input
+                type="checkbox"
+                className="size-5 accent-primary"
+                checked={draft.health.medicalClearance}
+                onChange={(e) => setHealth("medicalClearance", e.target.checked)}
+              />
+              {record.clearance}
+            </label>
+          ) : null}
+        </fieldset>
+      ) : null}
 
       <fieldset className={SECTION}>
-        <legend className={LEGEND}>Pontos de atenção</legend>
-        <Field
-          label="Exercícios com desconforto e o que evitar"
-          hint="Aparece em destaque na sessão."
-        >
+        <legend className={LEGEND}>{business.attention.legend}</legend>
+        <Field label={business.attention.label} hint={business.attention.hint}>
           <textarea
             className={TEXTAREA}
             value={draft.attention}
             onChange={(e) => setField("attention", e.target.value)}
           />
         </Field>
-        <Field label="Objetivos">
-          <textarea
-            className={TEXTAREA}
-            value={draft.goals}
-            onChange={(e) => setField("goals", e.target.value)}
-          />
-        </Field>
+        {business.goals ? (
+          <Field label={business.goals.label}>
+            <textarea
+              className={TEXTAREA}
+              value={draft.goals}
+              onChange={(e) => setField("goals", e.target.value)}
+            />
+          </Field>
+        ) : null}
       </fieldset>
 
       <fieldset className={SECTION}>
@@ -394,7 +393,7 @@ export const StudentForm = ({
             {selectedPlan && overPlan > 0 ? (
               <p className="rounded-lg bg-warn-soft px-3 py-2 text-sm text-warn-soft-fg">
                 Este plano dá direito a{" "}
-                {formatWeeklyClasses(selectedPlan.weeklyClasses)}, mas o aluno
+                {formatWeeklyClasses(selectedPlan.weeklyClasses)}, mas o {client.one}{" "}
                 tem {draft.slotIds.length} horários fixos.
               </p>
             ) : null}
@@ -403,8 +402,8 @@ export const StudentForm = ({
       </fieldset>
 
       <fieldset className={SECTION}>
-        <legend className={LEGEND}>Evolução</legend>
-        <Field label="Nova nota">
+        <legend className={LEGEND}>{business.evolution.legend}</legend>
+        <Field label={business.evolution.label}>
           <textarea
             className={TEXTAREA}
             value={noteText}
@@ -450,7 +449,7 @@ export const StudentForm = ({
 
       <div className="flex flex-wrap items-center gap-3">
         <button type="submit" className={BUTTON_PRIMARY}>
-          Salvar aluno
+          Salvar {client.one}
         </button>
         {!isNew ? (
           confirmingDelete ? (
@@ -476,7 +475,7 @@ export const StudentForm = ({
               className={BUTTON_SECONDARY}
               onClick={() => setConfirmingDelete(true)}
             >
-              Excluir aluno
+              Excluir {client.one}
             </button>
           )
         ) : null}

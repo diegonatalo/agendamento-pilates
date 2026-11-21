@@ -8,6 +8,7 @@ import {
   CAPACITY_RANGE,
   SESSION_MINUTES_RANGE,
 } from "@/lib/settings";
+import { businessOf } from "@/lib/business";
 import type { StudioSettings } from "@/types/pilates";
 
 type Props = {
@@ -17,7 +18,7 @@ type Props = {
   onSave: (settings: StudioSettings) => string | null;
 };
 
-type Draft = Record<keyof StudioSettings, string>;
+type Draft = Record<Exclude<keyof StudioSettings, "businessType">, string>;
 
 const toDraft = (settings: StudioSettings): Draft => ({
   sessionMinutes: String(settings.sessionMinutes),
@@ -30,6 +31,7 @@ const toNumber = (value: string) => (value.trim() === "" ? Number.NaN : Number(v
 
 export const StudioSettingsSection = ({ settings, onSave }: Props) => {
   const [draft, setDraft] = useState<Draft>(() => toDraft(settings));
+  const business = businessOf(settings);
   const [error, setError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
 
@@ -41,6 +43,7 @@ export const StudioSettingsSection = ({ settings, onSave }: Props) => {
   const handleSubmit = (event: FormEvent) => {
     event.preventDefault();
     const problem = onSave({
+      businessType: settings.businessType,
       sessionMinutes: toNumber(draft.sessionMinutes),
       breakMinutes: toNumber(draft.breakMinutes),
       capacity: toNumber(draft.capacity),
@@ -53,7 +56,7 @@ export const StudioSettingsSection = ({ settings, onSave }: Props) => {
     <section aria-labelledby="studio-title" className={`${CARD} flex flex-col gap-4 p-4 sm:p-5`}>
       <div>
         <h2 id="studio-title" className="text-lg font-semibold">
-          Estúdio
+          Funcionamento
         </h2>
         <p className="text-sm text-muted">
           Valem para todos os horários, na agenda e nas fichas.
@@ -61,7 +64,7 @@ export const StudioSettingsSection = ({ settings, onSave }: Props) => {
       </div>
       <form onSubmit={handleSubmit} className="flex flex-col gap-4" noValidate>
         <div className="grid gap-4 sm:grid-cols-3">
-          <Field label="Duração da sessão (min)">
+          <Field label={`Duração de cada ${business.session.one} (min)`}>
             <input
               type="number"
               inputMode="numeric"
@@ -73,7 +76,7 @@ export const StudioSettingsSection = ({ settings, onSave }: Props) => {
               onChange={(e) => change("sessionMinutes", e.target.value)}
             />
           </Field>
-          <Field label="Intervalo entre sessões">
+          <Field label={`Intervalo entre ${business.session.many}`}>
             <select
               className={INPUT_CLASS}
               value={draft.breakMinutes}
@@ -86,7 +89,7 @@ export const StudioSettingsSection = ({ settings, onSave }: Props) => {
               ))}
             </select>
           </Field>
-          <Field label="Alunos por turma">
+          <Field label={`${business.client.Many} por horário`}>
             <input
               type="number"
               inputMode="numeric"

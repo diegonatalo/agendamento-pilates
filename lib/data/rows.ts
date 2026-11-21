@@ -19,12 +19,14 @@ type Select<T extends { $inferSelect: unknown }> = T["$inferSelect"];
 
 export const settingsToRow = (userId: string, s: StudioSettings) => ({
   userId,
+  businessType: s.businessType,
   sessionMinutes: s.sessionMinutes,
   breakMinutes: s.breakMinutes,
   capacity: s.capacity,
 });
 
 export const settingsFromRow = (r: Select<typeof schema.studioSettings>): StudioSettings => ({
+  businessType: r.businessType,
   sessionMinutes: r.sessionMinutes,
   breakMinutes: r.breakMinutes,
   capacity: r.capacity,

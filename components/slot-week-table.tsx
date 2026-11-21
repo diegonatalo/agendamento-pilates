@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { CARD, FOCUS_RING } from "@/components/form-styles";
 import { SlotRemove } from "@/components/slot-remove";
+import { businessOf } from "@/lib/business";
 import { cn } from "@/lib/cn";
 import {
   endTime,
@@ -29,6 +30,7 @@ const CELL_TONE = {
 
 /** A semana inteira: dias nas colunas, horários nas linhas. */
 export const SlotWeekTable = ({ slots, students, settings, onRemove }: Props) => {
+  const business = businessOf(settings);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const days = weekdaysOf(slots);
   const times = startTimesOf(slots);
@@ -40,7 +42,7 @@ export const SlotWeekTable = ({ slots, students, settings, onRemove }: Props) =>
       <div className={cn(CARD, "overflow-x-auto p-2")}>
         <table className="w-full border-separate border-spacing-1 text-sm">
           <caption className="sr-only">
-            Grade da semana: alunos fixos em cada horário
+            Grade da semana: {business.client.many} fixos em cada horário
           </caption>
           <thead>
             <tr>
@@ -71,7 +73,7 @@ export const SlotWeekTable = ({ slots, students, settings, onRemove }: Props) =>
                       <button
                         type="button"
                         aria-pressed={isSelected}
-                        aria-label={`${WEEKDAY_LABELS[day]}, ${time}: ${enrolled} de ${settings.capacity} alunos`}
+                        aria-label={`${WEEKDAY_LABELS[day]}, ${time}: ${enrolled} de ${settings.capacity} ${business.client.many}`}
                         onClick={() => setSelectedId(isSelected ? null : slot.id)}
                         className={cn(
                           "flex h-9 w-full items-center justify-center rounded-md border text-xs font-semibold tabular-nums",
@@ -93,7 +95,7 @@ export const SlotWeekTable = ({ slots, students, settings, onRemove }: Props) =>
 
       <div className="flex flex-wrap items-center gap-4 text-xs text-muted" aria-hidden="true">
         <span className="flex items-center gap-1.5">
-          <span className="size-3 rounded-sm border border-line bg-surface" /> Sem alunos
+          <span className="size-3 rounded-sm border border-line bg-surface" /> Sem {business.client.many}
         </span>
         <span className="flex items-center gap-1.5">
           <span className="size-3 rounded-sm bg-primary-soft" /> Com vaga
@@ -114,7 +116,7 @@ export const SlotWeekTable = ({ slots, students, settings, onRemove }: Props) =>
               {endTime(selected.startTime, settings.sessionMinutes)}
             </p>
             <p className="text-sm text-muted">
-              {selectedStudents.length}/{settings.capacity} alunos fixos
+              {selectedStudents.length}/{settings.capacity} {business.client.many} fixos
               {selectedStudents.length > 0
                 ? `: ${selectedStudents.map((s) => s.name).join(", ")}`
                 : ""}
@@ -132,7 +134,7 @@ export const SlotWeekTable = ({ slots, students, settings, onRemove }: Props) =>
         </section>
       ) : (
         <p className="text-sm text-muted">
-          Clique num horário para ver os alunos fixos ou removê-lo.
+          Clique num horário para ver os {business.client.many} fixos ou removê-lo.
         </p>
       )}
     </div>

@@ -1,7 +1,7 @@
 <!-- Arquivo gerado pelo readme-kit. Não edite aqui: altere docs/readme/ e rode "readme-kit build". -->
 <div align="center">
 
-<img src="docs/assets/banner.svg" alt="Encaixe: A agenda de estúdios e professores com turmas fixas. github.com/diegonatalo/encaixe. Stack: Next.js 16, React 19, TypeScript 6, Tailwind CSS 4" width="100%" />
+<img src="docs/assets/banner.svg" alt="Encaixe: A agenda de quem atende com hora marcada: estúdios, personal, professores, psicólogos e barbearias. github.com/diegonatalo/encaixe. Stack: Next.js 16, React 19, TypeScript 6, Tailwind CSS 4" width="100%" />
 
 <br />
 
@@ -27,8 +27,8 @@
 
 </div>
 
-**A agenda de estúdios e professores com turmas fixas.**<br />
-Encaixe é um sistema de agendamento para estúdios e professores com turmas fixas, como pilates, yoga, funcional e aulas particulares. Quem dá as aulas define a duração da sessão e quantos alunos cabem em cada horário, e controla a agenda, a presença, as reposições, a mensalidade e a ficha de saúde de cada aluno. Os alunos não acessam o sistema. Cada estúdio tem a própria conta, e os dados ficam num banco Postgres.
+**A agenda de quem atende com hora marcada: estúdios, personal, professores, psicólogos e barbearias.**<br />
+Encaixe é um sistema de agendamento para quem atende com hora marcada e tem clientes que voltam toda semana: estúdio de pilates, personal com academia particular, professor particular (idiomas, música, reforço), psicólogo e barbearia. Cada conta escolhe o seu ramo, e o app passa a falar em alunos, pacientes ou clientes, com os campos de ficha que fazem sentido para aquele negócio. Quem atende define a duração e as vagas de cada horário e controla a agenda, a presença, as reposições, os atendimentos avulsos e a mensalidade. Os clientes não acessam o sistema. Cada conta tem os próprios dados, num banco Postgres.
 
 <br />
 
@@ -76,8 +76,8 @@ Encaixe é um sistema de agendamento para estúdios e professores com turmas fix
 
 <div align="center">
 
-<img src="docs/assets/f-01.svg" alt="Agenda por horário: Turmas com vagas por horário e duração da sessão definidas pelo estúdio." width="49%" />
-<img src="docs/assets/f-02.svg" alt="Ficha do aluno: Saúde, lesões, pontos de atenção e evolução em um só lugar." width="49%" />
+<img src="docs/assets/f-01.svg" alt="Agenda por horário: Grade semanal com vagas e duração definidas por você, e encaixe de reposição ou avulso." width="49%" />
+<img src="docs/assets/f-02.svg" alt="Ficha por ramo: Aluno, paciente ou cliente: nomes e campos da ficha mudam conforme o seu negócio." width="49%" />
 <br />
 <img src="docs/assets/f-03.svg" alt="Reposição: Cada desmarcação vira crédito, sem expiração." width="49%" />
 <img src="docs/assets/f-04.svg" alt="Mensalidade: Indicador de pago ou pendente por mês." width="49%" />

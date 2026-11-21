@@ -36,8 +36,11 @@ const isIntIn = (value: unknown, min: number, max: number): boolean =>
 const isOneOf = (value: unknown, options: readonly string[]): boolean =>
   typeof value === "string" && options.includes(value);
 
+const BUSINESS_TYPES = ["pilates", "personal", "tutor", "psychology", "barber"];
+
 export const isSettings = (v: unknown): boolean =>
   isRec(v) &&
+  (v.businessType === null || isOneOf(v.businessType, BUSINESS_TYPES)) &&
   isIntIn(v.sessionMinutes, 1, 600) &&
   isIntIn(v.breakMinutes, 0, 600) &&
   isIntIn(v.capacity, 1, 1000);

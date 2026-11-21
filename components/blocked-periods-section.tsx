@@ -8,12 +8,13 @@ import {
   CARD,
   INPUT_CLASS,
 } from "@/components/form-styles";
-import { useStudio } from "@/hooks/use-studio";
+import { useBusiness, useStudio } from "@/hooks/use-studio";
 import { formatDateBr } from "@/lib/dates";
 
 export const BlockedPeriodsSection = () => {
   const { ready, blockedPeriods, addBlockedPeriod, removeBlockedPeriod } =
     useStudio();
+  const business = useBusiness();
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [reason, setReason] = useState("");
@@ -37,7 +38,7 @@ export const BlockedPeriodsSection = () => {
           Datas bloqueadas
         </h2>
         <p className="text-muted">
-          Feriados e férias. As aulas desses dias não acontecem e não geram
+          Feriados e férias. Os {business.session.many} desses dias não acontecem e não geram
           crédito de reposição.
         </p>
       </div>

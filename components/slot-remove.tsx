@@ -7,6 +7,8 @@ import {
 } from "@/components/form-styles";
 import { WEEKDAY_LABELS } from "@/lib/slots";
 import type { ClassSlot } from "@/types/pilates";
+import { useBusiness } from "@/hooks/use-studio";
+import { countOf } from "@/lib/business";
 
 type Props = {
   slot: ClassSlot;
@@ -17,6 +19,7 @@ type Props = {
 
 /** Botão "Remover" que pede confirmação antes. */
 export const SlotRemove = ({ slot, enrolled, onRemove }: Props) => {
+  const business = useBusiness();
   const [confirming, setConfirming] = useState(false);
 
   if (!confirming) {
@@ -38,7 +41,7 @@ export const SlotRemove = ({ slot, enrolled, onRemove }: Props) => {
     <div className="flex flex-col gap-2">
       <p className="text-sm">
         {enrolled > 0
-          ? `Remover o horário e desvincular ${enrolled} ${enrolled === 1 ? "aluno" : "alunos"}?`
+          ? `Remover o horário e desvincular ${countOf(enrolled, business.client)}?`
           : "Remover este horário?"}
       </p>
       <div className="flex flex-wrap gap-2">
