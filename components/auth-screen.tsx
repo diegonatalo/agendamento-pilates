@@ -11,14 +11,14 @@ import { RETURN_PARAM, paths } from "@/lib/paths";
 const COPY = {
   "sign-in": {
     title: "Entrar",
-    lead: "A agenda, os alunos e as mensalidades do estúdio em qualquer aparelho.",
+    lead: "A sua agenda, as fichas e as mensalidades em qualquer aparelho.",
     switchText: "Ainda não tem conta?",
     switchLabel: "Criar conta",
     switchHref: paths.signUp,
   },
   "sign-up": {
     title: "Criar conta",
-    lead: "Grátis. Os dados do estúdio ficam salvos na sua conta.",
+    lead: "Grátis. Os seus dados ficam salvos na sua conta.",
     switchText: "Já tem conta?",
     switchLabel: "Entrar",
     switchHref: paths.signIn,

@@ -28,7 +28,7 @@ export const validateStudent = (
   student: Student,
   plans: Plan[],
 ): string | null => {
-  if (!student.name.trim()) return "Informe o nome do aluno.";
+  if (!student.name.trim()) return "Informe o nome.";
   const fee = student.monthlyFee;
   if (fee) {
     if (fee.planId !== null && !findPlan(fee.planId, plans))

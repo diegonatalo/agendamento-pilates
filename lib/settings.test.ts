@@ -29,8 +29,8 @@ describe("validateSettings", () => {
 
   it("valida o intervalo e a capacidade", () => {
     expect(validateSettings(settings({ breakMinutes: -5 }), [])).toMatch(/intervalo/);
-    expect(validateSettings(settings({ capacity: 0 }), [])).toMatch(/capacidade/);
-    expect(validateSettings(settings({ capacity: 2.5 }), [])).toMatch(/capacidade/);
+    expect(validateSettings(settings({ capacity: 0 }), [])).toMatch(/vagas por horário/);
+    expect(validateSettings(settings({ capacity: 2.5 }), [])).toMatch(/vagas por horário/);
   });
 
   it("recusa duração que sobrepõe horários já cadastrados", () => {

@@ -3,6 +3,7 @@
 import { useRef, type KeyboardEvent } from "react";
 import { CARD, FOCUS_RING } from "@/components/form-styles";
 import { SlotRemove } from "@/components/slot-remove";
+import { businessOf } from "@/lib/business";
 import { cn } from "@/lib/cn";
 import {
   endTime,
@@ -37,6 +38,7 @@ export const SlotDayTabs = ({
   onDayChange,
   onRemove,
 }: Props) => {
+  const business = businessOf(settings);
   const tabs = useRef<(HTMLButtonElement | null)[]>([]);
   const daySlots = slots.filter((slot) => slot.weekday === day);
 
@@ -139,7 +141,7 @@ export const SlotDayTabs = ({
                         {slot.startTime} às {endTime(slot.startTime, settings.sessionMinutes)}
                       </p>
                       <p className="truncate text-sm text-muted">
-                        {enrolled}/{settings.capacity} alunos fixos
+                        {enrolled}/{settings.capacity} {business.client.many} fixos
                         {enrolled > 0
                           ? ` · ${enrolledStudents.map((s) => s.name).join(", ")}`
                           : ""}

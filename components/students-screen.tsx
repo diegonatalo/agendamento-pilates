@@ -30,6 +30,7 @@ export const StudentsScreen = () => {
     markPayment,
     plans,
     settings,
+    business,
   } = useStudio();
   const today = useToday();
   const [creating, setCreating] = useState<Student | null>(null);
@@ -93,21 +94,23 @@ export const StudentsScreen = () => {
     <main className="flex flex-col gap-6">
       <header className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="text-3xl font-semibold">Alunos</h1>
+          <h1 className="text-3xl font-semibold">{business.client.Many}</h1>
           <p className="text-muted">Fichas, horários fixos e mensalidades.</p>
         </div>
         <button type="button" className={BUTTON_PRIMARY} onClick={startCreating}>
-          Novo aluno
+          Novo {business.client.one}
         </button>
       </header>
-      <p className="rounded-xl bg-warn-soft px-3.5 py-2.5 text-sm text-warn-soft-fg">
-        As fichas têm dados de saúde dos alunos e ficam só neste navegador. Não use em computador
-        compartilhado, e peça o{" "}
-        <Link href="/termos/consentimento" className="font-medium underline underline-offset-2">
-          termo de consentimento
-        </Link>{" "}
-        de cada aluno.
-      </p>
+      {business.sensitive ? (
+        <p className="rounded-xl bg-warn-soft px-3.5 py-2.5 text-sm text-warn-soft-fg">
+          As fichas têm dados de saúde, que a LGPD trata como sensíveis. Use uma senha forte, saia da conta em
+          aparelhos de outras pessoas e peça o{" "}
+          <Link href="/termos/consentimento" className="font-medium underline underline-offset-2">
+            termo de consentimento
+          </Link>{" "}
+          de cada {business.client.one}.
+        </p>
+      ) : null}
 
       {month && today ? (
         <PaymentToolbar
@@ -131,15 +134,15 @@ export const StudentsScreen = () => {
       ) : null}
 
       {!ready ? null : students.length === 0 ? (
-        <EmptyState title="Nenhum aluno cadastrado ainda.">
-          Toque em “Novo aluno” para criar a primeira ficha.
+        <EmptyState title={`Nenhum ${business.client.one} cadastrado ainda.`}>
+          Toque em “Novo {business.client.one}” para criar a primeira ficha.
         </EmptyState>
       ) : visible.length === 0 ? (
         <EmptyState
           title={
             onlyUnpaid && !query.trim()
               ? "Nenhuma mensalidade pendente neste mês."
-              : "Nenhum aluno encontrado."
+              : `Nenhum ${business.client.one} encontrado.`
           }
         />
       ) : (

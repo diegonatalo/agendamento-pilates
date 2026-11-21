@@ -3,7 +3,7 @@ import { TermsPage } from "@/components/legal-pages";
 
 export const metadata: Metadata = {
   title: "Termos de uso",
-  description: "As regras para usar o Encaixe. Os dados dos alunos são responsabilidade do estúdio.",
+  description: "As regras para usar o Encaixe. Os dados dos clientes são responsabilidade de quem usa o app.",
   alternates: { canonical: "/termos" },
 };
 

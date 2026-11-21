@@ -11,6 +11,7 @@ import { cn } from "@/lib/cn";
 import type { Attendee, Session } from "@/lib/schedule";
 import { endTime } from "@/lib/slots";
 import type { Booking, BookingStatus, Student } from "@/types/pilates";
+import { useBusiness } from "@/hooks/use-studio";
 
 type Props = {
   session: Session;
@@ -26,7 +27,6 @@ type Props = {
 
 type Action = "present" | "absent" | "cancelled";
 
-const KIND_LABEL = { regular: null, makeup: "Reposição", trial: "Experimental" };
 
 const ACTIONS: Record<Action, { label: string; tone: string }> = {
   present: { label: "Presente", tone: "bg-primary text-primary-fg shadow-xs" },
@@ -68,6 +68,7 @@ export const SessionCard = ({
   onBookMakeup,
   onBookTrial,
 }: Props) => {
+  const business = useBusiness();
   const { slot, blockedBy, attendees, occupied, capacity, vacancies } = session;
   const titleId = `session-${slot.id}`;
 
@@ -95,20 +96,20 @@ export const SessionCard = ({
 
       {blockedBy ? (
         <p className="text-sm font-medium text-muted">
-          Sem aula: {blockedBy.reason}
+          Sem {business.session.one}: {blockedBy.reason}
         </p>
       ) : (
         <>
           {attendees.length === 0 ? (
-            <p className="text-sm text-muted">Nenhum aluno neste horário.</p>
+            <p className="text-sm text-muted">Nenhum {business.client.one} neste horário.</p>
           ) : (
             <ul className="flex flex-col gap-4">
               {attendees.map((attendee) => {
                 const name =
                   attendee.student?.name ??
                   attendee.guestName ??
-                  "Aluno excluído";
-                const kindLabel = KIND_LABEL[attendee.kind];
+                  `${business.client.One} excluído`;
+                const kindLabel = { regular: null, makeup: "Reposição", trial: business.oneOff.badge }[attendee.kind];
                 const attention = attendee.student?.attention.trim();
                 const canMark = attendee.kind !== "regular" || attendee.student;
                 return (
@@ -178,7 +179,7 @@ export const SessionCard = ({
                         >
                           {attendee.kind === "makeup"
                             ? "Cancelar reposição"
-                            : "Remover aula experimental"}{" "}
+                            : `Remover ${business.oneOff.label.toLowerCase()}`}{" "}
                           <span className="sr-only">— {name}</span>
                         </button>
                       </div>

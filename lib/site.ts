@@ -8,7 +8,7 @@ export const SITE_URL = (
 
 export const SITE_NAME = "Encaixe";
 export const SITE_DESCRIPTION =
-  "Agenda, alunos e mensalidades para estúdios e professores com turmas fixas.";
+  "Agenda, fichas e mensalidades para quem atende com hora marcada: estúdios, personal, professores, psicólogos e barbearias.";
 
 /** Rotas públicas, usadas pelo sitemap. */
 /** Rotas públicas, usadas pelo sitemap. As telas do app têm dados dos alunos e ficam fora. */

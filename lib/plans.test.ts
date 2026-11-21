@@ -49,9 +49,9 @@ describe("validatePlan", () => {
   });
 
   it("valida aulas por semana e valor", () => {
-    expect(validatePlan({ ...draft, weeklyClasses: 0 }, plans)).toMatch(/aulas/);
-    expect(validatePlan({ ...draft, weeklyClasses: 8 }, plans)).toMatch(/aulas/);
-    expect(validatePlan({ ...draft, weeklyClasses: 1.5 }, plans)).toMatch(/aulas/);
+    expect(validatePlan({ ...draft, weeklyClasses: 0 }, plans)).toMatch(/frequência/);
+    expect(validatePlan({ ...draft, weeklyClasses: 8 }, plans)).toMatch(/frequência/);
+    expect(validatePlan({ ...draft, weeklyClasses: 1.5 }, plans)).toMatch(/frequência/);
     expect(validatePlan({ ...draft, amount: 0 }, plans)).toMatch(/valor/);
     expect(validatePlan({ ...draft, amount: Number.NaN }, plans)).toMatch(/valor/);
   });

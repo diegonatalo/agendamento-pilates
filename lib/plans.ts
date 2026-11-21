@@ -21,7 +21,7 @@ export const validatePlan = (
     draft.weeklyClasses < 1 ||
     draft.weeklyClasses > 7
   )
-    return "As aulas por semana devem ficar entre 1 e 7.";
+    return "A frequência deve ficar entre 1 e 7 vezes por semana.";
   if (!Number.isFinite(draft.amount) || draft.amount <= 0)
     return "Informe um valor de mensalidade maior que zero.";
   return null;

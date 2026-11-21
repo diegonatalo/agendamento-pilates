@@ -14,6 +14,7 @@ import {
   type Session,
 } from "@/lib/schedule";
 import type { Booking, Student } from "@/types/pilates";
+import { useBusiness } from "@/hooks/use-studio";
 
 type Props = {
   session: Session;
@@ -33,6 +34,7 @@ export const AddToSession = ({
   onBookMakeup,
   onBookTrial,
 }: Props) => {
+  const business = useBusiness();
   const [open, setOpen] = useState(false);
   const [mode, setMode] = useState<Mode>("makeup");
   const [chosenId, setChosenId] = useState<string | null>(null);
@@ -89,7 +91,7 @@ export const AddToSession = ({
           >
             <path d="M12 5v14M5 12h14" />
           </svg>
-          Encaixar aluno{" "}
+          Encaixar {business.client.one}{" "}
           <span className="sr-only">às {session.slot.startTime}</span>
         </button>
       </div>
@@ -102,11 +104,11 @@ export const AddToSession = ({
       className="flex flex-col gap-4 rounded-xl bg-surface-2 p-4"
     >
       <fieldset className="flex flex-wrap gap-x-5 gap-y-1">
-        <legend className="mb-1 text-sm font-semibold">Tipo de aula</legend>
+        <legend className="mb-1 text-sm font-semibold">Quem vem</legend>
         {(
           [
             ["makeup", "Reposição"],
-            ["trial", "Aula experimental"],
+            ["trial", business.oneOff.label],
           ] as const
         ).map(([value, label]) => (
           <label key={value} className="flex min-h-11 items-center gap-2 text-sm">
@@ -128,10 +130,10 @@ export const AddToSession = ({
       {mode === "makeup" ? (
         eligible.length === 0 ? (
           <p className="text-sm text-muted">
-            Nenhum aluno com crédito de reposição.
+            Nenhum {business.client.one} com crédito de reposição.
           </p>
         ) : (
-          <Field label="Aluno">
+          <Field label={business.client.One}>
             <select
               className={INPUT_CLASS}
               value={studentId}
@@ -147,7 +149,7 @@ export const AddToSession = ({
           </Field>
         )
       ) : (
-        <Field label="Nome de quem vai fazer a aula">
+        <Field label={business.oneOff.nameLabel}>
           <input
             className={INPUT_CLASS}
             value={guestName}

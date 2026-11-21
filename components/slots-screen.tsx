@@ -17,6 +17,7 @@ import { SlotWeekTable } from "@/components/slot-week-table";
 import { StudioSettingsSection } from "@/components/studio-settings-section";
 import { DESKTOP_QUERY, useMediaQuery } from "@/hooks/use-media-query";
 import { useStudio } from "@/hooks/use-studio";
+import { businessOf } from "@/lib/business";
 import { formatMinutes } from "@/lib/settings";
 import { WEEKDAY_LABELS, WEEKDAY_ORDER, weekdaysOf } from "@/lib/slots";
 import type { Weekday } from "@/types/pilates";
@@ -32,6 +33,7 @@ export const SlotsScreen = () => {
     addSlots,
     removeSlot,
   } = useStudio();
+  const business = businessOf(settings);
   const isDesktop = useMediaQuery(DESKTOP_QUERY);
   const [weekday, setWeekday] = useState<Weekday>(1);
   const [startTime, setStartTime] = useState("08:00");
@@ -62,9 +64,9 @@ export const SlotsScreen = () => {
           <div>
             <h1 className="text-3xl font-semibold">Horários</h1>
             <p className="text-muted">
-              Grade semanal fixa. Cada sessão dura{" "}
-              {formatMinutes(settings.sessionMinutes)} e comporta até{" "}
-              {settings.capacity} alunos.
+              Grade semanal fixa. Cada {business.session.one} dura{" "}
+              {formatMinutes(settings.sessionMinutes)}, com até{" "}
+              {settings.capacity} {settings.capacity === 1 ? business.client.one : business.client.many} por horário.
             </p>
           </div>
           {ready && hasSlots ? (
@@ -89,7 +91,7 @@ export const SlotsScreen = () => {
               onCreate={addSlots}
             />
 
-            {/* Exceções fora do expediente, como uma aula às 06:30 só na terça. */}
+            {/* Exceções fora do expediente, como um horário às 06:30 só na terça. */}
             <div>
               <button
                 type="button"
@@ -104,7 +106,7 @@ export const SlotsScreen = () => {
                 {singleOpen ? "Fechar horário avulso" : "Adicionar horário avulso"}
               </button>
               <p className="mt-1 text-xs text-muted">
-                Para exceções fora do expediente, como uma aula às 06:30 só na
+                Para exceções fora do expediente, como um horário às 06:30 só na
                 terça.
               </p>
             </div>

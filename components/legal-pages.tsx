@@ -5,7 +5,7 @@ import { PrintButton } from "@/components/print-button";
 import { PRIVACY_EMAIL, SITE_NAME, SOURCE_URL } from "@/lib/site";
 
 /** Data da última mudança nos textos (`AAAA-MM-DD`). */
-const UPDATED_AT = "2026-11-23";
+const UPDATED_AT = "2026-11-24";
 
 const linkClass = "font-semibold text-primary underline underline-offset-2";
 
@@ -19,7 +19,7 @@ export const PrivacyPage = () => (
   <PublicShell>
     <LegalPage
       title="Privacidade"
-      summary={`O ${SITE_NAME} guarda os dados do estúdio e dos alunos num banco de dados ligado à conta do estúdio. Esta página diz o que é guardado, onde e como apagar.`}
+      summary={`O ${SITE_NAME} guarda os dados de quem usa o app e dos clientes dele num banco de dados ligado à conta. Esta página diz o que é guardado, onde e como apagar.`}
       updatedAt={UPDATED_AT}
       sections={[
         {
@@ -28,17 +28,18 @@ export const PrivacyPage = () => (
           content: (
             <>
               <p>
-                A grade de horários, os bloqueios (feriados e férias), os planos, as configurações do estúdio, a
-                agenda e os pagamentos. E, de cada aluno: nome, telefone, data de nascimento, data de início, horários
-                fixos, mensalidade, objetivos, pontos de atenção, evolução e a <strong>ficha de saúde</strong>{" "}
+                A grade de horários, os bloqueios (feriados e férias), os planos, o ramo do negócio e as
+                configurações, a agenda e os pagamentos. E, de cada cliente (aluno, paciente ou cliente, conforme o
+                ramo): nome, telefone, data de nascimento, data de início, horários fixos, mensalidade, objetivos,
+                pontos de atenção, anotações e, nos ramos que usam, a <strong>ficha de saúde</strong>{" "}
                 (lesões e condições, cirurgias, restrições de movimento, liberação médica e contato de emergência).
               </p>
               <p>
-                Da conta do estúdio: nome, e-mail e a senha, guardada só como hash (não dá para ler a senha de volta).
+                Da conta: nome, e-mail e a senha, guardada só como hash (não dá para ler a senha de volta).
               </p>
               <p>
                 Tudo fica num banco de dados Postgres no <strong>Neon</strong>, ligado à conta, e só abre com o e-mail e
-                a senha do estúdio. Cada conta vê apenas os próprios dados. No navegador fica só a preferência de tema
+                a senha da conta. Cada conta vê apenas os próprios dados. No navegador fica só a preferência de tema
                 claro ou escuro.
               </p>
             </>
@@ -51,8 +52,9 @@ export const PrivacyPage = () => (
             <>
               <p>
                 Pela LGPD (art. 5º, II), dados de saúde são <strong>dados pessoais sensíveis</strong>. Quem cadastra
-                os alunos é o estúdio, que é o responsável por esses dados (controlador) e precisa de uma base legal
-                para tratá-los, como o consentimento específico do aluno.
+                os clientes é o profissional ou o negócio dono da conta, que é o responsável por esses dados
+                (controlador) e precisa de uma base legal para tratá-los, como o consentimento específico do cliente.
+                Psicólogos seguem também as regras do seu conselho sobre registro e sigilo.
               </p>
               <p>
                 Para ajudar, deixamos um{" "}
@@ -63,7 +65,7 @@ export const PrivacyPage = () => (
               </p>
               <p>
                 Recomendações: use uma senha forte e só sua; saia da conta em aparelhos de outras pessoas; cadastre só
-                o necessário para dar as aulas com segurança; e apague a ficha de quem deixou de ser aluno.
+                o necessário para atender com segurança; e apague a ficha de quem deixou de ser cliente.
               </p>
             </>
           ),
@@ -79,10 +81,10 @@ export const PrivacyPage = () => (
                 de login. Os dois só guardam e processam os dados para o app funcionar.
               </p>
               <p>
-                O botão de WhatsApp na ficha só abre o WhatsApp com o número do aluno; nada é enviado sem você mandar.
+                O botão de WhatsApp na ficha só abre o WhatsApp com o número do cliente; nada é enviado sem você mandar.
               </p>
               <p>
-                O único cookie é o de <strong>sessão</strong>, necessário para manter o estúdio logado. Não usamos
+                O único cookie é o de <strong>sessão</strong>, necessário para manter a conta logada. Não usamos
                 estatísticas de visita nem propaganda.
               </p>
             </>
@@ -93,8 +95,8 @@ export const PrivacyPage = () => (
           title: "Como apagar",
           content: (
             <p>
-              Apague a ficha do aluno na própria tela de alunos. Para apagar tudo, use <strong>Excluir conta</strong>{" "}
-              na aba Conta: a conta e todos os dados do estúdio são apagados do banco na hora. Depois disso, não há como
+              Apague a ficha do cliente na própria tela de fichas. Para apagar tudo, use <strong>Excluir conta</strong>{" "}
+              na aba Conta: a conta e todos os dados dela são apagados do banco na hora. Depois disso, não há como
               recuperar.
             </p>
           ),
@@ -104,7 +106,7 @@ export const PrivacyPage = () => (
           title: "Contato",
           content: (
             <p>
-              Pedidos de alunos sobre os próprios dados devem ir ao estúdio, que tem acesso às fichas. Dúvidas sobre
+              Pedidos de clientes sobre os próprios dados devem ir ao profissional ou negócio que os atende, que tem acesso às fichas. Dúvidas sobre
               esta página: <Contact />.
             </p>
           ),
@@ -118,7 +120,7 @@ export const TermsPage = () => (
   <PublicShell>
     <LegalPage
       title="Termos de uso"
-      summary={`As regras para usar o ${SITE_NAME}. Ao usar o app, o estúdio concorda com elas.`}
+      summary={`As regras para usar o ${SITE_NAME}. Ao usar o app, você concorda com elas.`}
       updatedAt={UPDATED_AT}
       sections={[
         {
@@ -126,7 +128,7 @@ export const TermsPage = () => (
           title: `O que é o ${SITE_NAME}`,
           content: (
             <p>
-              Um app gratuito de agenda e cadastro de alunos para estúdios e professores com turmas fixas, mantido por Diego Natalo como
+              Um app gratuito de agenda e fichas para quem atende com hora marcada (estúdios, personal, professores particulares, psicólogos e barbearias), mantido por Diego Natalo como
               projeto pessoal. O código é aberto, no{" "}
               <a href={SOURCE_URL} target="_blank" rel="noopener noreferrer" className={linkClass}>
                 GitHub
@@ -137,15 +139,15 @@ export const TermsPage = () => (
         },
         {
           id: "responsabilidade",
-          title: "Os dados dos alunos são responsabilidade do estúdio",
+          title: "Os dados dos clientes são responsabilidade de quem usa o app",
           content: (
             <p>
-              O estúdio é quem cadastra e usa os dados dos alunos, inclusive os de saúde. Cabe ao estúdio informar os
-              alunos, obter o consentimento quando a lei exigir (veja o{" "}
+              Quem usa o app é quem cadastra e usa os dados dos clientes, inclusive os de saúde. Cabe a essa pessoa
+              ou negócio informar os clientes, obter o consentimento quando a lei exigir (veja o{" "}
               <Link href="/termos/consentimento" className={linkClass}>
                 modelo de termo
               </Link>
-              ), manter a senha da conta em segredo e atender os pedidos dos alunos sobre os próprios dados.
+              ), manter a senha da conta em segredo e atender os pedidos dos clientes sobre os próprios dados.
             </p>
           ),
         },
@@ -154,7 +156,7 @@ export const TermsPage = () => (
           title: "Não é prontuário nem orientação de saúde",
           content: (
             <p>
-              A ficha de saúde é um registro de apoio para as aulas. Ela não substitui avaliação médica nem
+              A ficha é um registro de apoio para os atendimentos. Ela não substitui avaliação médica nem
               fisioterapêutica, nem é prontuário.
             </p>
           ),
@@ -164,7 +166,7 @@ export const TermsPage = () => (
           title: "Exclusão da conta",
           content: (
             <p>
-              Os dados ficam na conta do estúdio. Excluir a conta apaga todos eles para sempre, sem como recuperar.
+              Os dados ficam na sua conta. Excluir a conta apaga todos eles para sempre, sem como recuperar.
               Detalhes em{" "}
               <Link href="/privacidade" className={linkClass}>
                 Privacidade
@@ -204,14 +206,15 @@ const Blank = ({ label }: { label: string }) => (
   </p>
 );
 
-/** Modelo de termo de consentimento do aluno, para o estúdio imprimir e colher a assinatura. */
+/** Modelo de termo de consentimento do cliente, para o profissional imprimir e colher a assinatura. */
 export const ConsentPage = () => (
   <PublicShell>
     <main id="conteudo" className="mx-auto w-full max-w-3xl flex-1 px-6 py-16 print:py-0">
       <div className="mb-8 flex flex-col gap-3 rounded-xl bg-warn-soft p-4 text-sm text-warn-soft-fg print:hidden">
         <p>
-          <strong>Modelo para o estúdio imprimir.</strong> Ele é um ponto de partida e não substitui orientação
-          jurídica: revise com um advogado antes de usar. Preencha o nome do estúdio e o prazo de guarda.
+          <strong>Modelo para imprimir.</strong> Ele é um ponto de partida e não substitui orientação jurídica:
+          revise com um advogado antes de usar e ajuste a lista de dados ao seu ramo. Preencha o seu nome (ou o do
+          negócio) e o prazo de guarda.
         </p>
         <div>
           <PrintButton />
@@ -224,31 +227,31 @@ export const ConsentPage = () => (
         <Blank label="Eu," />
         <Blank label="CPF" />
         <p>
-          autorizo o estúdio ______________________________________ (nome e CNPJ/CPF) a registrar e usar os dados
-          abaixo <strong>somente</strong> para planejar e acompanhar as minhas aulas com segurança:
+          autorizo ______________________________________ (nome e CNPJ/CPF do profissional ou do negócio) a registrar e usar os dados
+          abaixo <strong>somente</strong> para planejar e acompanhar os meus atendimentos com segurança:
         </p>
         <ul className="list-disc pl-6">
           <li>nome, telefone e data de nascimento;</li>
           <li>lesões, condições de saúde, cirurgias e restrições de movimento que eu informar;</li>
           <li>se tenho liberação médica para a prática;</li>
           <li>nome e telefone de um contato de emergência;</li>
-          <li>objetivos, pontos de atenção e a evolução nas aulas.</li>
+          <li>objetivos, pontos de atenção e a evolução ao longo dos atendimentos.</li>
         </ul>
         <p>Fui informado(a) de que:</p>
         <ol className="list-decimal pl-6">
           <li>
-            os dados ficam no sistema {SITE_NAME}, na conta do estúdio, protegida por senha, e não são compartilhados
+            os dados ficam no sistema {SITE_NAME}, na conta do profissional, protegida por senha, e não são compartilhados
             com terceiros além dos serviços que hospedam o sistema;
           </li>
-          <li>só os instrutores do estúdio têm acesso a eles;</li>
+          <li>só quem me atende tem acesso a eles;</li>
           <li>
             posso pedir a qualquer momento para ver, corrigir ou apagar os meus dados e revogar esta autorização,
-            falando com o estúdio;
+            falando com quem me atende;
           </li>
-          <li>os dados serão apagados quando eu deixar de ser aluno(a), em até ____ meses depois da última aula.</li>
+          <li>os dados serão apagados quando eu deixar de ser atendido(a), em até ____ meses depois do último atendimento.</li>
         </ol>
         <Blank label="Local e data:" />
-        <Blank label="Assinatura do(a) aluno(a):" />
+        <Blank label="Assinatura:" />
         <Blank label="Se menor de idade, assinatura do responsável:" />
       </div>
     </main>

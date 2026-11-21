@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/cn";
+import { useBusiness } from "@/hooks/use-studio";
 
 const ITEMS = [
   { href: "/app", label: "Agenda", icon: "M8 2v3M16 2v3M3 9h18M5 4h14a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Z" },
@@ -14,6 +15,7 @@ const ITEMS = [
 
 /** Barra flutuante embaixo no celular; abas no cabeçalho a partir de `md`. */
 export const MainNav = () => {
+  const business = useBusiness();
   const pathname = usePathname();
 
   return (
@@ -23,6 +25,7 @@ export const MainNav = () => {
     >
       <ul className="flex gap-1 md:gap-1">
         {ITEMS.map((item) => {
+          const label = item.href === "/app/alunos" ? business.client.Many : item.label;
           const active =
             item.href === "/app" ? pathname === "/app" : pathname.startsWith(item.href);
           return (
@@ -49,7 +52,7 @@ export const MainNav = () => {
                 >
                   <path d={item.icon} />
                 </svg>
-                {item.label}
+                {label}
               </Link>
             </li>
           );

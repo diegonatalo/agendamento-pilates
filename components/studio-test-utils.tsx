@@ -14,7 +14,8 @@ import type { StudioStore } from "@/lib/studio-store";
 export type StudioKey = keyof StudioState;
 
 const empty = (): StudioState => ({
-  settings: DEFAULT_SETTINGS,
+  // As telas são testadas com o vocabulário de pilates, o ramo original do app.
+  settings: { ...DEFAULT_SETTINGS, businessType: "pilates" },
   plans: [],
   slots: [],
   students: [],

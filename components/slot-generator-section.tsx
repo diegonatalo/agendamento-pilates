@@ -61,7 +61,7 @@ export const SlotGeneratorSection = ({ timing, existing, onCreate }: Props) => {
           Montar grade pelo expediente
         </h2>
         <p className="text-sm text-muted">
-          Informe os dias e o horário de funcionamento; o app cria as sessões.
+          Informe os dias e o horário de funcionamento; o app cria os horários.
           Horários já cadastrados são mantidos.
         </p>
       </div>
@@ -128,7 +128,7 @@ export const SlotGeneratorSection = ({ timing, existing, onCreate }: Props) => {
               setMessage(null);
             }}
           />
-          Pausa sem aulas (almoço)
+          Pausa (almoço)
         </label>
         {hasPause ? (
           <div className="grid grid-cols-2 gap-4 sm:max-w-sm">
@@ -155,11 +155,11 @@ export const SlotGeneratorSection = ({ timing, existing, onCreate }: Props) => {
           {problem ? (
             <p className="text-danger">{problem}</p>
           ) : times.length === 0 ? (
-            <p>Nenhuma sessão cabe nesse expediente.</p>
+            <p>Nenhum horário cabe nesse expediente.</p>
           ) : (
             <>
               <p>
-                <strong>{plural(times.length, "sessão", "sessões")} por dia:</strong>{" "}
+                <strong>{plural(times.length, "horário", "horários")} por dia:</strong>{" "}
                 {times.join(", ")}.
               </p>
               <p className="mt-1 text-muted">

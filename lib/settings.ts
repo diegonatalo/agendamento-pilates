@@ -39,7 +39,7 @@ export const validateSettings = (
     capacity < CAPACITY_RANGE.min ||
     capacity > CAPACITY_RANGE.max
   )
-    return `A capacidade deve ficar entre ${CAPACITY_RANGE.min} e ${CAPACITY_RANGE.max} alunos.`;
+    return `As vagas por horário devem ficar entre ${CAPACITY_RANGE.min} e ${CAPACITY_RANGE.max}.`;
   const overlap = findOverlap(slots, settings);
   if (overlap)
     return `Com essa duração, os horários ${formatSlotShort(overlap[0])} e ${formatSlotShort(overlap[1])} ficariam sobrepostos. Remova um deles antes.`;
