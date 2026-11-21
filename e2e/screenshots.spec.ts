@@ -1,5 +1,4 @@
-import { test } from "@playwright/test";
-import { createSlots, createStudent } from "./fixtures";
+import { createSlots, createStudent, test } from "./fixtures";
 
 // Gera os prints da landing em public/landing/, com alunos fictícios. Fica fora da suíte normal:
 // rode com `SCREENSHOTS=1 pnpm test:e2e e2e/screenshots.spec.ts`.

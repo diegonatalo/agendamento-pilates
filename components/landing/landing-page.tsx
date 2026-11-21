@@ -44,6 +44,9 @@ export const PublicHeader = () => (
       <Logo />
       <div className="ml-auto flex items-center gap-2">
         <ThemeToggle />
+        <Link href="/entrar" className={`${BUTTON_SECONDARY} whitespace-nowrap`}>
+          Entrar
+        </Link>
         {/* No celular o hero já traz o mesmo link logo abaixo. */}
         <Link href="/app" className={`${BUTTON_PRIMARY} whitespace-nowrap max-sm:hidden`}>
           Abrir a agenda
@@ -86,8 +89,8 @@ export const LandingPage = () => (
             </h1>
             <p className="text-lg text-pretty text-muted">{HERO.subtitle}</p>
             <div className="flex flex-wrap gap-3">
-              <Link href="/app" className={`${BUTTON_PRIMARY} rounded-full px-6`}>
-                Abrir a agenda
+              <Link href="/cadastro" className={`${BUTTON_PRIMARY} rounded-full px-6`}>
+                Criar conta grátis
               </Link>
               <a href="#como-funciona" className={`${BUTTON_SECONDARY} rounded-full px-6`}>
                 Ver como funciona
@@ -199,9 +202,9 @@ export const LandingPage = () => (
               Dados de saúde pedem cuidado
             </h2>
             <p className="text-pretty">
-              As fichas ficam só no navegador do estúdio: não há conta, servidor nem cookies de rastreamento. Como são
-              dados de saúde, use um computador só do estúdio, guarde o backup com cuidado e peça o termo de
-              consentimento de cada aluno.
+              As fichas ficam na conta do estúdio, protegidas por senha, e cada conta vê só os próprios alunos. Sem
+              cookies de rastreamento nem propaganda. Como são dados de saúde, use uma senha forte, guarde o backup
+              com cuidado e peça o termo de consentimento de cada aluno.
             </p>
             <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm font-semibold">
               <Link href="/termos/consentimento" className="underline underline-offset-4">

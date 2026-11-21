@@ -1,21 +1,26 @@
-import { expect, test } from "@playwright/test";
+import { expect, test as publicTest, type Page } from "@playwright/test";
+import { test } from "./fixtures";
+
+const collectErrors = (page: Page) => {
+  const errors: string[] = [];
+  page.on("console", (message) => {
+    if (message.type() === "error") errors.push(message.text());
+  });
+  page.on("pageerror", (error) => errors.push(error.message));
+  return errors;
+};
 
 const PAGES = [
   { path: "/app", heading: "Agenda" },
   { path: "/app/alunos", heading: "Alunos" },
   { path: "/app/horarios", heading: "Horários" },
   { path: "/app/planos", heading: "Planos" },
-  { path: "/app/backup", heading: "Backup" },
+  { path: "/app/conta", heading: "Conta" },
 ];
 
 for (const { path, heading } of PAGES) {
   test(`abre ${path} sem erros no console`, async ({ page }) => {
-    const errors: string[] = [];
-    page.on("console", (message) => {
-      if (message.type() === "error") errors.push(message.text());
-    });
-    page.on("pageerror", (error) => errors.push(error.message));
-
+    const errors = collectErrors(page);
     await page.goto(path);
     await expect(page.getByRole("heading", { name: heading, level: 1 })).toBeVisible();
     expect(errors).toEqual([]);
@@ -30,30 +35,27 @@ test("endereço desconhecido mostra a página 404", async ({ page }) => {
   await expect(page.getByRole("heading", { name: "Agenda", level: 1 })).toBeVisible();
 });
 
-const collectErrors = (page: import("@playwright/test").Page) => {
-  const errors: string[] = [];
-  page.on("console", (message) => {
-    if (message.type() === "error") errors.push(message.text());
-  });
-  page.on("pageerror", (error) => errors.push(error.message));
-  return errors;
-};
-
-test("a página inicial apresenta o app e leva à agenda", async ({ page }) => {
+publicTest("a página inicial apresenta o app e leva a criar a conta", async ({ page }) => {
   const errors = collectErrors(page);
   await page.goto("/");
   await expect(page.getByRole("heading", { level: 1 })).toHaveText(/agenda do estúdio/);
-  await page.getByRole("main").getByRole("link", { name: "Abrir a agenda" }).click();
-  await expect(page).toHaveURL("/app");
-  await expect(page.getByRole("heading", { name: "Agenda", level: 1 })).toBeVisible();
+  await page.getByRole("main").getByRole("link", { name: "Criar conta grátis" }).click();
+  await expect(page).toHaveURL("/cadastro");
+  await expect(page.getByRole("heading", { name: "Criar conta", level: 1 })).toBeVisible();
   expect(errors).toEqual([]);
 });
 
-test("os endereços antigos redirecionam para /app", async ({ request }) => {
-  for (const path of ["/alunos", "/planos", "/horarios", "/backup"]) {
+publicTest("os endereços antigos redirecionam para dentro do app", async ({ request }) => {
+  for (const [path, target] of [
+    ["/alunos", "/app/alunos"],
+    ["/planos", "/app/planos"],
+    ["/horarios", "/app/horarios"],
+    ["/backup", "/app/conta"],
+    ["/app/backup", "/app/conta"],
+  ]) {
     const response = await request.get(path, { maxRedirects: 0 });
     expect(response.status(), path).toBe(308);
-    expect(response.headers().location, path).toBe(`/app${path}`);
+    expect(response.headers().location, path).toBe(target);
   }
 });
 
@@ -61,11 +63,23 @@ for (const { path, heading } of [
   { path: "/privacidade", heading: "Privacidade" },
   { path: "/termos", heading: "Termos de uso" },
 ]) {
-  test(`abre ${path} pelo rodapé sem erros no console`, async ({ page }) => {
+  publicTest(`abre ${path} pelo rodapé sem erros no console`, async ({ page }) => {
     const errors = collectErrors(page);
     await page.goto("/");
     await page.getByRole("contentinfo").getByRole("link", { name: heading }).click();
     await expect(page).toHaveURL(path);
+    await expect(page.getByRole("heading", { level: 1, name: heading })).toBeVisible();
+    expect(errors).toEqual([]);
+  });
+}
+
+for (const { path, heading } of [
+  { path: "/entrar", heading: "Entrar" },
+  { path: "/cadastro", heading: "Criar conta" },
+]) {
+  publicTest(`abre ${path} sem erros no console`, async ({ page }) => {
+    const errors = collectErrors(page);
+    await page.goto(path);
     await expect(page.getByRole("heading", { level: 1, name: heading })).toBeVisible();
     expect(errors).toEqual([]);
   });

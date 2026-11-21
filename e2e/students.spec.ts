@@ -1,5 +1,4 @@
-import { expect, test } from "@playwright/test";
-import { createSlots, createStudent } from "./fixtures";
+import { createSlots, createStudent, expect, test } from "./fixtures";
 
 test("cadastra um aluno num horário e mantém depois de recarregar", async ({ page }) => {
   await createSlots(page);
@@ -8,6 +7,7 @@ test("cadastra um aluno num horário e mantém depois de recarregar", async ({ p
   const list = page.getByRole("list").filter({ hasText: "Ana Teste" });
   await expect(list).toBeVisible();
 
+  // Recarregar busca tudo do banco de novo.
   await page.reload();
   await expect(page.getByText("Ana Teste")).toBeVisible();
 

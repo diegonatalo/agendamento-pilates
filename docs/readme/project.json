@@ -18,6 +18,9 @@
     {
       "pkg": "tailwindcss"
     },
+    "Better Auth",
+    "Drizzle ORM",
+    "Neon Postgres",
     {
       "pkg": "eslint"
     },
@@ -29,7 +32,7 @@
     {
       "alt": "Dados",
       "label": "dados",
-      "message": "só no seu navegador",
+      "message": "na conta do estúdio",
       "color": "9fe02e"
     }
   ],
@@ -89,6 +92,10 @@
     {
       "title": "Mensalidade",
       "desc": "Indicador de pago ou pendente por mês."
+    },
+    {
+      "title": "Conta",
+      "desc": "Login com e-mail e senha e os dados no Postgres, iguais no computador e no celular."
     },
     {
       "title": "Backup",
