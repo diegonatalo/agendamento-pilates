@@ -91,3 +91,11 @@ export const FAQ: Faq[] = [
       "Os dados não sincronizam sozinhos. Para trocar de aparelho, baixe o backup num e restaure no outro.",
   },
 ];
+
+export type Photo = { src: string; alt: string };
+
+/** Fotos do Unsplash (licença livre), guardadas em `public/landing/`. */
+export const PHOTOS = {
+  studio: { src: "/landing/estudio.webp", alt: "Estúdio de pilates claro, com aparelhos de madeira e plantas." },
+  student: { src: "/landing/aluna.webp", alt: "Aluna alongando sobre um reformer de pilates." },
+} satisfies Record<string, Photo>;
