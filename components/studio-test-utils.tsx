@@ -15,7 +15,6 @@ export type StudioKey = keyof StudioState;
 
 const empty = (): StudioState => ({
   settings: DEFAULT_SETTINGS,
-  lastBackup: null,
   plans: [],
   slots: [],
   students: [],

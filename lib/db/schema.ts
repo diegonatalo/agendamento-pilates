@@ -124,6 +124,7 @@ export const studioSettings = pgTable("studio_settings", {
   sessionMinutes: integer("session_minutes").notNull(),
   breakMinutes: integer("break_minutes").notNull(),
   capacity: integer("capacity").notNull(),
+  /** Not used since the backup file was removed; dropped in a later migration (two-step rule). */
   lastBackup: date("last_backup"),
 });
 

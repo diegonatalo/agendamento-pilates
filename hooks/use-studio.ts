@@ -1,7 +1,6 @@
 import { createContext, useContext, useSyncExternalStore } from "react";
 import { toDateKey } from "@/lib/dates";
 import { newId } from "@/lib/ids";
-import type { StudioData } from "@/lib/backup";
 import { removePaymentsOfStudent, setPayment } from "@/lib/payments";
 import {
   feeAmount,
@@ -140,11 +139,6 @@ export const useStudio = () => {
       payments: removePaymentsOfStudent(s.payments, studentId),
     }));
 
-  /** Substitui todos os dados pelos do backup. */
-  const restoreData = (data: StudioData) => update((s) => ({ ...s, ...data }));
-
-  const recordBackup = (date: DateKey) => update((s) => ({ ...s, lastBackup: date }));
-
   /** Ao marcar como pago, grava o valor atual da mensalidade do aluno. */
   const markPayment = (studentId: string, month: MonthKey, paid: boolean, today: DateKey) =>
     update((s) => {
@@ -196,10 +190,7 @@ export const useStudio = () => {
     slots,
     students,
     payments: state.payments,
-    lastBackup: state.lastBackup,
     markPayment,
-    restoreData,
-    recordBackup,
     bookings: state.bookings,
     blockedPeriods,
     addSlot,

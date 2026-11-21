@@ -5,7 +5,7 @@ import { PrintButton } from "@/components/print-button";
 import { PRIVACY_EMAIL, SITE_NAME, SOURCE_URL } from "@/lib/site";
 
 /** Data da última mudança nos textos (`AAAA-MM-DD`). */
-const UPDATED_AT = "2026-11-22";
+const UPDATED_AT = "2026-11-23";
 
 const linkClass = "font-semibold text-primary underline underline-offset-2";
 
@@ -89,23 +89,13 @@ export const PrivacyPage = () => (
           ),
         },
         {
-          id: "backup",
-          title: "Backup",
-          content: (
-            <p>
-              O backup leva tudo, inclusive as fichas de saúde, <strong>sem criptografia</strong>. Por isso, o app pede
-              confirmação antes de baixar. Guarde o arquivo em local seguro e não envie por WhatsApp ou e-mail.
-            </p>
-          ),
-        },
-        {
           id: "como-apagar",
           title: "Como apagar",
           content: (
             <p>
               Apague a ficha do aluno na própria tela de alunos. Para apagar tudo, use <strong>Excluir conta</strong>{" "}
               na aba Conta: a conta e todos os dados do estúdio são apagados do banco na hora. Depois disso, não há como
-              recuperar, a não ser por um backup.
+              recuperar.
             </p>
           ),
         },
@@ -171,11 +161,11 @@ export const TermsPage = () => (
         },
         {
           id: "seus-dados",
-          title: "Backup e perda de dados",
+          title: "Exclusão da conta",
           content: (
             <p>
-              Os dados ficam na conta do estúdio. Mesmo assim, guardar um backup de vez em quando é responsabilidade
-              do estúdio, e excluir a conta apaga tudo para sempre. Detalhes em{" "}
+              Os dados ficam na conta do estúdio. Excluir a conta apaga todos eles para sempre, sem como recuperar.
+              Detalhes em{" "}
               <Link href="/privacidade" className={linkClass}>
                 Privacidade
               </Link>

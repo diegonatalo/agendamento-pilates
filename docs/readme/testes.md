@@ -8,7 +8,7 @@ Cobrem a lógica em `lib/` (capacidade das turmas, conflito de horários, geraç
 
 Para reexecutar ao salvar: `pnpm test:watch`.
 
-Os testes de ponta a ponta (Playwright, em `e2e/`) abrem o app no Chromium e percorrem os fluxos inteiros com uma conta nova por teste: criar a conta, entrar e sair, senha errada, e-mail repetido, isolamento entre contas e excluir a conta; montar a grade, cadastrar um aluno e recarregar; baixar o backup e restaurar numa conta nova; e abrir todas as páginas sem erros. Usam o banco do `.env.local` (no CI, um Postgres descartável).
+Os testes de ponta a ponta (Playwright, em `e2e/`) abrem o app no Chromium e percorrem os fluxos inteiros com uma conta nova por teste: criar a conta, entrar e sair, senha errada, e-mail repetido, isolamento entre contas e excluir a conta; montar a grade, cadastrar um aluno e recarregar; e abrir todas as páginas sem erros. Usam o banco do `.env.local` (no CI, um Postgres descartável).
 
 ```bash
 pnpm exec playwright install chromium   # só na primeira vez

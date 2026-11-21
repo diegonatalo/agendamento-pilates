@@ -43,7 +43,6 @@ export async function loadStudio(userId: string): Promise<StudioState> {
   const settings = settingsRows[0];
   return {
     settings: settings ? settingsFromRow(settings) : DEFAULT_SETTINGS,
-    lastBackup: settings?.lastBackup ?? null,
     plans: planRows.map(planFromRow),
     slots: slotRows.map(slotFromRow),
     students: studentRows.map(studentFromRow),
