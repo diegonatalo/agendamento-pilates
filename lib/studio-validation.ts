@@ -3,7 +3,7 @@ import { isValidTime } from "@/lib/slots";
 
 /**
  * Checks for each record of the studio. They read `unknown`, because the
- * backup file and the Server Actions accept anything, and enforce size limits
+ * Server Actions accept anything from the browser, and enforce size limits
  * so a single request cannot fill the database.
  */
 
@@ -13,7 +13,7 @@ export const LIMITS = {
   longText: 4000,
   slotsPerStudent: 50,
   evolutionNotes: 1000,
-  /** Records in one save (a backup restore sends everything at once). */
+  /** Records in one save. */
   recordsPerSave: 20000,
   amount: 1_000_000,
 } as const;
@@ -118,4 +118,3 @@ export const isPayment = (v: unknown): boolean =>
 export const isPaymentKey = (v: unknown): boolean => isRec(v) && isId(v.studentId) && isMonth(v.month);
 
 export const isIdValue = isId;
-export const isDateValue = isDate;

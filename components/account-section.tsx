@@ -76,8 +76,8 @@ export const AccountSection = () => {
             Excluir a conta e todos os dados?
           </p>
           <p className="text-sm">
-            Alunos, fichas de saúde, horários, agenda, planos e pagamentos são apagados para sempre. Se quiser guardar
-            uma cópia, baixe o backup antes. Essa ação não pode ser desfeita.
+            Alunos, fichas de saúde, horários, agenda, planos e pagamentos são apagados para sempre. Essa ação não
+            pode ser desfeita.
           </p>
           <div className="flex flex-wrap gap-2">
             <button type="button" onClick={deleteAccount} disabled={pending} className={BUTTON_DANGER}>

@@ -5,7 +5,6 @@ import { createStudioStore } from "@/lib/studio-store";
 
 const initial: StudioState = {
   settings: DEFAULT_SETTINGS,
-  lastBackup: null,
   plans: [],
   slots: [],
   students: [],

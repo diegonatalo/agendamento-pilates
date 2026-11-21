@@ -6,7 +6,6 @@ import { createEmptyStudent } from "@/lib/students";
 
 const base: StudioState = {
   settings: DEFAULT_SETTINGS,
-  lastBackup: null,
   plans: [{ id: "p1", name: "1x", weeklyClasses: 1, amount: 200 }],
   slots: [
     { id: "s1", weekday: 1, startTime: "08:00" },
@@ -44,16 +43,10 @@ describe("diffStudio", () => {
     expect(changes.remove.payments).toEqual([{ studentId: "a", month: "2026-11" }]);
   });
 
-  it("inclui configurações e data do backup só quando mudam", () => {
-    const changes = diffStudio(base, {
-      ...base,
-      settings: { ...DEFAULT_SETTINGS, capacity: 5 },
-      lastBackup: "2026-11-20",
-    });
+  it("inclui as configurações só quando mudam", () => {
+    const changes = diffStudio(base, { ...base, settings: { ...DEFAULT_SETTINGS, capacity: 5 } });
     expect(changes.settings?.capacity).toBe(5);
-    expect(changes.lastBackup).toBe("2026-11-20");
     expect(diffStudio(base, base).settings).toBeUndefined();
-    expect(diffStudio(base, base).lastBackup).toBeUndefined();
   });
 });
 
@@ -81,8 +74,8 @@ describe("parseChanges", () => {
     expect(parseChanges(huge)).toBeNull();
   });
 
-  it("recusa data de backup que não é data", () => {
-    expect(parseChanges({ ...emptyChanges(), lastBackup: "ontem" })).toBeNull();
-    expect(parseChanges({ ...emptyChanges(), lastBackup: null })).not.toBeNull();
+  it("recusa configurações fora do formato", () => {
+    expect(parseChanges({ ...emptyChanges(), settings: { capacity: "3" } })).toBeNull();
+    expect(parseChanges({ ...emptyChanges(), settings: DEFAULT_SETTINGS })).not.toBeNull();
   });
 });

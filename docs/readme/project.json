@@ -98,10 +98,6 @@
       "desc": "Login com e-mail e senha e os dados no Postgres, iguais no computador e no celular."
     },
     {
-      "title": "Backup",
-      "desc": "Exporta e restaura todos os dados em um arquivo JSON."
-    },
-    {
       "title": "Tema claro e escuro",
       "desc": "Segue o sistema ou a sua escolha, sem piscar ao abrir."
     }

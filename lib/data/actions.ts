@@ -53,14 +53,10 @@ export async function saveChanges(input: unknown) {
   const { upsert, remove } = changes;
 
   await db.transaction(async (tx) => {
-    if (changes.settings || changes.lastBackup !== undefined) {
+    if (changes.settings) {
       await tx
         .update(studioSettings)
-        .set({
-          ...(changes.settings ? settingsToRow(userId, changes.settings) : {}),
-          ...(changes.lastBackup !== undefined ? { lastBackup: changes.lastBackup } : {}),
-          userId,
-        })
+        .set(settingsToRow(userId, changes.settings))
         .where(eq(studioSettings.userId, userId));
     }
 
