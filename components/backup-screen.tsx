@@ -55,7 +55,7 @@ export const BackupScreen = () => {
     );
     const today = toDateKey(now);
     downloadJson(
-      `agenda-pilates-${today}.json`,
+      `encaixe-backup-${today}.json`,
       JSON.stringify(backup, null, 2),
     );
     recordBackup(today);

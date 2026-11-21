@@ -87,7 +87,7 @@ describe("parseBackup", () => {
     for (const text of ["[]", "null", '{"app":"outro","data":{}}', '{"foo":1}']) {
       expect(parseBackup(text)).toEqual({
         ok: false,
-        error: "Este arquivo não é um backup do Agenda Pilates.",
+        error: "Este arquivo não é um backup do Encaixe.",
       });
     }
   });

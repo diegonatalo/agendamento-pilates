@@ -1,7 +1,7 @@
 {
-  "name": "Agendamento Pilates",
+  "name": "Encaixe",
   "repo": "agendamento-pilates",
-  "tagline": "A agenda do estúdio de pilates, feita para a instrutora.",
+  "tagline": "A agenda de estúdios e professores com turmas fixas.",
   "urls": {
     "demo": "https://agendamento-pilates.vercel.app"
   },
@@ -79,7 +79,7 @@
   "features": [
     {
       "title": "Agenda por horário",
-      "desc": "Turmas de até 3 alunos, sessões de 1h, com vagas livres à vista."
+      "desc": "Turmas com vagas por horário e duração da sessão definidas pelo estúdio."
     },
     {
       "title": "Ficha do aluno",
@@ -107,5 +107,5 @@
     }
   ],
   "credits": [],
-  "footer": "Feito com 💚 para quem cuida do movimento dos outros"
+  "footer": "Feito com 💚 para quem cuida do horário dos outros"
 }

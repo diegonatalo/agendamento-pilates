@@ -3,9 +3,9 @@ export const SITE_URL = (
   process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"
 ).replace(/\/+$/, "");
 
-export const SITE_NAME = "Agenda Pilates";
+export const SITE_NAME = "Encaixe";
 export const SITE_DESCRIPTION =
-  "Agendamento e controle de alunos para estúdio de pilates.";
+  "Agenda, alunos e mensalidades para estúdios e professores com turmas fixas.";
 
 /** Rotas públicas, usadas pelo sitemap. */
 /** Rotas públicas, usadas pelo sitemap. As telas do app têm dados dos alunos e ficam fora. */

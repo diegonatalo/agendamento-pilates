@@ -1,7 +1,7 @@
 <!-- Arquivo gerado pelo readme-kit. Não edite aqui: altere docs/readme/ e rode "readme-kit build". -->
 <div align="center">
 
-<img src="docs/assets/banner.svg" alt="Agendamento Pilates: A agenda do estúdio de pilates, feita para a instrutora. github.com/diegonatalo/agendamento-pilates. Stack: Next.js 16, React 19, TypeScript 6, Tailwind CSS 4" width="100%" />
+<img src="docs/assets/banner.svg" alt="Encaixe: A agenda de estúdios e professores com turmas fixas. github.com/diegonatalo/agendamento-pilates. Stack: Next.js 16, React 19, TypeScript 6, Tailwind CSS 4" width="100%" />
 
 <br />
 
@@ -27,8 +27,8 @@
 
 </div>
 
-**A agenda do estúdio de pilates, feita para a instrutora.**<br />
-Sistema de agendamento para um estúdio de pilates, de uso exclusivo da dona e instrutora. As turmas têm até 3 alunos por horário e cada sessão dura 1h. Ela controla a agenda, a presença, as reposições, a mensalidade e a ficha de saúde de cada aluno. Os alunos não acessam o sistema. Cada estúdio tem a própria conta, e os dados ficam num banco Postgres.
+**A agenda de estúdios e professores com turmas fixas.**<br />
+Encaixe é um sistema de agendamento para estúdios e professores com turmas fixas, como pilates, yoga, funcional e aulas particulares. Quem dá as aulas define a duração da sessão e quantos alunos cabem em cada horário, e controla a agenda, a presença, as reposições, a mensalidade e a ficha de saúde de cada aluno. Os alunos não acessam o sistema. Cada estúdio tem a própria conta, e os dados ficam num banco Postgres.
 
 <br />
 
@@ -76,7 +76,7 @@ Sistema de agendamento para um estúdio de pilates, de uso exclusivo da dona e i
 
 <div align="center">
 
-<img src="docs/assets/f-01.svg" alt="Agenda por horário: Turmas de até 3 alunos, sessões de 1h, com vagas livres à vista." width="49%" />
+<img src="docs/assets/f-01.svg" alt="Agenda por horário: Turmas com vagas por horário e duração da sessão definidas pelo estúdio." width="49%" />
 <img src="docs/assets/f-02.svg" alt="Ficha do aluno: Saúde, lesões, pontos de atenção e evolução em um só lugar." width="49%" />
 <br />
 <img src="docs/assets/f-03.svg" alt="Reposição: Cada desmarcação vira crédito, sem expiração." width="49%" />
@@ -214,7 +214,7 @@ Na Vercel, com o banco Postgres do Neon ligado pela integração da Vercel (ela 
 
 ### 💾 Backup
 
-Na aba **Conta**, o backup baixa um arquivo `agenda-pilates-AAAA-MM-DD.json` com horários, alunos, presenças, datas bloqueadas e pagamentos, e restaura a partir dele (substituindo os dados atuais da conta, depois de confirmar). Serve para guardar uma cópia ou levar os dados para outra conta. Arquivos de outro app, de outra versão ou incompletos são recusados sem alterar nada.
+Na aba **Conta**, o backup baixa um arquivo `encaixe-backup-AAAA-MM-DD.json` com horários, alunos, presenças, datas bloqueadas e pagamentos, e restaura a partir dele (substituindo os dados atuais da conta, depois de confirmar). Serve para guardar uma cópia ou levar os dados para outra conta. Arquivos de outro app, de outra versão ou incompletos são recusados sem alterar nada.
 
 O arquivo tem dados de saúde e contato dos alunos, **sem criptografia**: guarde em local seguro.
 
@@ -255,6 +255,6 @@ O arquivo tem dados de saúde e contato dos alunos, **sem criptografia**: guarde
 
 <div align="center">
 
-<img src="docs/assets/footer.svg" alt="© 2026 Diego Natalo. Feito com 💚 para quem cuida do movimento dos outros" width="100%" />
+<img src="docs/assets/footer.svg" alt="© 2026 Diego Natalo. Feito com 💚 para quem cuida do horário dos outros" width="100%" />
 
 </div>

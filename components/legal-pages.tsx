@@ -5,7 +5,7 @@ import { PrintButton } from "@/components/print-button";
 import { PRIVACY_EMAIL, SITE_NAME, SOURCE_URL } from "@/lib/site";
 
 /** Data da última mudança nos textos (`AAAA-MM-DD`). */
-const UPDATED_AT = "2026-11-21";
+const UPDATED_AT = "2026-11-22";
 
 const linkClass = "font-semibold text-primary underline underline-offset-2";
 
@@ -19,7 +19,7 @@ export const PrivacyPage = () => (
   <PublicShell>
     <LegalPage
       title="Privacidade"
-      summary={`A ${SITE_NAME} guarda os dados do estúdio e dos alunos num banco de dados ligado à conta do estúdio. Esta página diz o que é guardado, onde e como apagar.`}
+      summary={`O ${SITE_NAME} guarda os dados do estúdio e dos alunos num banco de dados ligado à conta do estúdio. Esta página diz o que é guardado, onde e como apagar.`}
       updatedAt={UPDATED_AT}
       sections={[
         {
@@ -128,15 +128,15 @@ export const TermsPage = () => (
   <PublicShell>
     <LegalPage
       title="Termos de uso"
-      summary={`As regras para usar a ${SITE_NAME}. Ao usar o app, o estúdio concorda com elas.`}
+      summary={`As regras para usar o ${SITE_NAME}. Ao usar o app, o estúdio concorda com elas.`}
       updatedAt={UPDATED_AT}
       sections={[
         {
           id: "o-que-e",
-          title: "O que é a Agenda Pilates",
+          title: `O que é o ${SITE_NAME}`,
           content: (
             <p>
-              Um app gratuito de agenda e cadastro de alunos para estúdios de pilates, mantido por Diego Natalo como
+              Um app gratuito de agenda e cadastro de alunos para estúdios e professores com turmas fixas, mantido por Diego Natalo como
               projeto pessoal. O código é aberto, no{" "}
               <a href={SOURCE_URL} target="_blank" rel="noopener noreferrer" className={linkClass}>
                 GitHub
@@ -188,7 +188,7 @@ export const TermsPage = () => (
           title: "Disponibilidade",
           content: (
             <p>
-              A Agenda Pilates é oferecida &quot;como está&quot;, sem garantia de que vai funcionar sempre ou sem
+              O {SITE_NAME} é oferecido &quot;como está&quot;, sem garantia de que vai funcionar sempre ou sem
               erros. Ela pode mudar ou sair do ar.
             </p>
           ),
@@ -235,7 +235,7 @@ export const ConsentPage = () => (
         <Blank label="CPF" />
         <p>
           autorizo o estúdio ______________________________________ (nome e CNPJ/CPF) a registrar e usar os dados
-          abaixo <strong>somente</strong> para planejar e acompanhar as minhas aulas de pilates com segurança:
+          abaixo <strong>somente</strong> para planejar e acompanhar as minhas aulas com segurança:
         </p>
         <ul className="list-disc pl-6">
           <li>nome, telefone e data de nascimento;</li>
