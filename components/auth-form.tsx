@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useState, type FormEvent, type ReactNode } from "react";
+import { useId, useState, useSyncExternalStore, type FormEvent, type ReactNode } from "react";
 import { BUTTON_PRIMARY, FOCUS_RING } from "@/components/form-styles";
 import {
   PASSWORD_MIN,
@@ -29,6 +29,8 @@ const EYE = "M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12ZM12 15a3 3 0 1 0 0-
 const EYE_OFF =
   "M3 3l18 18M10.6 5.1A10.7 10.7 0 0 1 12 5c6.4 0 10 7 10 7a17 17 0 0 1-3.2 4.1M6.6 6.6A17 17 0 0 0 2 12s3.6 7 10 7a10 10 0 0 0 5.4-1.6M9.9 9.9a3 3 0 0 0 4.2 4.2";
 
+const noSubscribe = () => () => {};
+
 export const AuthForm = ({ mode, onSubmit }: Props) => {
   const id = useId();
   const [values, setValues] = useState<SignUpInput>({ name: "", email: "", password: "" });
@@ -36,6 +38,7 @@ export const AuthForm = ({ mode, onSubmit }: Props) => {
   const [formError, setFormError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const hydrated = useSyncExternalStore(noSubscribe, () => true, () => false);
   const signUp = mode === "sign-up";
 
   const change = (field: keyof SignUpInput) => (value: string) => {
@@ -68,8 +71,10 @@ export const AuthForm = ({ mode, onSubmit }: Props) => {
     }
   };
 
+  // `post` e o botão desligado até hidratar: antes do JavaScript carregar, o envio
+  // nativo (GET por padrão) poria a senha na URL, no histórico e nos logs.
   return (
-    <form noValidate onSubmit={submit} className="flex flex-col gap-4">
+    <form method="post" noValidate onSubmit={submit} className="flex flex-col gap-4">
       {signUp && (
         <AuthField
           id={`${id}-name`}
@@ -134,7 +139,7 @@ export const AuthForm = ({ mode, onSubmit }: Props) => {
         </p>
       )}
 
-      <button type="submit" disabled={pending} className={cn(BUTTON_PRIMARY, "mt-1 w-full text-base")}>
+      <button type="submit" disabled={!hydrated || pending} className={cn(BUTTON_PRIMARY, "mt-1 w-full text-base")}>
         {pending ? COPY[mode].pending : COPY[mode].submit}
       </button>
     </form>
