@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { AuthForm, type AuthMode } from "@/components/auth-form";
 import { CARD } from "@/components/form-styles";
-import { PublicShell } from "@/components/landing/landing-page";
+import { PublicShell } from "@/components/landing/public-shell";
 import { authClient } from "@/lib/auth-client";
 import { authErrorMessage, safeRedirect, type SignUpInput } from "@/lib/auth-form";
 import { RETURN_PARAM, paths } from "@/lib/paths";

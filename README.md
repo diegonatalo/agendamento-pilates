@@ -225,6 +225,8 @@ Na Vercel, com o banco Postgres do Neon ligado pela integração da Vercel (ela 
 
 ### 📄 Créditos e licença
 
+- Fotos da landing de [Ahmet Kurt](https://unsplash.com/photos/0xn-8kRWOhE), [maxhome fitness](https://unsplash.com/photos/wSUlQl8HPYc), [ThisisEngineering](https://unsplash.com/photos/h6gCRTCxM7o), Vitaly Gariev ([música](https://unsplash.com/photos/S-vWVfbGr28) e [psicologia](https://unsplash.com/photos/RqR2pnTpmHA)) e [Obi](https://unsplash.com/photos/-sRVfY0f2d8), sob a [Licença do Unsplash](https://unsplash.com/license). Elas não entram na licença MIT do código.
+- Títulos da landing em [Bricolage Grotesque](https://fonts.google.com/specimen/Bricolage+Grotesque), carregada com `next/font`.
 - Distribuído sob a licença **MIT**. Veja o arquivo [LICENSE](LICENSE).
 
 <br />
