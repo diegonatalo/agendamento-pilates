@@ -38,8 +38,7 @@ export const BlockedPeriodsSection = () => {
           Datas bloqueadas
         </h2>
         <p className="text-muted">
-          Feriados e férias. Os {business.session.many} desses dias não acontecem e não geram
-          crédito de reposição.
+          Feriados e férias. Nesses dias não há {business.session.many}, e ninguém ganha crédito de reposição.
         </p>
       </div>
 

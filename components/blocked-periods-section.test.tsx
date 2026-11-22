@@ -3,6 +3,7 @@ import { renderStudio, resetStudio, seed, stored } from "@/components/studio-tes
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it } from "vitest";
 import { BlockedPeriodsSection } from "@/components/blocked-periods-section";
+import { DEFAULT_SETTINGS } from "@/lib/constants";
 import type { BlockedPeriod } from "@/types/pilates";
 
 const saved = (): BlockedPeriod[] =>
@@ -66,5 +67,20 @@ describe("BlockedPeriodsSection", () => {
 
     expect(screen.getByText("Nenhuma data bloqueada.")).toBeInTheDocument();
     expect(saved()).toEqual([]);
+  });
+
+  it.each([
+    ["pilates", "aulas"],
+    ["personal", "treinos"],
+    ["tutor", "aulas"],
+    ["psychology", "sessões"],
+    ["barber", "atendimentos"],
+  ])("explica o bloqueio sem artigo, que erraria o gênero (%s)", (businessType, sessions) => {
+    // "aula" e "sessão" são femininas; "treino" e "atendimento", masculinas.
+    seed("settings", { ...DEFAULT_SETTINGS, businessType });
+    renderStudio(<BlockedPeriodsSection />);
+    expect(
+      screen.getByText(`Feriados e férias. Nesses dias não há ${sessions}, e ninguém ganha crédito de reposição.`),
+    ).toBeInTheDocument();
   });
 });
