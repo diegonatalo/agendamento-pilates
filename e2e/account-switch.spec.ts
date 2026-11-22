@@ -1,4 +1,4 @@
-import { chooseBusiness, createSlots, createStudent, expect, signUpByApi, test } from "./fixtures";
+import { PASSWORD, chooseBusiness, createSlots, createStudent, expect, signUpByApi, test } from "./fixtures";
 
 // Aparelho dividido: A deixou uma aba aberta e B entrou em outra.
 
@@ -30,6 +30,7 @@ test("excluir conta na aba de A não apaga a conta de B", async ({ page, baseURL
   const other = await page.context().newPage();
   await chooseBusiness(other);
 
+  await page.getByLabel("Sua senha").fill(PASSWORD);
   await page.getByRole("button", { name: "Excluir para sempre" }).click();
   await expect(page.getByRole("alert").filter({ hasText: "Outra conta entrou" })).toBeVisible();
 
