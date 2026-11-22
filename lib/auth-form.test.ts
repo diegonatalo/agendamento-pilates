@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   PASSWORD_MIN,
   authErrorMessage,
+  deleteErrorMessage,
   hasErrors,
   safeRedirect,
   validateSignIn,
@@ -78,5 +79,14 @@ describe("safeRedirect", () => {
     expect(safeRedirect("//outro.site")).toBe("/app");
     expect(safeRedirect("/privacidade")).toBe("/app");
     expect(safeRedirect("/appendice")).toBe("/app");
+  });
+});
+
+describe("deleteErrorMessage", () => {
+  it("explica cada recusa ao excluir a conta", () => {
+    expect(deleteErrorMessage("ACCOUNT_CHANGED")).toMatch(/Outra conta entrou/);
+    expect(deleteErrorMessage("INVALID_PASSWORD")).toMatch(/Senha incorreta/);
+    expect(deleteErrorMessage("PASSWORD_REQUIRED")).toMatch(/Digite sua senha/);
+    expect(deleteErrorMessage(undefined)).toMatch(/Não foi possível excluir/);
   });
 });

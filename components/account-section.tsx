@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
-import { BUTTON_DANGER, BUTTON_SECONDARY, CARD } from "@/components/form-styles";
+import { useState, type FormEvent } from "react";
+import { BUTTON_DANGER, BUTTON_SECONDARY, CARD, INPUT_CLASS } from "@/components/form-styles";
 import { useAccount } from "@/hooks/use-account";
 import { authClient } from "@/lib/auth-client";
-import { ACCOUNT_HEADER } from "@/lib/auth-form";
+import { ACCOUNT_HEADER, deleteErrorMessage } from "@/lib/auth-form";
 
 /**
  * Navegação completa de propósito, não `router.push`: descarta o store e o
@@ -17,6 +17,12 @@ export const AccountSection = () => {
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [confirmingDelete, setConfirmingDelete] = useState(false);
+  const [password, setPassword] = useState("");
+
+  const closeDelete = () => {
+    setConfirmingDelete(false);
+    setPassword("");
+  };
 
   const signOut = async () => {
     setPending(true);
@@ -30,22 +36,18 @@ export const AccountSection = () => {
     leave();
   };
 
-  const deleteAccount = async () => {
+  const deleteAccount = async (event: FormEvent) => {
+    event.preventDefault();
+    if (!password) return;
     setPending(true);
     setError(null);
     const { error } = await authClient
-      .deleteUser({ fetchOptions: { headers: { [ACCOUNT_HEADER]: account.id } } })
+      .deleteUser({ password, fetchOptions: { headers: { [ACCOUNT_HEADER]: account.id } } })
       .catch(() => ({ error: { code: "NETWORK" } }));
     if (error) {
       setPending(false);
-      setConfirmingDelete(false);
-      setError(
-        error.code === "ACCOUNT_CHANGED"
-          ? "Outra conta entrou neste navegador. Entre com a sua para poder excluí-la."
-          : error.code === "SESSION_EXPIRED"
-            ? "Por segurança, saia e entre de novo antes de excluir a conta."
-            : "Não foi possível excluir a conta. Tente de novo.",
-      );
+      closeDelete();
+      setError(deleteErrorMessage(error.code));
       return;
     }
     leave();
@@ -76,7 +78,12 @@ export const AccountSection = () => {
         )}
       </div>
       {confirmingDelete && (
-        <div role="group" aria-labelledby="delete-title" className="flex flex-col gap-3 rounded-xl bg-danger-soft p-4 text-danger-soft-fg">
+        <form
+          role="group"
+          aria-labelledby="delete-title"
+          onSubmit={deleteAccount}
+          className="flex flex-col gap-3 rounded-xl bg-danger-soft p-4 text-danger-soft-fg"
+        >
           <p id="delete-title" className="font-semibold">
             Excluir a conta e todos os dados?
           </p>
@@ -84,20 +91,33 @@ export const AccountSection = () => {
             Fichas, horários, agenda, planos e pagamentos são apagados para sempre. Essa ação não
             pode ser desfeita.
           </p>
+          <div className="flex flex-col gap-1.5">
+            <label htmlFor="delete-password" className="text-sm font-medium">
+              Sua senha
+            </label>
+            <input
+              id="delete-password"
+              type="password"
+              autoComplete="current-password"
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+              className={INPUT_CLASS}
+            />
+          </div>
           <div className="flex flex-wrap gap-2">
-            <button type="button" onClick={deleteAccount} disabled={pending} className={BUTTON_DANGER}>
+            <button type="submit" disabled={pending || !password} className={BUTTON_DANGER}>
               Excluir para sempre
             </button>
             <button
               type="button"
-              onClick={() => setConfirmingDelete(false)}
+              onClick={closeDelete}
               disabled={pending}
               className={BUTTON_SECONDARY}
             >
               Cancelar
             </button>
           </div>
-        </div>
+        </form>
       )}
       {error && (
         <p role="alert" className="text-sm font-medium text-danger">

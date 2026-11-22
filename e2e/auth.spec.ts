@@ -96,6 +96,7 @@ test("excluir a conta apaga tudo e não deixa entrar de novo", async ({ page, ba
   await createStudent(page, "Aluna que some");
   await page.goto("/app/conta");
   await page.getByRole("button", { name: "Excluir conta" }).click();
+  await page.getByLabel("Sua senha").fill(PASSWORD);
   await page.getByRole("button", { name: "Excluir para sempre" }).click();
   await expect(page).toHaveURL("/");
 
@@ -118,4 +119,18 @@ test("o ramo escolhido muda os nomes do app e fica salvo na conta", async ({ pag
   await saved(page);
   await page.reload();
   await expect(page.getByRole("navigation", { name: "Principal" }).getByRole("link", { name: "Clientes" })).toBeVisible();
+});
+
+test("excluir a conta com a senha errada não apaga nada", async ({ page, baseURL }) => {
+  await signUpByApi(page.request, baseURL!);
+  // conta nova começa escolhendo o ramo, numa tela que fica por cima do app
+  await chooseBusiness(page);
+  await page.goto("/app/conta");
+  await page.getByRole("button", { name: "Excluir conta" }).click();
+  await page.getByLabel("Sua senha").fill("senha-errada-123");
+  await page.getByRole("button", { name: "Excluir para sempre" }).click();
+  await expect(page.getByRole("main").getByRole("alert")).toHaveText("Senha incorreta. A conta não foi excluída.");
+
+  await page.reload();
+  await expect(page.getByRole("button", { name: "Excluir conta" })).toBeVisible();
 });

@@ -1,5 +1,5 @@
 import type { Page } from "@playwright/test";
-import { expect, saved, test } from "./fixtures";
+import { PASSWORD, expect, saved, test } from "./fixtures";
 
 // Gera os prints do README em docs/screenshots/, com um estúdio de pilates fictício.
 // O `shots` do readme-kit não serve aqui porque não faz login. Fica fora da suíte normal:
@@ -169,6 +169,7 @@ test("prints do README", async ({ page, browser, baseURL }) => {
   // A conta só existe para os prints: não fica sobrando no banco de desenvolvimento.
   await page.goto("/app/conta");
   await page.getByRole("button", { name: "Excluir conta" }).click();
+  await page.getByLabel("Sua senha").fill(PASSWORD);
   await page.getByRole("button", { name: "Excluir para sempre" }).click();
   await expect(page).toHaveURL("/");
 });
