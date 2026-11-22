@@ -119,7 +119,7 @@ export const FAQ: Faq[] = [
   {
     question: "Onde ficam os dados dos clientes?",
     answer:
-      "Num banco de dados em São Paulo, ligado à sua conta e processado por um servidor nos Estados Unidos. No app, cada conta vê só os próprios dados. Quem mantém o Encaixe administra o banco e tecnicamente consegue ler o que está nele.",
+      "Num banco de dados ligado à sua conta, em São Paulo, onde também roda o servidor. As empresas de hospedagem são estrangeiras e podem tratar dados fora do Brasil. No app, cada conta vê só os próprios dados. Quem mantém o Encaixe administra o banco e tecnicamente consegue ler o que está nele.",
   },
   {
     question: "Preciso pedir autorização aos clientes?",
