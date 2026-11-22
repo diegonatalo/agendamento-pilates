@@ -40,9 +40,9 @@ Encaixe é um sistema de agendamento para quem atende com hora marcada e tem cli
 
 <div align="center">
 
-<sub>Prints no tema claro, com dados de exemplo.</sub>
+<sub>Prints no tema claro, com um estúdio de pilates fictício. Nos outros ramos mudam os nomes e a ficha.</sub>
 
-<img src="docs/assets/shot-01.svg" alt="Agenda do dia com as turmas, vagas livres e presença de cada aluno" width="100%" />
+<img src="docs/assets/shot-01.svg" alt="Agenda do dia com os horários, as vagas livres e a presença de cada aluno" width="100%" />
 <br />
 <sub>Agenda do dia: vagas por horário, pontos de atenção e presença com um toque.</sub>
 
@@ -56,7 +56,7 @@ Encaixe é um sistema de agendamento para quem atende com hora marcada e tem cli
 
 <img src="docs/assets/shot-03.svg" alt="Grade semanal com a ocupação de cada horário" width="100%" />
 <br />
-<sub>Grade da semana com a ocupação de cada turma e as datas bloqueadas.</sub>
+<sub>Grade da semana com a ocupação de cada horário e as datas bloqueadas.</sub>
 
 <br />
 
@@ -160,6 +160,12 @@ Os testes de ponta a ponta (Playwright, em `e2e/`) abrem o app no Chromium e per
 ```bash
 pnpm exec playwright install chromium   # só na primeira vez
 pnpm test:e2e                           # gera o build e testa contra ele
+```
+
+Os prints deste README vêm de `e2e/readme-screenshots.spec.ts`, que cria uma conta com dados fictícios, fotografa as telas e exclui a conta. Para refazer, num terminal bash, rode o comando abaixo e depois o `build` do readme-kit:
+
+```bash
+README_SHOTS=1 pnpm test:e2e e2e/readme-screenshots.spec.ts
 ```
 
 <br />
