@@ -52,7 +52,7 @@ export const renderStudio = (ui: ReactElement) =>
   render(
     <StudioProvider
       initialData={initial}
-      account={{ name: "Pessoa de Teste", email: "teste@exemplo.test" }}
+      account={{ id: "pessoa-de-teste", name: "Pessoa de Teste", email: "teste@exemplo.test" }}
       save={async (changes) => {
         sent.push(changes);
       }}

@@ -18,7 +18,12 @@ export const SignedInApp = async ({ children }: { children: ReactNode }) => {
   if (!user) redirect(paths.signIn);
   const data = await loadStudio(user.id);
   return (
-    <StudioProvider initialData={data} account={{ name: user.name, email: user.email }} save={saveChanges}>
+    <StudioProvider
+      initialData={data}
+      account={{ id: user.id, name: user.name, email: user.email }}
+      // presa ao dono destes dados: com outra conta logada, o servidor recusa
+      save={saveChanges.bind(null, user.id)}
+    >
       <AppShell>
         <BusinessGate>{children}</BusinessGate>
       </AppShell>
