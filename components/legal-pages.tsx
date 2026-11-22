@@ -97,9 +97,9 @@ export const PrivacyPage = () => (
                 dados para o app funcionar.
               </p>
               <p>
-                O banco fica no Brasil, mas o servidor que lê e grava os dados roda nos <strong>Estados Unidos</strong>.
-                Ou seja, os dados, inclusive os de saúde, <strong>passam por fora do Brasil</strong> (transferência
-                internacional, art. 33 da LGPD).
+                O banco e o servidor que lê e grava os dados ficam em <strong>São Paulo</strong>. Mas a Vercel e o Neon
+                são empresas estrangeiras e <strong>podem tratar dados fora do Brasil</strong>, inclusive os de saúde,
+                por exemplo em suporte, manutenção e registros técnicos (transferência internacional, art. 33 da LGPD).
               </p>
               <p>
                 O botão de WhatsApp na ficha só abre o WhatsApp com o número do cliente; nada é enviado sem você mandar.
@@ -270,8 +270,9 @@ export const ConsentPage = () => (
             têm criptografia de ponta a ponta;
           </li>
           <li>
-            <strong>os dados são processados também fora do Brasil, nos Estados Unidos</strong>, e eu concordo com essa
-            transferência;
+            os dados ficam e são processados em São Paulo, mas{" "}
+            <strong>os serviços que hospedam o sistema são estrangeiros e podem tratar os dados fora do Brasil</strong>,
+            e eu concordo com essa transferência;
           </li>
           <li>
             posso pedir a qualquer momento para ver, corrigir ou apagar os meus dados e revogar esta autorização,
