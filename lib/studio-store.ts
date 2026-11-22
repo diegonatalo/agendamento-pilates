@@ -1,9 +1,12 @@
 import { countChanges, diffStudio, type StudioChanges, type StudioState } from "@/lib/studio-changes";
 
-/** Where each change goes. In the app it is the `saveChanges` Server Action. */
-export type SaveChanges = (changes: StudioChanges) => Promise<void>;
+/** `conflict`: another device changed the same data, and nothing of the batch was saved. */
+export type SaveResult = "saved" | "conflict";
 
-export type SyncStatus = { saving: boolean; failed: boolean };
+/** Where each change goes. In the app it is the `saveChanges` Server Action. */
+export type SaveChanges = (changes: StudioChanges) => Promise<SaveResult | void>;
+
+export type SyncStatus = { saving: boolean; failed: boolean; conflict: boolean };
 
 /**
  * The account's data in memory, saved in the background. `update` changes the
@@ -13,7 +16,7 @@ export type SyncStatus = { saving: boolean; failed: boolean };
  */
 export const createStudioStore = (initial: StudioState, save: SaveChanges) => {
   let state = initial;
-  let status: SyncStatus = { saving: false, failed: false };
+  let status: SyncStatus = { saving: false, failed: false, conflict: false };
   let pending = 0;
   let queue: Promise<void> = Promise.resolve();
   const listeners = new Set<() => void>();
@@ -21,7 +24,7 @@ export const createStudioStore = (initial: StudioState, save: SaveChanges) => {
   const notify = () => listeners.forEach((listener) => listener());
 
   const setStatus = (next: SyncStatus) => {
-    if (next.saving === status.saving && next.failed === status.failed) return;
+    if (next.saving === status.saving && next.failed === status.failed && next.conflict === status.conflict) return;
     status = next;
     notify();
   };
@@ -36,6 +39,9 @@ export const createStudioStore = (initial: StudioState, save: SaveChanges) => {
     setStatus({ ...status, saving: true });
     queue = queue
       .then(() => save(changes))
+      .then((result) => {
+        if (result === "conflict") status = { ...status, conflict: true };
+      })
       .catch((error: unknown) => {
         console.error(error);
         status = { ...status, failed: true };

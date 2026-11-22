@@ -43,6 +43,14 @@ describe("diffStudio", () => {
     expect(changes.remove.payments).toEqual([{ studentId: "a", month: "2026-11" }]);
   });
 
+  it("manda como a ficha editada era antes, e nada disso para a ficha nova", () => {
+    const edited = { ...base.students[0], goals: "costas" };
+    const created = { ...base.students[0], id: "b" };
+    const changes = diffStudio(base, { ...base, students: [edited, created] });
+    expect(changes.upsert.students).toEqual([edited, created]);
+    expect(changes.baseStudents).toEqual(base.students);
+  });
+
   it("inclui as configurações só quando mudam", () => {
     const changes = diffStudio(base, { ...base, settings: { ...DEFAULT_SETTINGS, capacity: 5 } });
     expect(changes.settings?.capacity).toBe(5);
@@ -62,6 +70,14 @@ describe("parseChanges", () => {
     const bad = emptyChanges();
     (bad.upsert.slots as unknown[]).push({ id: "x", weekday: 9, startTime: "08:00" });
     expect(parseChanges(bad)).toBeNull();
+  });
+
+  it("recusa a versão anterior ausente, inválida ou sem edição", () => {
+    const changes = emptyChanges();
+    expect(parseChanges({ ...changes, baseStudents: undefined })).toBeNull();
+    expect(parseChanges({ ...changes, baseStudents: base.students })).toBeNull();
+    changes.upsert.students.push(base.students[0]);
+    expect(parseChanges({ ...changes, baseStudents: [{ id: "a" }] })).toBeNull();
   });
 
   it("recusa texto longo demais e lotes grandes demais", () => {

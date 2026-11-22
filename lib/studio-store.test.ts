@@ -25,7 +25,7 @@ describe("createStudioStore", () => {
     await store.flush();
     expect(save).toHaveBeenCalledTimes(1);
     expect(save.mock.calls[0]).toEqual([expect.objectContaining({ upsert: expect.objectContaining({ slots: [slot("s1")] }) })]);
-    expect(store.getStatus()).toEqual({ saving: false, failed: false });
+    expect(store.getStatus()).toEqual({ saving: false, failed: false, conflict: false });
   });
 
   it("não chama o servidor quando nada mudou", async () => {
@@ -68,8 +68,15 @@ describe("createStudioStore", () => {
     });
     store.update((s) => ({ ...s, slots: [slot("s1")] }));
     await store.flush();
-    expect(store.getStatus()).toEqual({ saving: false, failed: true });
+    expect(store.getStatus()).toEqual({ saving: false, failed: true, conflict: false });
     error.mockRestore();
+  });
+
+  it("avisa quando outro aparelho mudou o mesmo dado", async () => {
+    const store = createStudioStore(initial, async () => "conflict" as const);
+    store.update((s) => ({ ...s, slots: [slot("s1")] }));
+    await store.flush();
+    expect(store.getStatus()).toEqual({ saving: false, failed: false, conflict: true });
   });
 
   it("avisa quem está ouvindo", () => {
