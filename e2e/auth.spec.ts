@@ -123,6 +123,8 @@ test("o ramo escolhido muda os nomes do app e fica salvo na conta", async ({ pag
 
 test("excluir a conta com a senha errada não apaga nada", async ({ page, baseURL }) => {
   await signUpByApi(page.request, baseURL!);
+  // conta nova começa escolhendo o ramo, numa tela que fica por cima do app
+  await chooseBusiness(page);
   await page.goto("/app/conta");
   await page.getByRole("button", { name: "Excluir conta" }).click();
   await page.getByLabel("Sua senha").fill("senha-errada-123");
