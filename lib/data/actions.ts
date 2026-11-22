@@ -14,15 +14,22 @@ import {
 } from "@/lib/db/schema";
 import { getCurrentUser } from "@/lib/session";
 import { mergeStudent } from "@/lib/student-merge";
-import { parseChanges } from "@/lib/studio-changes";
+import { parseChanges, paymentKey, type StudioChanges } from "@/lib/studio-changes";
+import { breaksPlans, mergeBookings, mergePayment, mergeRows, mergeSettings } from "@/lib/studio-merge";
 import type { SaveResult } from "@/lib/studio-store";
 import type { Student } from "@/types/pilates";
 import {
+  blockedFromRow,
   blockedToRow,
+  bookingFromRow,
   bookingToRow,
+  paymentFromRow,
   paymentToRow,
+  planFromRow,
   planToRow,
+  settingsFromRow,
   settingsToRow,
+  slotFromRow,
   slotToRow,
   studentFromRow,
   studentToRow,
@@ -58,6 +65,56 @@ class ConflictError extends Error {}
 
 type Tx = Parameters<Parameters<typeof db.transaction>[0]>[0];
 
+const orConflict = <T>(value: T | null): T => {
+  if (value === null) throw new ConflictError();
+  return value;
+};
+
+/** The settings row stays locked, so one account's saves go one at a time. */
+async function lockAccount(tx: Tx, userId: string) {
+  const [row] = await tx.select().from(studioSettings).where(eq(studioSettings.userId, userId)).for("update");
+  return row;
+}
+
+/**
+ * The other edited rows, on top of what other devices saved. Each kind is read
+ * only when the batch changes it.
+ */
+async function mergeOthers(tx: Tx, userId: string, { upsert, before }: StudioChanges) {
+  const merged = { ...upsert };
+  if (upsert.plans.length) {
+    const saved = await tx.select().from(plans).where(eq(plans.userId, userId));
+    merged.plans = orConflict(mergeRows(upsert.plans, before.plans, saved.map(planFromRow), (p) => p.id));
+  }
+  if (upsert.slots.length) {
+    const saved = await tx.select().from(slots).where(eq(slots.userId, userId));
+    merged.slots = orConflict(mergeRows(upsert.slots, before.slots, saved.map(slotFromRow), (s) => s.id));
+  }
+  if (upsert.blockedPeriods.length) {
+    const saved = await tx.select().from(blockedPeriods).where(eq(blockedPeriods.userId, userId));
+    merged.blockedPeriods = orConflict(
+      mergeRows(upsert.blockedPeriods, before.blockedPeriods, saved.map(blockedFromRow), (b) => b.id),
+    );
+  }
+  if (upsert.bookings.length) {
+    const dates = [...new Set([...upsert.bookings, ...before.bookings].map((b) => b.date))];
+    const saved = [];
+    for (const part of chunks(dates))
+      saved.push(...(await tx.select().from(bookings).where(and(eq(bookings.userId, userId), inArray(bookings.date, part)))));
+    merged.bookings = orConflict(mergeBookings(upsert.bookings, before.bookings, saved.map(bookingFromRow)));
+  }
+  if (upsert.payments.length) {
+    const months = [...new Set(upsert.payments.map((p) => p.month))];
+    const saved = [];
+    for (const part of chunks(months))
+      saved.push(...(await tx.select().from(payments).where(and(eq(payments.userId, userId), inArray(payments.month, part)))));
+    merged.payments = orConflict(
+      mergeRows(upsert.payments, before.payments, saved.map(paymentFromRow), paymentKey, mergePayment),
+    );
+  }
+  return merged;
+}
+
 /**
  * The records to write, on top of what other devices saved. The rows stay
  * locked until the transaction ends, so nothing changes between read and write.
@@ -86,15 +143,19 @@ export async function saveChanges(owner: unknown, input: unknown): Promise<SaveR
   const userId = await requireUserId(owner);
   const changes = parseChanges(input);
   if (!changes) throw new Error("Dados inválidos.");
-  const { upsert, remove } = changes;
+  const { before, remove } = changes;
 
   const write = async (tx: Tx) => {
-    const editedStudents = await mergeStudents(tx, userId, upsert.students, changes.baseStudents);
-    if (changes.settings) {
-      await tx
-        .update(studioSettings)
-        .set(settingsToRow(userId, changes.settings))
-        .where(eq(studioSettings.userId, userId));
+    const account = await lockAccount(tx, userId);
+    const editedStudents = await mergeStudents(tx, userId, changes.upsert.students, before.students);
+    const upsert = await mergeOthers(tx, userId, changes);
+    if (changes.settings && before.settings) {
+      if (!account) throw new ConflictError();
+      const grid = await tx.select().from(slots).where(eq(slots.userId, userId));
+      const merged = orConflict(
+        mergeSettings(before.settings, changes.settings, settingsFromRow(account), grid.map(slotFromRow)),
+      );
+      await tx.update(studioSettings).set(settingsToRow(userId, merged)).where(eq(studioSettings.userId, userId));
     }
 
     for (const [table, ids] of [
@@ -169,6 +230,17 @@ export async function saveChanges(owner: unknown, input: unknown): Promise<SaveR
           target: [payments.userId, payments.studentId, payments.month],
           set: excluded(payments, ["paid", "paidAt", "amount"]),
         });
+
+    if (remove.plans.length || editedStudents.some((s) => s.monthlyFee?.planId)) {
+      const [studentRows, planRows] = [
+        await tx.select().from(students).where(eq(students.userId, userId)),
+        await tx.select().from(plans).where(eq(plans.userId, userId)),
+      ];
+      const savedStudents = studentRows.map(studentFromRow);
+      // a rollback of the whole batch, if it would leave a record without its plan
+      if (breaksPlans(remove.plans, savedStudents, planRows.map(planFromRow), changes.upsert.students, before.students))
+        throw new ConflictError();
+    }
   };
 
   try {
