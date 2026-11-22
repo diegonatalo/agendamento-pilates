@@ -37,12 +37,15 @@ describe("saveChanges", () => {
   it("devolve conflito sem gravar quando o campo mudou no banco", async () => {
     const insert = vi.fn();
     const locked = [studentToRow("u1", { ...base, goals: "do outro aparelho" })];
-    const select = () => ({ from: () => ({ where: () => ({ orderBy: () => ({ for: async () => locked }) }) }) });
+    // a trava da conta e, depois dela, as fichas
+    const select = () => ({
+      from: () => ({ where: () => ({ for: async () => [], orderBy: () => ({ for: async () => locked }) }) }),
+    });
     transaction.mockImplementation((run: (tx: unknown) => unknown) => run({ select, insert }));
 
     const changes = emptyChanges();
     changes.upsert.students.push({ ...base, goals: "deste aparelho" });
-    changes.baseStudents.push(base);
+    changes.before.students.push(base);
 
     expect(await saveChanges("u1", changes)).toBe("conflict");
     expect(insert).not.toHaveBeenCalled();

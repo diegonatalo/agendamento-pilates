@@ -58,7 +58,7 @@ const SyncNotice = () => {
       {saving && <span data-saving hidden />}
       {conflict && (
         <div role="alert" className="fixed inset-x-3 top-3 z-40 mx-auto max-w-lg rounded-xl bg-danger px-4 py-3 text-sm font-medium text-danger-fg shadow-card">
-          A ficha mudou em outro aparelho, e a sua última alteração não foi salva. Copie o que você escreveu e{" "}
+          Este dado mudou em outro aparelho, e a sua última alteração não foi salva. Copie o que você escreveu e{" "}
           <button type="button" onClick={() => window.location.reload()} className="underline underline-offset-2">
             recarregue a página
           </button>

@@ -1,22 +1,6 @@
 import { isStudent } from "@/lib/studio-validation";
+import { CONFLICT, pick, same } from "@/lib/three-way";
 import type { Student } from "@/types/pilates";
-
-/** Same content, whatever the key order (`jsonb` does not keep it). */
-const stable = (value: unknown): string =>
-  JSON.stringify(value, (_, item: unknown) =>
-    typeof item === "object" && item !== null && !Array.isArray(item)
-      ? Object.fromEntries(Object.entries(item).sort(([a], [b]) => a.localeCompare(b)))
-      : item,
-  );
-const same = (a: unknown, b: unknown) => stable(a) === stable(b);
-
-const CONFLICT = Symbol("conflict");
-
-/** The value to keep for one field, or `CONFLICT` when both sides changed it differently. */
-const pick = <T>(base: T, next: T, current: T): T | typeof CONFLICT => {
-  if (same(base, next) || same(next, current)) return current;
-  return same(base, current) ? next : CONFLICT;
-};
 
 /** Applies what was added and removed to the saved list. Items are never edited in place. */
 const mergeList = <T>(base: T[], next: T[], current: T[], key: (item: T) => string): T[] => {

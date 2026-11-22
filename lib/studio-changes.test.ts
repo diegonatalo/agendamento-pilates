@@ -48,12 +48,13 @@ describe("diffStudio", () => {
     const created = { ...base.students[0], id: "b" };
     const changes = diffStudio(base, { ...base, students: [edited, created] });
     expect(changes.upsert.students).toEqual([edited, created]);
-    expect(changes.baseStudents).toEqual(base.students);
+    expect(changes.before.students).toEqual(base.students);
   });
 
   it("inclui as configurações só quando mudam", () => {
     const changes = diffStudio(base, { ...base, settings: { ...DEFAULT_SETTINGS, capacity: 5 } });
     expect(changes.settings?.capacity).toBe(5);
+    expect(changes.before.settings).toEqual(DEFAULT_SETTINGS);
     expect(diffStudio(base, base).settings).toBeUndefined();
   });
 });
@@ -74,10 +75,10 @@ describe("parseChanges", () => {
 
   it("recusa a versão anterior ausente, inválida ou sem edição", () => {
     const changes = emptyChanges();
-    expect(parseChanges({ ...changes, baseStudents: undefined })).toBeNull();
-    expect(parseChanges({ ...changes, baseStudents: base.students })).toBeNull();
+    expect(parseChanges({ ...changes, before: undefined })).toBeNull();
+    expect(parseChanges({ ...changes, before: { ...changes.before, students: base.students } })).toBeNull();
     changes.upsert.students.push(base.students[0]);
-    expect(parseChanges({ ...changes, baseStudents: [{ id: "a" }] })).toBeNull();
+    expect(parseChanges({ ...changes, before: { ...changes.before, students: [{ id: "a" }] } })).toBeNull();
   });
 
   it("recusa texto longo demais e lotes grandes demais", () => {
@@ -92,6 +93,8 @@ describe("parseChanges", () => {
 
   it("recusa configurações fora do formato", () => {
     expect(parseChanges({ ...emptyChanges(), settings: { capacity: "3" } })).toBeNull();
-    expect(parseChanges({ ...emptyChanges(), settings: DEFAULT_SETTINGS })).not.toBeNull();
+    const changes = { ...emptyChanges(), settings: DEFAULT_SETTINGS };
+    expect(parseChanges(changes)).toBeNull();
+    expect(parseChanges({ ...changes, before: { ...changes.before, settings: DEFAULT_SETTINGS } })).not.toBeNull();
   });
 });

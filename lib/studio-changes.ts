@@ -38,8 +38,8 @@ export type PaymentKey = { studentId: string; month: MonthKey };
 /** Rows to write and to delete, per table. Lists keep the shape of `StudioState`. */
 export type StudioChanges = {
   settings?: StudioSettings;
-  /** How each edited record was before the edit: the server saves only what changed since. */
-  baseStudents: Student[];
+  /** How each edited row was before the edit: the server saves only what changed since. */
+  before: StudioChanges["upsert"] & { settings?: StudioSettings };
   upsert: {
     plans: Plan[];
     slots: ClassSlot[];
@@ -70,7 +70,7 @@ const keyOf = (list: ListKey, item: unknown): string =>
 const same = (a: unknown, b: unknown) => a === b || JSON.stringify(a) === JSON.stringify(b);
 
 export const emptyChanges = (): StudioChanges => ({
-  baseStudents: [],
+  before: { plans: [], slots: [], students: [], bookings: [], blockedPeriods: [], payments: [] },
   upsert: { plans: [], slots: [], students: [], bookings: [], blockedPeriods: [], payments: [] },
   remove: { plans: [], slots: [], students: [], bookings: [], blockedPeriods: [], payments: [] },
 });
@@ -78,7 +78,10 @@ export const emptyChanges = (): StudioChanges => ({
 /** What changed from `prev` to `next`: new and edited rows, and rows that are gone. */
 export const diffStudio = (prev: StudioState, next: StudioState): StudioChanges => {
   const changes = emptyChanges();
-  if (!same(prev.settings, next.settings)) changes.settings = next.settings;
+  if (!same(prev.settings, next.settings)) {
+    changes.settings = next.settings;
+    changes.before.settings = prev.settings;
+  }
   for (const list of LIST_KEYS) {
     if (prev[list] === next[list]) continue;
     const before = new Map<string, unknown>(prev[list].map((item) => [keyOf(list, item), item]));
@@ -89,7 +92,7 @@ export const diffStudio = (prev: StudioState, next: StudioState): StudioChanges 
       const old = before.get(key);
       if (old !== undefined && same(old, item)) continue;
       (changes.upsert[list] as unknown[]).push(item);
-      if (list === "students" && old !== undefined) changes.baseStudents.push(old as Student);
+      if (old !== undefined) (changes.before[list] as unknown[]).push(old);
     }
     for (const [key, item] of before) {
       if (seen.has(key)) continue;
@@ -133,8 +136,14 @@ export const parseChanges = (input: unknown): StudioChanges | null => {
     if (!added.every(UPSERT_GUARDS[list])) return null;
     if (!gone.every(list === "payments" ? isPaymentKey : isIdValue)) return null;
   }
-  const { baseStudents } = input;
-  if (!Array.isArray(baseStudents) || baseStudents.length > (upsert.students as unknown[]).length) return null;
-  if (!baseStudents.every(isStudent)) return null;
+  const { before } = input;
+  if (!isRec(before)) return null;
+  if ((before.settings === undefined) !== (input.settings === undefined)) return null;
+  if (before.settings !== undefined && !isSettings(before.settings)) return null;
+  for (const list of LIST_KEYS) {
+    const old = before[list];
+    if (!Array.isArray(old) || old.length > (upsert[list] as unknown[]).length) return null;
+    if (!old.every(UPSERT_GUARDS[list])) return null;
+  }
   return input as unknown as StudioChanges;
 };
