@@ -28,11 +28,16 @@ import {
  * Server Actions are public endpoints: each one checks the session again and
  * validates what arrived as `unknown`. Every write is limited to the rows of
  * the signed-in account (user_id).
+ *
+ * The first argument is the account the screen was loaded for. It grants nothing:
+ * it only makes the action refuse when another account signed in on another tab,
+ * instead of writing one person's data into the other's account.
  */
 
-async function requireUserId() {
+async function requireUserId(owner: unknown) {
   const user = await getCurrentUser();
   if (!user) throw new Error("Sessão expirada. Entre de novo.");
+  if (user.id !== owner) throw new Error("Outra conta entrou neste navegador.");
   return user.id;
 }
 
@@ -46,8 +51,8 @@ const excluded = (table: PgTable, columns: string[]) =>
   Object.fromEntries(columns.map((c) => [c, sql.raw(`excluded."${(table as unknown as Record<string, { name: string }>)[c].name}"`)]));
 
 /** Applies one batch of changes from the app, all or nothing. */
-export async function saveChanges(input: unknown) {
-  const userId = await requireUserId();
+export async function saveChanges(owner: unknown, input: unknown) {
+  const userId = await requireUserId(owner);
   const changes = parseChanges(input);
   if (!changes) throw new Error("Dados inválidos.");
   const { upsert, remove } = changes;

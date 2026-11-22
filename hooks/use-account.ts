@@ -1,7 +1,7 @@
 import { createContext, useContext } from "react";
 
 /** A pessoa logada, como aparece no app (nunca a sessão em si). */
-export type Account = { name: string; email: string };
+export type Account = { id: string; name: string; email: string };
 
 export const AccountContext = createContext<Account | null>(null);
 
