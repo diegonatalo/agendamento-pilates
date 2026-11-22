@@ -156,6 +156,28 @@ export const businessOf = (settings: Pick<StudioSettings, "businessType">): Busi
 /** "1 aula", "3 sessões". */
 export const countOf = (count: number, word: Noun) => `${count} ${count === 1 ? word.one : word.many}`;
 
+/** "0/1 paciente fixo", "2/3 alunos fixos": o substantivo concorda com as vagas. */
+export const enrolledOf = (enrolled: number, capacity: number, client: Noun) =>
+  `${enrolled}/${capacity} ${capacity === 1 ? `${client.one} fixo` : `${client.many} fixos`}`;
+
+/** "lotada" para aula e sessão, "lotado" para treino e atendimento. */
+const FULL: Record<BusinessType, string> = {
+  pilates: "lotada",
+  personal: "lotado",
+  tutor: "lotada",
+  psychology: "lotada",
+  barber: "lotado",
+};
+
+/** Situação de um horário na agenda. Com uma vaga só, é livre ou ocupado. */
+export const occupancyText = (occupied: number, capacity: number, business: BusinessConfig) => {
+  if (capacity === 1 && occupied <= 1) return occupied === 1 ? "horário ocupado" : "horário livre";
+  const vacancies = capacity - occupied;
+  const rest =
+    vacancies <= 0 ? FULL[business.type] : `${vacancies} ${vacancies === 1 ? "vaga livre" : "vagas livres"}`;
+  return `${occupied}/${capacity} ocupadas · ${rest}`;
+};
+
 /**
  * Settings after picking a business. The suggested duration and capacity only
  * apply while the grid is empty, so a change never breaks existing slots.

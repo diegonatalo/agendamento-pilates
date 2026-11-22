@@ -41,7 +41,7 @@ describe("BlockedPeriodsSection", () => {
     await user.click(screen.getByRole("button", { name: "Bloquear datas" }));
 
     expect(screen.getByText("20/11/2026")).toBeInTheDocument();
-    expect(saved()[0]).toMatchObject({ endDate: "2026-11-20", reason: "Sem aula" });
+    expect(saved()[0]).toMatchObject({ endDate: "2026-11-20", reason: "" });
   });
 
   it("recusa sem data inicial e fim antes do início", async () => {

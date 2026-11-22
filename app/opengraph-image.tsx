@@ -31,7 +31,17 @@ export default function OpengraphImage() {
         <div style={{ display: "flex", fontSize: 88, fontWeight: 700 }}>
           {SITE_NAME}
         </div>
-        <div style={{ display: "flex", fontSize: 34, color: "#6b6b74" }}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            maxWidth: 980,
+            fontSize: 34,
+            lineHeight: 1.35,
+            textAlign: "center",
+            color: "#6b6b74",
+          }}
+        >
           {SITE_DESCRIPTION}
         </div>
       </div>

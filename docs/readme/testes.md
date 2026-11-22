@@ -4,7 +4,7 @@
 pnpm test
 ```
 
-Cobrem a lógica em `lib/` (capacidade das turmas, conflito de horários, geração de sessões e saldo de reposição) e o comportamento dos componentes.
+Cobrem a lógica em `lib/` (vagas por horário, conflito e geração de horários, vocabulário por ramo e saldo de reposição) e o comportamento dos componentes.
 
 Para reexecutar ao salvar: `pnpm test:watch`.
 

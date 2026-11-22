@@ -14,7 +14,7 @@
 ![React](https://img.shields.io/badge/React_19-20232a?style=flat-square&logo=react&logoColor=61dafb)
 ![TypeScript](https://img.shields.io/badge/TypeScript_6-3178c6?style=flat-square&logo=typescript&logoColor=white)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS_4-06b6d4?style=flat-square&logo=tailwindcss&logoColor=white)
-![Dados](https://img.shields.io/badge/dados-na_conta_do_est%C3%BAdio-9fe02e?style=flat-square)
+![Dados](https://img.shields.io/badge/dados-na_sua_conta-9fe02e?style=flat-square)
 ![Licença](https://img.shields.io/badge/licen%C3%A7a-MIT-16a34a?style=flat-square)
 
 </div>
@@ -151,7 +151,7 @@ Veja [`.env.example`](.env.example).
 pnpm test
 ```
 
-Cobrem a lógica em `lib/` (capacidade das turmas, conflito de horários, geração de sessões e saldo de reposição) e o comportamento dos componentes.
+Cobrem a lógica em `lib/` (vagas por horário, conflito e geração de horários, vocabulário por ramo e saldo de reposição) e o comportamento dos componentes.
 
 Para reexecutar ao salvar: `pnpm test:watch`.
 
@@ -176,7 +176,7 @@ components/       Telas e componentes de interface
 docs/             Fontes do README
 e2e/              Testes de ponta a ponta (Playwright)
 drizzle/          Migrações do banco (geradas pelo Drizzle)
-hooks/            Estado do estúdio e tema
+hooks/            Estado da conta e tema
 lib/              Lógica pura, sem React; lib/db (schema e conexão) e lib/data (leitura e Server Actions)
 public/           Arquivos estáticos
 types/            Tipos compartilhados do domínio
@@ -194,12 +194,13 @@ types/            Tipos compartilhados do domínio
 
 | Conceito | Regra |
 |---|---|
-| **Turma** | Dia da semana e hora de início; até 3 alunos; 1h de duração; sem sobreposição. |
-| **Sessão** | Uma turma em uma data, com a presença de cada aluno. |
-| **Reposição** | Desmarcar gera 1 crédito, sem expiração; encaixar o aluno em uma vaga livre consome 1; cancelar a reposição devolve. |
-| **Aula experimental** | Vaga livre para quem ainda não é aluno, só com o nome. |
-| **Bloqueio** | Feriados e férias bloqueiam as sessões e não geram crédito. |
-| **Mensalidade** | Cobra-se aluno ativo com valor definido, a partir do mês em que começou. Cada mês fica pago, pendente ou atrasado (depois do vencimento); dia 31 em mês curto vence no último dia. Os totais usam o valor atual da ficha. |
+| **Ramo** | Cada conta escolhe um. Ele muda os nomes, a ficha e a sugestão de duração, intervalo e vagas. |
+| **Horário** | Dia da semana e hora de início; duração e vagas definidas pela conta; sem sobreposição. |
+| **Atendimento** | Um horário em uma data, com a presença de cada pessoa. É a aula, o treino ou a sessão, conforme o ramo. |
+| **Reposição** | Desmarcar gera 1 crédito, sem expiração; encaixar em uma vaga livre consome 1; cancelar a reposição devolve. |
+| **Avulso** | Vaga livre para quem ainda não tem ficha, só com o nome: aula ou treino experimental, primeira sessão ou cliente avulso. |
+| **Bloqueio** | Feriados e férias bloqueiam os horários e não geram crédito. O motivo é opcional. |
+| **Mensalidade** | Cobra-se quem está ativo e tem valor definido, a partir do mês em que começou. Cada mês fica pago, pendente ou atrasado (depois do vencimento); dia 31 em mês curto vence no último dia. Os totais usam o valor atual da ficha. |
 
 ### 🌐 Deploy
 
