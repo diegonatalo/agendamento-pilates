@@ -1,7 +1,7 @@
 {
   "name": "Encaixe",
   "repo": "encaixe",
-  "tagline": "A agenda de quem atende com hora marcada: estúdios, personal, professores, psicólogos e barbearias.",
+  "tagline": "A agenda de quem atende com hora marcada, do pilates à barbearia.",
   "urls": {
     "demo": "https://dn-encaixe.vercel.app"
   },
@@ -44,13 +44,13 @@
     }
   },
   "demo": {
-    "note": "Prints no tema claro, com dados de exemplo.",
+    "note": "Prints no tema claro, com um estúdio de pilates fictício. Nos outros ramos mudam os nomes e a ficha.",
     "layout": "stack",
     "shots": [
       {
         "file": "docs/screenshots/agenda.png",
         "title": "/app",
-        "alt": "Agenda do dia com as turmas, vagas livres e presença de cada aluno",
+        "alt": "Agenda do dia com os horários, as vagas livres e a presença de cada aluno",
         "caption": "Agenda do dia: vagas por horário, pontos de atenção e presença com um toque."
       },
       {
@@ -63,7 +63,7 @@
         "file": "docs/screenshots/horarios.png",
         "title": "/app/horarios",
         "alt": "Grade semanal com a ocupação de cada horário",
-        "caption": "Grade da semana com a ocupação de cada turma e as datas bloqueadas."
+        "caption": "Grade da semana com a ocupação de cada horário e as datas bloqueadas."
       },
       {
         "files": [

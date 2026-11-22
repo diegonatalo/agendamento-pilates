@@ -14,3 +14,9 @@ Os testes de ponta a ponta (Playwright, em `e2e/`) abrem o app no Chromium e per
 pnpm exec playwright install chromium   # só na primeira vez
 pnpm test:e2e                           # gera o build e testa contra ele
 ```
+
+Os prints deste README vêm de `e2e/readme-screenshots.spec.ts`, que cria uma conta com dados fictícios, fotografa as telas e exclui a conta. Para refazer, num terminal bash, rode o comando abaixo e depois o `build` do readme-kit:
+
+```bash
+README_SHOTS=1 pnpm test:e2e e2e/readme-screenshots.spec.ts
+```

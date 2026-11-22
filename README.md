@@ -1,7 +1,7 @@
 <!-- Arquivo gerado pelo readme-kit. Não edite aqui: altere docs/readme/ e rode "readme-kit build". -->
 <div align="center">
 
-<img src="docs/assets/banner.svg" alt="Encaixe: A agenda de quem atende com hora marcada: estúdios, personal, professores, psicólogos e barbearias. github.com/diegonatalo/encaixe. Stack: Next.js 16, React 19, TypeScript 6, Tailwind CSS 4" width="100%" />
+<img src="docs/assets/banner.svg" alt="Encaixe: A agenda de quem atende com hora marcada, do pilates à barbearia. github.com/diegonatalo/encaixe. Stack: Next.js 16, React 19, TypeScript 6, Tailwind CSS 4" width="100%" />
 
 <br />
 
@@ -27,7 +27,7 @@
 
 </div>
 
-**A agenda de quem atende com hora marcada: estúdios, personal, professores, psicólogos e barbearias.**<br />
+**A agenda de quem atende com hora marcada, do pilates à barbearia.**<br />
 Encaixe é um sistema de agendamento para quem atende com hora marcada e tem clientes que voltam toda semana: estúdio de pilates, personal com academia particular, professor particular (idiomas, música, reforço), psicólogo e barbearia. Cada conta escolhe o seu ramo, e o app passa a falar em alunos, pacientes ou clientes, com os campos de ficha que fazem sentido para aquele negócio. Quem atende define a duração e as vagas de cada horário e controla a agenda, a presença, as reposições, os atendimentos avulsos e a mensalidade. Os clientes não acessam o sistema. Cada conta tem os próprios dados, num banco Postgres.
 
 <br />
@@ -40,9 +40,9 @@ Encaixe é um sistema de agendamento para quem atende com hora marcada e tem cli
 
 <div align="center">
 
-<sub>Prints no tema claro, com dados de exemplo.</sub>
+<sub>Prints no tema claro, com um estúdio de pilates fictício. Nos outros ramos mudam os nomes e a ficha.</sub>
 
-<img src="docs/assets/shot-01.svg" alt="Agenda do dia com as turmas, vagas livres e presença de cada aluno" width="100%" />
+<img src="docs/assets/shot-01.svg" alt="Agenda do dia com os horários, as vagas livres e a presença de cada aluno" width="100%" />
 <br />
 <sub>Agenda do dia: vagas por horário, pontos de atenção e presença com um toque.</sub>
 
@@ -56,7 +56,7 @@ Encaixe é um sistema de agendamento para quem atende com hora marcada e tem cli
 
 <img src="docs/assets/shot-03.svg" alt="Grade semanal com a ocupação de cada horário" width="100%" />
 <br />
-<sub>Grade da semana com a ocupação de cada turma e as datas bloqueadas.</sub>
+<sub>Grade da semana com a ocupação de cada horário e as datas bloqueadas.</sub>
 
 <br />
 
@@ -160,6 +160,12 @@ Os testes de ponta a ponta (Playwright, em `e2e/`) abrem o app no Chromium e per
 ```bash
 pnpm exec playwright install chromium   # só na primeira vez
 pnpm test:e2e                           # gera o build e testa contra ele
+```
+
+Os prints deste README vêm de `e2e/readme-screenshots.spec.ts`, que cria uma conta com dados fictícios, fotografa as telas e exclui a conta. Para refazer, num terminal bash, rode o comando abaixo e depois o `build` do readme-kit:
+
+```bash
+README_SHOTS=1 pnpm test:e2e e2e/readme-screenshots.spec.ts
 ```
 
 <br />
