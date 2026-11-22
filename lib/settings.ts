@@ -33,7 +33,7 @@ export const validateSettings = (
   )
     return `A duração deve ficar entre ${min} e ${max} minutos, de ${step} em ${step}.`;
   if (!Number.isInteger(breakMinutes) || breakMinutes < 0 || breakMinutes > 60)
-    return "O intervalo entre sessões deve ficar entre 0 e 60 minutos.";
+    return "O intervalo deve ficar entre 0 e 60 minutos.";
   if (
     !Number.isInteger(capacity) ||
     capacity < CAPACITY_RANGE.min ||

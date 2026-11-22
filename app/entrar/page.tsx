@@ -4,7 +4,7 @@ import { SITE_NAME } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: `Entrar | ${SITE_NAME}`,
-  description: "Entre na conta do estúdio para ver a agenda, os alunos e as mensalidades.",
+  description: "Entre na sua conta para ver a agenda, as fichas e as mensalidades.",
   alternates: { canonical: "/entrar" },
   robots: { index: false, follow: true },
 };

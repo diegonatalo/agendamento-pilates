@@ -100,7 +100,7 @@ export const BlockedPeriodsSection = () => {
                     ? formatDateBr(period.startDate)
                     : `${formatDateBr(period.startDate)} a ${formatDateBr(period.endDate)}`}
                 </p>
-                <p className="text-sm text-muted">{period.reason}</p>
+                <p className="text-sm text-muted">{period.reason || `Sem ${business.session.many}`}</p>
               </div>
               <button
                 type="button"
@@ -108,7 +108,7 @@ export const BlockedPeriodsSection = () => {
                 onClick={() => removeBlockedPeriod(period.id)}
               >
                 Remover{" "}
-                <span className="sr-only">bloqueio de {period.reason}</span>
+                <span className="sr-only">bloqueio de {period.reason || formatDateBr(period.startDate)}</span>
               </button>
             </li>
           ))}

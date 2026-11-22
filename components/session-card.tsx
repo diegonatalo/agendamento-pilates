@@ -7,6 +7,7 @@ import {
   FOCUS_RING,
   LINK_BUTTON,
 } from "@/components/form-styles";
+import { occupancyText } from "@/lib/business";
 import { cn } from "@/lib/cn";
 import type { Attendee, Session } from "@/lib/schedule";
 import { endTime } from "@/lib/slots";
@@ -69,7 +70,7 @@ export const SessionCard = ({
   onBookTrial,
 }: Props) => {
   const business = useBusiness();
-  const { slot, blockedBy, attendees, occupied, capacity, vacancies } = session;
+  const { slot, blockedBy, attendees, occupied, capacity } = session;
   const titleId = `session-${slot.id}`;
 
   return (
@@ -85,10 +86,7 @@ export const SessionCard = ({
           <div className="flex items-center gap-2">
             <Pips occupied={occupied} capacity={capacity} />
             <p className="text-sm text-muted">
-              {occupied}/{capacity} ocupadas ·{" "}
-              {vacancies === 0
-                ? "lotada"
-                : `${vacancies} ${vacancies === 1 ? "vaga livre" : "vagas livres"}`}
+              {occupancyText(occupied, capacity, business)}
             </p>
           </div>
         )}
@@ -96,7 +94,8 @@ export const SessionCard = ({
 
       {blockedBy ? (
         <p className="text-sm font-medium text-muted">
-          Sem {business.session.one}: {blockedBy.reason}
+          Sem {business.session.one}
+          {blockedBy.reason ? `: ${blockedBy.reason}` : ""}
         </p>
       ) : (
         <>

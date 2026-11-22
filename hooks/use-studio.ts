@@ -1,5 +1,5 @@
 import { createContext, useContext, useSyncExternalStore } from "react";
-import { businessOf, pickBusiness } from "@/lib/business";
+import { businessOf, countOf, pickBusiness } from "@/lib/business";
 import { toDateKey } from "@/lib/dates";
 import { newId } from "@/lib/ids";
 import { removePaymentsOfStudent, setPayment } from "@/lib/payments";
@@ -103,7 +103,7 @@ export const useStudio = () => {
   const removePlan = (planId: string) => {
     const using = studentsOnPlan(planId, current().students).length;
     if (using > 0)
-      return `Este plano está na ficha de ${using} ${using === 1 ? "aluno" : "alunos"}. Troque o plano deles antes de excluir.`;
+      return `Este plano está na ficha de ${countOf(using, businessOf(current().settings).client)}. Troque o plano ${using === 1 ? "dele" : "deles"} antes de excluir.`;
     update((s) => ({ ...s, plans: s.plans.filter((p) => p.id !== planId) }));
     return null;
   };
@@ -183,7 +183,8 @@ export const useStudio = () => {
   const addBlockedPeriod = (startDate: DateKey, endDate: DateKey, reason: string) => {
     const error = validateBlockedPeriod(startDate, endDate);
     if (error) return error;
-    const period: BlockedPeriod = { id: newId(), startDate, endDate, reason: reason.trim() || "Sem aula" };
+    // Sem motivo fica vazio: a tela mostra com o nome do ramo, que pode mudar depois.
+    const period: BlockedPeriod = { id: newId(), startDate, endDate, reason: reason.trim() };
     update((s) => ({ ...s, blockedPeriods: [...s.blockedPeriods, period] }));
     return null;
   };

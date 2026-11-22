@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { CARD, FOCUS_RING } from "@/components/form-styles";
 import { SlotRemove } from "@/components/slot-remove";
-import { businessOf } from "@/lib/business";
+import { businessOf, countOf, enrolledOf } from "@/lib/business";
 import { cn } from "@/lib/cn";
 import {
   endTime,
@@ -73,7 +73,7 @@ export const SlotWeekTable = ({ slots, students, settings, onRemove }: Props) =>
                       <button
                         type="button"
                         aria-pressed={isSelected}
-                        aria-label={`${WEEKDAY_LABELS[day]}, ${time}: ${enrolled} de ${settings.capacity} ${business.client.many}`}
+                        aria-label={`${WEEKDAY_LABELS[day]}, ${time}: ${enrolled} de ${countOf(settings.capacity, business.client)}`}
                         onClick={() => setSelectedId(isSelected ? null : slot.id)}
                         className={cn(
                           "flex h-9 w-full items-center justify-center rounded-md border text-xs font-semibold tabular-nums",
@@ -116,7 +116,7 @@ export const SlotWeekTable = ({ slots, students, settings, onRemove }: Props) =>
               {endTime(selected.startTime, settings.sessionMinutes)}
             </p>
             <p className="text-sm text-muted">
-              {selectedStudents.length}/{settings.capacity} {business.client.many} fixos
+              {enrolledOf(selectedStudents.length, settings.capacity, business.client)}
               {selectedStudents.length > 0
                 ? `: ${selectedStudents.map((s) => s.name).join(", ")}`
                 : ""}

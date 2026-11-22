@@ -3,7 +3,7 @@
 import { useRef, type KeyboardEvent } from "react";
 import { CARD, FOCUS_RING } from "@/components/form-styles";
 import { SlotRemove } from "@/components/slot-remove";
-import { businessOf } from "@/lib/business";
+import { businessOf, enrolledOf } from "@/lib/business";
 import { cn } from "@/lib/cn";
 import {
   endTime,
@@ -141,7 +141,7 @@ export const SlotDayTabs = ({
                         {slot.startTime} às {endTime(slot.startTime, settings.sessionMinutes)}
                       </p>
                       <p className="truncate text-sm text-muted">
-                        {enrolled}/{settings.capacity} {business.client.many} fixos
+                        {enrolledOf(enrolled, settings.capacity, business.client)}
                         {enrolled > 0
                           ? ` · ${enrolledStudents.map((s) => s.name).join(", ")}`
                           : ""}
