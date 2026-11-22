@@ -5,7 +5,7 @@ import { PrintButton } from "@/components/print-button";
 import { PRIVACY_EMAIL, SITE_NAME, SOURCE_URL } from "@/lib/site";
 
 /** Data da última mudança nos textos (`AAAA-MM-DD`). */
-const UPDATED_AT = "2026-11-24";
+const UPDATED_AT = "2026-11-22";
 
 const linkClass = "font-semibold text-primary underline underline-offset-2";
 
@@ -19,7 +19,7 @@ export const PrivacyPage = () => (
   <PublicShell>
     <LegalPage
       title="Privacidade"
-      summary={`O ${SITE_NAME} guarda os dados de quem usa o app e dos clientes dele num banco de dados ligado à conta. Esta página diz o que é guardado, onde e como apagar.`}
+      summary={`O ${SITE_NAME} guarda os dados de quem usa o app e dos clientes dele num banco de dados ligado à conta. Esta página diz o que é guardado, onde, quem consegue ler e como apagar.`}
       updatedAt={UPDATED_AT}
       sections={[
         {
@@ -35,12 +35,28 @@ export const PrivacyPage = () => (
                 (lesões e condições, cirurgias, restrições de movimento, liberação médica e contato de emergência).
               </p>
               <p>
-                Da conta: nome, e-mail e a senha, guardada só como hash (não dá para ler a senha de volta).
+                Da conta: nome, e-mail e a senha, guardada só como hash (não dá para ler a senha de volta). De cada
+                login: o endereço IP e o navegador usado. Para limitar tentativas de login, também um contador por
+                endereço IP, que não fica ligado à conta.
               </p>
               <p>
-                Tudo fica num banco de dados Postgres no <strong>Neon</strong>, ligado à conta, e só abre com o e-mail e
-                a senha da conta. Cada conta vê apenas os próprios dados. No navegador fica só a preferência de tema
-                claro ou escuro.
+                Tudo fica num banco de dados Postgres no <strong>Neon</strong>, em São Paulo. No navegador ficam o
+                cookie de sessão e a preferência de tema claro ou escuro.
+              </p>
+            </>
+          ),
+        },
+        {
+          id: "quem-consegue-ler",
+          title: "Quem consegue ler",
+          content: (
+            <>
+              <p>No app, cada conta vê apenas os próprios dados, e para entrar é preciso o e-mail e a senha dela.</p>
+              <p>
+                Fora do app, <strong>quem mantém o {SITE_NAME}</strong> (Diego Natalo) administra o banco e a hospedagem
+                e tecnicamente consegue ler tudo o que é cadastrado, inclusive anotações e fichas de saúde. Os dados{" "}
+                <strong>não têm criptografia de ponta a ponta</strong>. Se o seu trabalho exige que ninguém além de
+                você possa ler, não registre essas informações aqui.
               </p>
             </>
           ),
@@ -77,8 +93,13 @@ export const PrivacyPage = () => (
             <>
               <p>
                 O <strong>Neon</strong>, onde fica o banco de dados, e a <strong>Vercel</strong>, a hospedagem do site,
-                que registra dados técnicos de acesso (como IP e navegador) para entregar as páginas e limitar tentativas
-                de login. Os dois só guardam e processam os dados para o app funcionar.
+                que registra dados técnicos de acesso (como IP e navegador) para entregar as páginas. Os dois recebem os
+                dados para o app funcionar.
+              </p>
+              <p>
+                O banco fica no Brasil, mas o servidor que lê e grava os dados roda nos <strong>Estados Unidos</strong>.
+                Ou seja, os dados, inclusive os de saúde, <strong>passam por fora do Brasil</strong> (transferência
+                internacional, art. 33 da LGPD).
               </p>
               <p>
                 O botão de WhatsApp na ficha só abre o WhatsApp com o número do cliente; nada é enviado sem você mandar.
@@ -96,8 +117,9 @@ export const PrivacyPage = () => (
           content: (
             <p>
               Apague a ficha do cliente na própria tela de fichas. Para apagar tudo, use <strong>Excluir conta</strong>{" "}
-              na aba Conta: a conta e todos os dados dela são apagados do banco na hora. Depois disso, não há como
-              recuperar.
+              na aba Conta: a conta e os dados dela saem do app e do banco na hora, e você não consegue
+              recuperá-los. Cópias podem continuar por um tempo no histórico de recuperação do Neon e em cópias de
+              segurança feitas para manutenção. O contador de tentativas por IP não é apagado com a conta.
             </p>
           ),
         },
@@ -223,7 +245,7 @@ export const ConsentPage = () => (
 
       <h1 className="font-display text-2xl font-semibold">Termo de consentimento para tratamento de dados de saúde</h1>
 
-      <div className="mt-6 flex flex-col gap-4 leading-7">
+      <div className="mt-6 flex flex-col gap-4 leading-7 wrap-anywhere">
         <Blank label="Eu," />
         <Blank label="CPF" />
         <p>
@@ -240,10 +262,17 @@ export const ConsentPage = () => (
         <p>Fui informado(a) de que:</p>
         <ol className="list-decimal pl-6">
           <li>
-            os dados ficam no sistema {SITE_NAME}, na conta do profissional, protegida por senha, e não são compartilhados
-            com terceiros além dos serviços que hospedam o sistema;
+            os dados ficam no sistema {SITE_NAME}, na conta do profissional, protegida por senha, e são processados
+            também pelos serviços que hospedam o sistema;
           </li>
-          <li>só quem me atende tem acesso a eles;</li>
+          <li>
+            além de quem me atende, quem mantém o sistema {SITE_NAME} consegue tecnicamente ler esses dados, que não
+            têm criptografia de ponta a ponta;
+          </li>
+          <li>
+            <strong>os dados são processados também fora do Brasil, nos Estados Unidos</strong>, e eu concordo com essa
+            transferência;
+          </li>
           <li>
             posso pedir a qualquer momento para ver, corrigir ou apagar os meus dados e revogar esta autorização,
             falando com quem me atende;
