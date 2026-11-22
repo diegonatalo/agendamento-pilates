@@ -80,6 +80,26 @@
   --font-display: var(--font-geist);
 }
 
+/* Landing: cores de marca que não mudam com o tema (faixas e cartões dos ramos). */
+@theme {
+  --color-forest: #0b3028;
+  --color-cream: #f7f5ec;
+  --color-mint: #5ee0a8;
+  --color-sage: #cfe3cf;
+  --color-butter: #f5d98b;
+  --color-mist: #c9dde6;
+  --color-espresso: #3a2922;
+
+  --animate-fit-in: fit-in 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.4s both;
+
+  @keyframes fit-in {
+    from {
+      opacity: 0;
+      transform: translateY(-1.5rem) rotate(-5deg);
+    }
+  }
+}
+
 body {
   background: var(--bg);
   color: var(--fg);

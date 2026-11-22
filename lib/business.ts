@@ -112,7 +112,7 @@ export const BUSINESSES: Record<BusinessType, BusinessConfig> = {
   psychology: {
     type: "psychology",
     label: "Psicólogo",
-    description: "Sessões semanais com horário fixo e anotações de cada sessão.",
+    description: "Sessões semanais com horário fixo e anotações com data na ficha.",
     client: noun("paciente", "pacientes"),
     session: noun("sessão", "sessões"),
     oneOff: { label: "Primeira sessão", badge: "Primeira sessão", nameLabel: "Nome de quem vem" },

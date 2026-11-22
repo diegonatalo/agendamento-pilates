@@ -38,11 +38,24 @@ test("endereço desconhecido mostra a página 404", async ({ page }) => {
 publicTest("a página inicial apresenta o app e leva a criar a conta", async ({ page }) => {
   const errors = collectErrors(page);
   await page.goto("/");
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText(/sua agenda/);
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText(/Tudo se encaixa/);
   await page.getByRole("main").getByRole("link", { name: "Criar conta grátis" }).first().click();
   await expect(page).toHaveURL("/cadastro");
   await expect(page.getByRole("heading", { name: "Criar conta", level: 1 })).toBeVisible();
   expect(errors).toEqual([]);
+});
+
+publicTest("o botão Abrir o app do hero pede login", async ({ page }) => {
+  await page.goto("/");
+  await page.getByRole("main").getByRole("link", { name: "Abrir o app" }).click();
+  await expect(page).toHaveURL("/entrar");
+});
+
+publicTest("a página inicial cabe num celular estreito, sem rolagem horizontal", async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 640 });
+  await page.goto("/");
+  await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(320);
 });
 
 publicTest("os endereços antigos redirecionam para dentro do app", async ({ request }) => {

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { PublicShell } from "@/components/landing/landing-page";
+import { PublicShell } from "@/components/landing/public-shell";
 import { LegalPage } from "@/components/legal-page";
 import { PrintButton } from "@/components/print-button";
 import { PRIVACY_EMAIL, SITE_NAME, SOURCE_URL } from "@/lib/site";

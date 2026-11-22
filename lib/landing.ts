@@ -1,15 +1,16 @@
 /** Textos da landing (`/`). As seções ficam em `components/landing/`. */
 
+import type { PhotoKey } from "@/lib/landing-photos";
 import type { BusinessType } from "@/types/pilates";
 
 export const HERO = {
   kicker: "Para quem atende com hora marcada",
   subtitle:
-    "Monte a grade da semana, encaixe cada cliente no horário fixo, acompanhe a ficha e saiba quem está em dia com a mensalidade. Do estúdio de pilates à barbearia.",
+    "Do pilates à barbearia, da aula de violão à terapia: a agenda da semana, a ficha de cada pessoa e as mensalidades num lugar só.",
   note: "Grátis. Os dados ficam salvos na sua conta, em qualquer aparelho.",
 };
 
-export type Audience = { type: BusinessType; text: string };
+export type Audience = { type: BusinessType; text: string; photos: PhotoKey[] };
 
 /**
  * Um cartão por ramo, na ordem de `BUSINESS_ORDER`. O nome vem de `lib/business.ts`;
@@ -18,22 +19,27 @@ export type Audience = { type: BusinessType; text: string };
 export const AUDIENCES: Audience[] = [
   {
     type: "pilates",
+    photos: ["pilates"],
     text: "Turmas pequenas com vagas por horário, reposição de aula, aula experimental e ficha de saúde de cada aluno.",
   },
   {
     type: "personal",
+    photos: ["personal"],
     text: "Treinos individuais ou em dupla, horário fixo na semana, ficha de saúde e evolução de cada aluno.",
   },
   {
     type: "tutor",
+    photos: ["languages", "music"],
     text: "Aulas de idiomas, música ou reforço, com o contato do responsável, as dificuldades e os objetivos de cada aluno.",
   },
   {
     type: "psychology",
-    text: "Fala em pacientes e sessões, com intervalo entre atendimentos, demanda inicial e anotações de cada sessão.",
+    photos: ["psychology"],
+    text: "Sessões com horário fixo e intervalo entre elas, demanda inicial e anotações com data na ficha de cada paciente.",
   },
   {
     type: "barber",
+    photos: ["barber"],
     text: "Clientes fixos da semana, clube mensal, encaixe de quem vem avulso e as preferências de corte de cada um.",
   },
 ];
