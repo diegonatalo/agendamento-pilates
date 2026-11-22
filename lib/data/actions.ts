@@ -13,7 +13,10 @@ import {
   studioSettings,
 } from "@/lib/db/schema";
 import { getCurrentUser } from "@/lib/session";
+import { mergeStudent } from "@/lib/student-merge";
 import { parseChanges } from "@/lib/studio-changes";
+import type { SaveResult } from "@/lib/studio-store";
+import type { Student } from "@/types/pilates";
 import {
   blockedToRow,
   bookingToRow,
@@ -21,6 +24,7 @@ import {
   planToRow,
   settingsToRow,
   slotToRow,
+  studentFromRow,
   studentToRow,
 } from "./rows";
 
@@ -50,14 +54,42 @@ const chunks = <T>(list: T[]) =>
 const excluded = (table: PgTable, columns: string[]) =>
   Object.fromEntries(columns.map((c) => [c, sql.raw(`excluded."${(table as unknown as Record<string, { name: string }>)[c].name}"`)]));
 
+class ConflictError extends Error {}
+
+type Tx = Parameters<Parameters<typeof db.transaction>[0]>[0];
+
+/**
+ * The records to write, on top of what other devices saved. The rows stay
+ * locked until the transaction ends, so nothing changes between read and write.
+ */
+async function mergeStudents(tx: Tx, userId: string, edited: Student[], bases: Student[]) {
+  const baseById = new Map(bases.map((s) => [s.id, s]));
+  const savedById = new Map<string, Student>();
+  for (const part of chunks(edited.map((s) => s.id))) {
+    const rows = await tx
+      .select()
+      .from(students)
+      .where(and(eq(students.userId, userId), inArray(students.id, part)))
+      .orderBy(students.id)
+      .for("update");
+    for (const row of rows) savedById.set(row.id, studentFromRow(row));
+  }
+  return edited.map((next) => {
+    const merged = mergeStudent(baseById.get(next.id), next, savedById.get(next.id));
+    if (!merged) throw new ConflictError();
+    return merged;
+  });
+}
+
 /** Applies one batch of changes from the app, all or nothing. */
-export async function saveChanges(owner: unknown, input: unknown) {
+export async function saveChanges(owner: unknown, input: unknown): Promise<SaveResult> {
   const userId = await requireUserId(owner);
   const changes = parseChanges(input);
   if (!changes) throw new Error("Dados inválidos.");
   const { upsert, remove } = changes;
 
-  await db.transaction(async (tx) => {
+  const write = async (tx: Tx) => {
+    const editedStudents = await mergeStudents(tx, userId, upsert.students, changes.baseStudents);
     if (changes.settings) {
       await tx
         .update(studioSettings)
@@ -93,7 +125,7 @@ export async function saveChanges(owner: unknown, input: unknown) {
         .insert(slots)
         .values(part)
         .onConflictDoUpdate({ target: [slots.userId, slots.id], set: excluded(slots, ["weekday", "startTime"]) });
-    for (const part of chunks(upsert.students.map((s) => studentToRow(userId, s))))
+    for (const part of chunks(editedStudents.map((s) => studentToRow(userId, s))))
       await tx
         .insert(students)
         .values(part)
@@ -137,5 +169,16 @@ export async function saveChanges(owner: unknown, input: unknown) {
           target: [payments.userId, payments.studentId, payments.month],
           set: excluded(payments, ["paid", "paidAt", "amount"]),
         });
-  });
+  };
+
+  try {
+    await db.transaction(write);
+    return "saved";
+  } catch (error) {
+    if (error instanceof ConflictError) return "conflict";
+    // The driver's error carries the query values (health data): only its code may be logged.
+    const code = (error as { cause?: { code?: unknown } } | null)?.cause?.code;
+    console.error("saveChanges failed", typeof code === "string" ? code : "no code");
+    throw new Error("Não foi possível salvar.");
+  }
 }

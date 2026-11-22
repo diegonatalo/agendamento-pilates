@@ -43,7 +43,7 @@ export const StudioProvider = ({ initialData, account: initialAccount, save, chi
 
 /** Avisa quando algo não foi salvo e segura a aba enquanto há mudança a caminho. */
 const SyncNotice = () => {
-  const { saving, failed } = useSyncStatus();
+  const { saving, failed, conflict } = useSyncStatus();
 
   useEffect(() => {
     if (!saving) return;
@@ -56,7 +56,16 @@ const SyncNotice = () => {
     <>
       {/* Marca para os testes E2E esperarem o banco. */}
       {saving && <span data-saving hidden />}
-      {failed && (
+      {conflict && (
+        <div role="alert" className="fixed inset-x-3 top-3 z-40 mx-auto max-w-lg rounded-xl bg-danger px-4 py-3 text-sm font-medium text-danger-fg shadow-card">
+          A ficha mudou em outro aparelho, e a sua última alteração não foi salva. Copie o que você escreveu e{" "}
+          <button type="button" onClick={() => window.location.reload()} className="underline underline-offset-2">
+            recarregue a página
+          </button>
+          .
+        </div>
+      )}
+      {failed && !conflict && (
         <div role="alert" className="fixed inset-x-3 top-3 z-40 mx-auto max-w-lg rounded-xl bg-danger px-4 py-3 text-sm font-medium text-danger-fg shadow-card">
           Não foi possível salvar a última mudança: a conexão falhou ou outra conta entrou neste
           navegador. Verifique e{" "}
